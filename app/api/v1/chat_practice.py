@@ -81,6 +81,13 @@ async def start_chat_session(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
+        logger.error(f"Failed to start chat session: {e}", exc_info=True)
+        error_detail = str(e)
+        if "OPENAI_API_KEY" in error_detail:
+            raise HTTPException(
+                status_code=500,
+                detail="Chat practice feature requires OpenAI API key. Please configure OPENAI_API_KEY environment variable.",
+            )
         raise HTTPException(
             status_code=500, detail=f"Failed to start session: {str(e)}"
         )

@@ -2,6 +2,7 @@
 Chat service for MI practice sessions using OpenAI API.
 Handles session management, LLM interaction, and conversation history.
 """
+
 import os
 import uuid
 import httpx
@@ -21,6 +22,7 @@ def _get_openai_model() -> str:
     """Get OpenAI model from environment, defaulting to gpt-4.1-mini."""
     return os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
 
+
 # Maximum turns before session ends
 MAX_TURNS = 20
 
@@ -33,7 +35,9 @@ def _get_openai_key() -> str:
     return key
 
 
-def _build_system_prompt(persona: Dict[str, Any], turn_number: int, conversation_summary: str = "") -> str:
+def _build_system_prompt(
+    persona: Dict[str, Any], turn_number: int, conversation_summary: str = ""
+) -> str:
     """Build the system prompt for the persona."""
 
     summary_context = ""
@@ -43,28 +47,28 @@ CONVERSATION CONTEXT (Summary of earlier conversation):
 {conversation_summary}
 """
 
-    return f"""You are roleplaying as {persona['name']}, a {persona['age']}-year-old client in a
+    return f"""You are roleplaying as {persona["name"]}, a {persona["age"]}-year-old client in a
 Motivational Interviewing practice session.
 
-{persona['core_identity']}
+{persona["core_identity"]}
 
 CURRENT STATE:
-- Stage of change: {persona['stage_of_change']}
-- Initial mood: {persona['initial_mood']}
+- Stage of change: {persona["stage_of_change"]}
+- Initial mood: {persona["initial_mood"]}
 - Current turn: {turn_number} of {MAX_TURNS}
 
 AMBIVALENCE (reasons for NOT changing):
-{chr(10).join('- ' + point for point in persona['ambivalence_points'])}
+{chr(10).join("- " + point for point in persona["ambivalence_points"])}
 
 MOTIVATION (reasons FOR changing):
-{chr(10).join('- ' + point for point in persona['motivation_points'])}
+{chr(10).join("- " + point for point in persona["motivation_points"])}
 
 {summary_context}
 
-{persona['behavior_guidelines']}
+{persona["behavior_guidelines"]}
 
 RESPONSE GUIDELINES:
-1. Stay completely in character as {persona['name']}
+1. Stay completely in character as {persona["name"]}
 2. Respond naturally, as a real person would in a helping conversation
 3. Keep responses conversational - typically 1-3 sentences, occasionally longer for emotional moments
 4. Show realistic ambivalence - you're not sure about changing yet
@@ -75,10 +79,12 @@ RESPONSE GUIDELINES:
 9. Never explicitly comment on the practitioner's techniques
 10. Show emotion where appropriate - frustration, hope, doubt, fear, determination
 
-Remember: You are {persona['name']}, not an AI. Respond as they would."""
+Remember: You are {persona["name"]}, not an AI. Respond as they would."""
 
 
-def _summarize_conversation(history: List[Dict[str, str]], max_messages: int = 6) -> tuple[List[Dict[str, str]], str]:
+def _summarize_conversation(
+    history: List[Dict[str, str]], max_messages: int = 6
+) -> tuple[List[Dict[str, str]], str]:
     """
     Manage conversation context to reduce token usage.
     Returns recent messages and a summary of earlier conversation.
@@ -97,7 +103,11 @@ def _summarize_conversation(history: List[Dict[str, str]], max_messages: int = 6
     for msg in older_messages:
         role = "Practitioner" if msg["role"] == "user" else "Client"
         # Truncate long messages in summary
-        content = msg["content"][:100] + "..." if len(msg["content"]) > 100 else msg["content"]
+        content = (
+            msg["content"][:100] + "..."
+            if len(msg["content"]) > 100
+            else msg["content"]
+        )
         summary_parts.append(f"{role}: {content}")
 
     summary = "\n".join(summary_parts)
@@ -120,14 +130,13 @@ async def start_session(persona_id: str) -> Dict[str, Any]:
         "history": [],
         "turn": 0,
         "started_at": datetime.utcnow(),
-        "is_active": True
+        "is_active": True,
     }
 
     # Add the opening message to history
-    session["history"].append({
-        "role": "assistant",
-        "content": persona["opening_message"]
-    })
+    session["history"].append(
+        {"role": "assistant", "content": persona["opening_message"]}
+    )
 
     SESSIONS[session_id] = session
 
@@ -138,7 +147,7 @@ async def start_session(persona_id: str) -> Dict[str, Any]:
         "persona_avatar": persona["avatar"],
         "opening_message": persona["opening_message"],
         "max_turns": MAX_TURNS,
-        "current_turn": 0
+        "current_turn": 0,
     }
 
 
@@ -157,10 +166,7 @@ async def send_message(session_id: str, user_message: str) -> Dict[str, Any]:
     current_turn = session["turn"]
 
     # Add user message to history
-    session["history"].append({
-        "role": "user",
-        "content": user_message
-    })
+    session["history"].append({"role": "user", "content": user_message})
 
     # Check if this is the final turn
     is_final_turn = current_turn >= MAX_TURNS
@@ -170,9 +176,7 @@ async def send_message(session_id: str, user_message: str) -> Dict[str, Any]:
 
     # Build the prompt
     system_prompt = _build_system_prompt(
-        session["persona"],
-        current_turn,
-        conversation_summary
+        session["persona"], current_turn, conversation_summary
     )
 
     # Add special instruction for final turn
@@ -189,14 +193,13 @@ quite what you hoped for. Either way, bring the conversation to a natural close.
         response_text = await _call_openai(system_prompt, recent_history)
     except Exception as e:
         # On API error, provide a fallback response
-        response_text = f"*pauses* I'm sorry, I got a bit distracted. Could you say that again?"
+        response_text = (
+            f"*pauses* I'm sorry, I got a bit distracted. Could you say that again?"
+        )
         print(f"OpenAI API error: {e}")
 
     # Add assistant response to history
-    session["history"].append({
-        "role": "assistant",
-        "content": response_text
-    })
+    session["history"].append({"role": "assistant", "content": response_text})
 
     # Check if session is complete
     if is_final_turn:
@@ -207,7 +210,7 @@ quite what you hoped for. Either way, bring the conversation to a natural close.
         "current_turn": current_turn,
         "max_turns": MAX_TURNS,
         "is_session_complete": is_final_turn,
-        "session_summary": None
+        "session_summary": None,
     }
 
     return result
@@ -216,6 +219,12 @@ quite what you hoped for. Either way, bring the conversation to a natural close.
 async def _call_openai(system_prompt: str, messages: List[Dict[str, str]]) -> str:
     """Call OpenAI API using the responses endpoint."""
     api_key = _get_openai_key()
+
+    if not api_key or api_key.startswith("sk-your-"):
+        raise ValueError(
+            "OpenAI API key is not configured. Please set OPENAI_API_KEY environment variable. "
+            "Get your API key from https://platform.openai.com/api-keys"
+        )
 
     # Build the input for the responses API
     # Format conversation as a single input with context
@@ -226,10 +235,7 @@ async def _call_openai(system_prompt: str, messages: List[Dict[str, str]]) -> st
 
     conversation_text += "Client:"
 
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}"
-    }
+    headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
 
     payload = {
         "model": _get_openai_model(),
@@ -237,15 +243,13 @@ async def _call_openai(system_prompt: str, messages: List[Dict[str, str]]) -> st
     }
 
     async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.post(
-            OPENAI_API_URL,
-            headers=headers,
-            json=payload
-        )
+        response = await client.post(OPENAI_API_URL, headers=headers, json=payload)
 
         if response.status_code != 200:
             error_detail = response.text
-            raise Exception(f"OpenAI API error: {response.status_code} - {error_detail}")
+            raise Exception(
+                f"OpenAI API error: {response.status_code} - {error_detail}"
+            )
 
         data = response.json()
 
@@ -305,7 +309,7 @@ def end_session(session_id: str) -> Dict[str, Any]:
         "total_turns": session["turn"],
         "transcript": session["history"],
         "started_at": session["started_at"],
-        "ended_at": session["ended_at"]
+        "ended_at": session["ended_at"],
     }
 
 
