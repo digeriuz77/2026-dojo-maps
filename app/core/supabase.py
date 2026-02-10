@@ -240,7 +240,22 @@ class AuthenticatedTableQuery:
         with httpx.Client() as client:
             response = client.post(url, json=self._body, headers=self.headers)
             response.raise_for_status()
-            return type("Response", (), {"data": [response.json()]})()
+            # Handle empty 204 response or return the created record
+            if response.status_code == 204 or not response.text:
+                # Return the inserted data with default values for missing fields
+                return type("Response", (), {"data": [{"id": None, **self._body}]})()
+            try:
+                data = response.json()
+                if isinstance(data, list):
+                    return type("Response", (), {"data": data})()
+                elif isinstance(data, dict):
+                    return type("Response", (), {"data": [data]})()
+                else:
+                    return type(
+                        "Response", (), {"data": [{"id": None, **self._body}]}
+                    )()
+            except Exception:
+                return type("Response", (), {"data": [{"id": None, **self._body}]})()
 
 
 def get_authenticated_client(jwt_token: str) -> AuthenticatedSupabaseClient:
