@@ -55,9 +55,10 @@ def get_supabase() -> Client:
 
 def get_supabase_admin() -> Client:
     """
-    Get a Supabase client with service role key permissions.
+    Get a Supabase client with secret key permissions.
 
     Used for administrative operations that bypass RLS policies.
+    With new key format, this uses sb_secret_xxx for elevated access.
 
     Returns:
         Client: Initialized Supabase admin client
@@ -77,9 +78,9 @@ def get_supabase_admin() -> Client:
 
     global _supabase_admin_client
     if _supabase_admin_client is None:
-        logger.info("Initializing Supabase admin client with service role key")
+        logger.info("Initializing Supabase admin client with secret key")
         _supabase_admin_client = create_client(
-            settings.SUPABASE_URL, settings.SUPABASE_SERVICE_ROLE_KEY
+            settings.SUPABASE_URL, settings.SUPABASE_SECRET_KEY
         )
         logger.info("Supabase admin client initialized successfully")
     return _supabase_admin_client
@@ -111,7 +112,7 @@ async def test_connection() -> Dict[str, Any]:
             "config_present": {
                 "supabase_url": bool(settings.SUPABASE_URL),
                 "supabase_key": bool(settings.SUPABASE_KEY),
-                "service_role_key": bool(settings.SUPABASE_SERVICE_ROLE_KEY),
+                "secret_key": bool(settings.SUPABASE_SECRET_KEY),
                 "jwt_secret": bool(settings.SUPABASE_JWT_SECRET),
             },
         }
@@ -126,7 +127,7 @@ async def test_connection() -> Dict[str, Any]:
             "config_present": {
                 "supabase_url": bool(settings.SUPABASE_URL),
                 "supabase_key": bool(settings.SUPABASE_KEY),
-                "service_role_key": bool(settings.SUPABASE_SERVICE_ROLE_KEY),
+                "secret_key": bool(settings.SUPABASE_SECRET_KEY),
                 "jwt_secret": bool(settings.SUPABASE_JWT_SECRET),
             },
         }
