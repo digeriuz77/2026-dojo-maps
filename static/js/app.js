@@ -451,7 +451,8 @@ async function renderHome() {
                 </div>
             `;
         } catch (error) {
-        showError(error.message);
+            showError(error.message);
+        }
     }
 }
 
