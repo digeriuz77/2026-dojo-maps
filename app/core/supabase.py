@@ -162,5 +162,98 @@ def get_authenticated_supabase(jwt_token: str) -> Client:
         os.environ.pop(proxy_var, None)
 
     client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
-    client.auth.set_session(jwt_token, "")
+
+    # Use private method to set headers directly
+    try:
+        headers = {"Authorization": f"Bearer {jwt_token}"}
+        client._headers.update(headers)
+    except AttributeError:
+        pass
+
     return client
+
+
+class AuthenticatedSupabaseClient:
+    """
+    A lightweight authenticated Supabase client using httpx directly.
+    Used for operations that require RLS with user authentication.
+    """
+
+    def __init__(self, jwt_token: str):
+        self.jwt_token = jwt_token
+        self.base_url = settings.SUPABASE_URL.rstrip("/")
+        self.headers = {
+            "Authorization": f"Bearer {jwt_token}",
+            "apikey": settings.SUPABASE_KEY,
+            "Content-Type": "application/json",
+        }
+
+    def table(self, table_name: str):
+        """Return a query builder for the specified table."""
+        return AuthenticatedTableQuery(self.base_url, table_name, self.headers)
+
+
+class AuthenticatedTableQuery:
+    """Authenticated table query builder using httpx."""
+
+    def __init__(self, base_url: str, table_name: str, headers: dict):
+        self.base_url = base_url
+        self.table_name = table_name
+        self.headers = headers
+        self._select = "*"
+        self._filters = []
+        self._body = None
+
+    def select(self, columns: str):
+        """Set columns to select."""
+        self._select = columns
+        return self
+
+    def eq(self, column: str, value: str):
+        """Add equality filter."""
+        self._filters.append(f"{column}=eq.{value}")
+        return self
+
+    def execute(self):
+        """Execute the query."""
+        import httpx
+
+        url = f"{self.base_url}/rest/v1/{self.table_name}?select={self._select}"
+        if self._filters:
+            url += "&" + "&".join(self._filters)
+
+        with httpx.Client() as client:
+            response = client.get(url, headers=self.headers)
+            response.raise_for_status()
+            return type("Response", (), {"data": response.json()})()
+
+    def insert(self, data: dict):
+        """Insert data into table."""
+        self._body = data
+        return self
+
+    def insert_execute(self):
+        """Execute the insert."""
+        import httpx
+
+        url = f"{self.base_url}/rest/v1/{self.table_name}"
+        with httpx.Client() as client:
+            response = client.post(url, json=self._body, headers=self.headers)
+            response.raise_for_status()
+            return type("Response", (), {"data": [response.json()]})()
+
+
+def get_authenticated_client(jwt_token: str) -> AuthenticatedSupabaseClient:
+    """
+    Get an authenticated Supabase client using httpx directly.
+
+    This bypasses the Supabase Python client's auth handling and uses httpx
+    directly with the JWT token, which properly passes RLS policies.
+
+    Args:
+        jwt_token: The JWT token from the authenticated user
+
+    Returns:
+        AuthenticatedSupabaseClient: Client with authenticated REST access
+    """
+    return AuthenticatedSupabaseClient(jwt_token)

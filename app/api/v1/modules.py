@@ -9,7 +9,7 @@ from supabase import Client
 from typing import List
 import logging
 
-from app.core.supabase import get_supabase, get_authenticated_supabase
+from app.core.supabase import get_supabase, get_authenticated_client
 from app.core.auth import get_current_user, AuthContext
 from app.models.modules import ModuleResponse, ModuleListResponse
 
@@ -126,6 +126,9 @@ async def start_module(
     """
     Start a learning module. Creates a new progress record.
     """
+    import httpx
+    from app.config import settings
+
     logger.info(f"[MODULES] User {current_user.user_id} starting module {module_id}")
 
     # Get the JWT token from auth context or request
@@ -141,11 +144,9 @@ async def start_module(
             detail="No authentication token provided",
         )
 
-    # Get authenticated Supabase client with user's JWT
-    supabase = get_authenticated_supabase(jwt_token)
-
-    # Check if module exists
+    # Check if module exists (anon key can read)
     logger.debug(f"[MODULES] Checking if module {module_id} exists")
+    supabase = get_supabase()
     module_response = (
         supabase.table("learning_modules").select("*").eq("id", module_id).execute()
     )
@@ -157,15 +158,18 @@ async def start_module(
 
     logger.debug(f"[MODULES] Module {module_id} found, checking existing progress")
 
-    # Check if already started
-    existing_progress = await get_user_module_progress(
-        current_user.user_id, module_id, supabase
+    # Check if already started using authenticated client
+    auth_client = get_authenticated_client(jwt_token)
+    existing_progress = (
+        auth_client.table("user_progress")
+        .select("*")
+        .eq("user_id", current_user.user_id)
+        .eq("module_id", module_id)
+        .execute()
     )
-    if existing_progress:
-        logger.debug(
-            f"[MODULES] Found existing progress: {existing_progress.get('id')}"
-        )
-        if existing_progress["status"] == "completed":
+    if existing_progress.data:
+        progress = existing_progress.data[0]
+        if progress["status"] == "completed":
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Module already completed. Start a new attempt?",
@@ -175,8 +179,8 @@ async def start_module(
         )
         return {
             "message": "Module already in progress",
-            "progress_id": str(existing_progress["id"]),
-            "current_node_id": existing_progress["current_node_id"],
+            "progress_id": str(progress["id"]),
+            "current_node_id": progress["current_node_id"],
         }
 
     # Get dialogue content to find start node
@@ -187,10 +191,10 @@ async def start_module(
         f"[MODULES] Creating new progress for module {module_id}, start_node: {start_node}"
     )
 
-    # Create progress record
+    # Create progress record using authenticated INSERT
     try:
-        progress_response = (
-            supabase.table("user_progress")
+        insert_response = (
+            auth_client.table("user_progress")
             .insert(
                 {
                     "user_id": current_user.user_id,
@@ -199,11 +203,9 @@ async def start_module(
                     "current_node_id": start_node,
                 }
             )
-            .execute()
+            .insert_execute()
         )
-        logger.info(
-            f"[MODULES] Progress created: {progress_response.data[0].get('id')}"
-        )
+        logger.info(f"[MODULES] Progress created: {insert_response.data}")
     except Exception as e:
         logger.error(f"[MODULES] Failed to insert progress: {e}")
         raise HTTPException(
@@ -211,7 +213,7 @@ async def start_module(
             detail=f"Failed to create progress: {str(e)}",
         )
 
-    progress = progress_response.data[0]
+    progress = insert_response.data[0]
 
     return {
         "message": "Module started",
