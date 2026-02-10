@@ -1,0 +1,163 @@
+{
+  "dialogue_tree": {
+    "title": "Module 11: Giving Information, Advice & Feedback",
+    "learning_objective": "Ask permission before sharing information or advice; Build on what the person already knows; Keep information brief and neutral; Invite their interpretation",
+    "technique_focus": "Elicit-Provide-Elicit",
+    "stage_of_change": "Contemplation/Preparation",
+    "mi_process": "Engaging/Focusing",
+    "description": "A colleague asks about the promotion process. Practice sharing information collaboratively using the Elicit-Provide-Elicit approach.",
+    "module_type": "internal",
+    "maps_competencies": ["B1", "B2", "B6", "A2", "A6", "A1"],
+    "start_node": "info_1",
+    "nodes": [
+      {
+        "id": "info_1",
+        "patient_statement": "I'm thinking about applying for the specialist role, but I'm not really sure what the process involves. What should I do?",
+        "patient_context": "Colleague directly asks for information",
+        "practitioner_choices": [
+          {
+            "text": "First, you need to update your CV and submit it through the HR portal. Then there's a two-stage interview process. You should also prepare a portfolio of your work. The evidence clearly shows that candidates who do all this have the best chance.",
+            "technique": "Lecturing without permission (ineffective)",
+            "next_node_id": "info_2a",
+            "feedback": "This jumps straight to telling without first exploring what they know or asking permission."
+          },
+          {
+            "text": "I'd be happy to share some information about that. First, what do you already know about the promotion process - what have you heard or seen before?",
+            "technique": "Permission + Elicit (E-P-E first phase)",
+            "next_node_id": "info_2b",
+            "feedback": "Perfect - accepts the request and starts by eliciting what they already know."
+          },
+          {
+            "text": "It's really about being prepared. If you're not ready, you shouldn't apply.",
+            "technique": "Judgmental feedback (ineffective)",
+            "next_node_id": "info_2a",
+            "feedback": "This provides judgmental feedback that will likely create defensiveness."
+          }
+        ]
+      },
+      {
+        "id": "info_2a",
+        "patient_statement": "I know all that. It's not like I'm stupid. I just can't seem to figure out the right approach.",
+        "patient_context": "Colleague defensive after unsolicited advice",
+        "practitioner_choices": [
+          {
+            "text": "I didn't say you were stupid. I'm just trying to help. You asked me what to do.",
+            "technique": "Argumentative (ineffective)",
+            "next_node_id": "info_end_poor",
+            "feedback": "This becomes argumentative and damages the relationship further."
+          },
+          {
+            "text": "You're right, I jumped in too quickly. You've clearly been thinking about this. What's your understanding been so far about the process?",
+            "technique": "Taking responsibility + Eliciting",
+            "next_node_id": "info_2b",
+            "feedback": "Good recovery - practitioner takes responsibility and pivots to eliciting."
+          }
+        ]
+      },
+      {
+        "id": "info_2b",
+        "patient_statement": "Well, I know there's an application form, and then interviews. I think I need to provide examples of my work. I've seen people go through it, but I'm not clear on the timeline or what exactly they're looking for.",
+        "patient_context": "Colleague shares current knowledge and gaps",
+        "practitioner_choices": [
+          {
+            "text": "Right, so you understand the basics - application, interviews, work examples. Would it be helpful if I shared some information about the timeline and what the panel typically looks for?",
+            "technique": "Reflection + Permission (E-P-E transition)",
+            "next_node_id": "info_3a",
+            "feedback": "Excellent - acknowledges what they know and explicitly asks permission before providing information."
+          },
+          {
+            "text": "The timeline is 4-6 weeks from application to decision. You should start preparing immediately.",
+            "technique": "Directive advice without permission (ineffective)",
+            "next_node_id": "info_2a",
+            "feedback": "This gives directive advice without permission or exploring alternatives."
+          },
+          {
+            "text": "You need to understand this better or you won't succeed. Let me explain everything.",
+            "technique": "Belittling + Expert stance (ineffective)",
+            "next_node_id": "info_end_poor",
+            "feedback": "This belittles them and takes an expert-superior position."
+          }
+        ]
+      },
+      {
+        "id": "info_3a",
+        "patient_statement": "Yes, I'd appreciate that. I want to make sure I approach this the right way.",
+        "patient_context": "Colleague gives permission for information",
+        "practitioner_choices": [
+          {
+            "text": "The process typically takes 4-6 weeks. After submitting your application, there's usually a screening interview, then a panel interview with the hiring manager and a peer. The panel looks for both technical expertise and leadership potential. They'll want specific examples of how you've handled complex situations and supported colleagues.",
+            "technique": "Providing brief, neutral information",
+            "next_node_id": "info_4a",
+            "feedback": "Good - provides information neutrally, briefly, and without being prescriptive."
+          },
+          {
+            "text": "The process is rigorous. Most people who apply don't get it. You really need to prepare extensively. Let me give you a detailed breakdown of every step, including common pitfalls, question types, scoring rubrics, and what to wear...",
+            "technique": "Information overload (ineffective)",
+            "next_node_id": "info_end_poor",
+            "feedback": "This provides too much information, is overly prescriptive, and doesn't check understanding."
+          }
+        ]
+      },
+      {
+        "id": "info_4a",
+        "patient_statement": "That's helpful. So 4-6 weeks total, and they want both technical and leadership examples. That gives me a clearer picture of what to prepare.",
+        "patient_context": "Colleague responds to information",
+        "practitioner_choices": [
+          {
+            "text": "What do you make of that information? How does it shape your thinking about preparing?",
+            "technique": "Elicit interpretation (E-P-E final phase)",
+            "next_node_id": "info_5a",
+            "feedback": "Perfect - invites their interpretation and returns control to them."
+          },
+          {
+            "text": "Yes, that's exactly right. You should focus on leadership examples mostly.",
+            "technique": "Telling them what to think (ineffective)",
+            "next_node_id": "info_2a",
+            "feedback": "This tells them what to think rather than eliciting their perspective."
+          },
+          {
+            "text": "There's a lot more detail I should add. Let me explain the scoring system...",
+            "technique": "More information without checking (ineffective)",
+            "next_node_id": "info_end_poor",
+            "feedback": "This dumps more information without checking how the first information was received."
+          }
+        ]
+      },
+      {
+        "id": "info_5a",
+        "patient_statement": "It makes me feel more prepared knowing what to expect. I can start gathering my examples now - maybe situations where I helped resolve a difficult case or supported a new team member. The 4-6 week timeline gives me time to prepare properly rather than rushing.",
+        "patient_context": "Colleague interprets and applies information",
+        "practitioner_choices": [
+          {
+            "text": "You're already thinking about specific examples that would demonstrate your expertise and leadership. The timeline gives you space to prepare thoughtfully. What feels most important to focus on first?",
+            "technique": "Affirmation + Open question",
+            "next_node_id": "info_end_good",
+            "feedback": "Excellent - affirms their application and continues collaborative exploration."
+          },
+          {
+            "text": "You should focus on leadership examples first. Those carry the most weight.",
+            "technique": "Directive advice (ineffective)",
+            "next_node_id": "info_end_poor",
+            "feedback": "This loads on more directives instead of staying with their understanding."
+          }
+        ]
+      },
+      {
+        "id": "info_end_good",
+        "patient_statement": "I think I should start by documenting my recent cases - maybe 3-4 strong examples. Then I can practice articulating what I did and why it worked. Having this information really helps me approach this more strategically.",
+        "patient_context": "Successful information exchange",
+        "is_ending": true,
+        "outcome": "Good engagement - Using Elicit-Provide-Elicit, information was shared collaboratively and the colleague integrated it in their own way.",
+        "learning_summary": "The Elicit-Provide-Elicit approach transforms information-giving from a lecture to a collaborative exchange: (1) Elicit what the person already knows, (2) Ask permission and provide brief, neutral information, (3) Elicit their interpretation and application. This builds partnership and increases the likelihood that information will be used."
+      },
+      {
+        "id": "info_end_poor",
+        "patient_statement": "I feel more confused now than when I started. Maybe I should just figure this out on my own.",
+        "patient_context": "Poor outcome from information overload or lecture",
+        "is_ending": true,
+        "outcome": "Poor engagement - Giving unsolicited advice, overloading with information, or being prescriptive led to confusion and disengagement.",
+        "learning_summary": "Giving unsolicited advice, lecturing without first eliciting, overloading with too much information, being prescriptive rather than presenting options, and failing to check the colleague's interpretation all undermine effective information exchange in MI."
+      }
+    ]
+  }
+}

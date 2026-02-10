@@ -1,0 +1,240 @@
+{
+  "dialogue_tree": {
+    "title": "Supporting Colleagues with Workload",
+    "learning_objective": "Practice supporting colleagues experiencing workload stress using a non-directive, empowering approach (MaPS A6, A4).",
+    "technique_focus": "Colleague Support & Non-Directive Guidance",
+    "stage_of_change": "Engagement",
+    "mi_process": "Engaging & Supporting",
+    "description": "Supporting colleagues requires a non-directive approach that empowers them to identify their own solutions. This differs from management in that we focus on supportive listening, reflections, and affirming their autonomy rather than giving advice or directing actions.",
+    "module_type": "internal",
+    "maps_competencies": ["B7: Working with others", "C1: Self-management", "A4: Diplomacy", "A5: Flexibility"],
+    "start_node": "initial_contact",
+    "nodes": [
+      {
+        "id": "initial_contact",
+        "patient_statement": "Hi. Look, I know I have not been myself lately. The caseload has just been so heavy.",
+        "patient_context": "Colleague initiates contact, acknowledges they haven't been themselves, and attributes it to workload",
+        "practitioner_choices": [
+          {
+            "text": "I have noticed and I am here if you want to talk about it.",
+            "technique": "Empathic acknowledgment + open invitation",
+            "next_node_id": "sharing_starts",
+            "feedback": "Good - notices the change and offers support without pressure. You acknowledge their reality while leaving them in control."
+          },
+          {
+            "text": "Yes, I am concerned about you. You seem really stressed.",
+            "technique": "Observation + concern",
+            "next_node_id": "defensive_response",
+            "feedback": "Expressing concern but from a manager-like perspective. This can feel evaluative rather than supportive."
+          },
+          {
+            "text": "Have you thought about speaking to your manager about the caseload?",
+            "technique": "Advice",
+            "next_node_id": "dismissive_response",
+            "feedback": "Jumps to solutions before understanding the situation. You are problem-solving rather than listening."
+          }
+        ]
+      },
+      {
+        "id": "sharing_starts",
+        "patient_statement": "Thanks. It is just... I do not want to seem like I cannot cope. But some days I feel completely overwhelmed.",
+        "patient_context": "Colleague shares vulnerability - fear of appearing incapable and feeling overwhelmed",
+        "practitioner_choices": [
+          {
+            "text": "You do not want to appear unable to cope, but the overwhelm is real.",
+            "technique": "Complex reflection",
+            "next_node_id": "deeper_sharing",
+            "feedback": "Excellent! This complex reflection captures both the concern and the reality. You honor their vulnerability without judgment."
+          },
+          {
+            "text": "That is understandable. Have you tried any coping strategies?",
+            "technique": "Validation + advice",
+            "next_node_id": "surface_response",
+            "feedback": "Moves toward solutions before fully exploring. You jump to problem-solving rather than staying with their experience."
+          }
+        ]
+      },
+      {
+        "id": "defensive_response",
+        "patient_statement": "Look, I am managing. It is just a busy period. Everyone is stressed.",
+        "patient_context": "Colleague becomes defensive, minimizes the issue",
+        "practitioner_choices": [
+          {
+            "text": "You want me to know you are handling it, even though you are also feeling the pressure of this busy period.",
+            "technique": "Double-sided reflection",
+            "next_node_id": "cautious_sharing",
+            "feedback": "Good reflection that captures both sides - their competence and their stress. This can lower defensiveness."
+          },
+          {
+            "text": "But are you really managing? You seem exhausted.",
+            "technique": "Confrontation",
+            "next_node_id": "shuts_down",
+            "feedback": "Confrontational question that will increase defensiveness. You are judging rather than understanding."
+          }
+        ]
+      },
+      {
+        "id": "dismissive_response",
+        "patient_statement": "I do not need you to solve my problems. I just thought you might listen.",
+        "patient_context": "Colleague feels dismissed and unheard",
+        "practitioner_choices": [
+          {
+            "text": "You are right - I jumped to solutions instead of listening. I apologize. What do you need right now?",
+            "technique": "Apology + collaboration",
+            "next_node_id": "sharing_starts",
+            "feedback": "Good recovery! You acknowledge the misstep and return to supportive listening. This repairs the relationship."
+          }
+        ]
+      },
+      {
+        "id": "deeper_sharing",
+        "patient_statement": "Yeah, exactly. And the thing is, I do not even know where to start with getting back on top of things.",
+        "patient_context": "Colleague expresses feeling stuck and unsure how to move forward",
+        "practitioner_choices": [
+          {
+            "text": "You want to get back on top of things but you are not sure where to begin.",
+            "technique": "Reflection",
+            "next_node_id": "exploring_possibilities",
+            "feedback": "Acknowledges their desire to improve without directing how. You stay supportive and non-directive."
+          },
+          {
+            "text": "What if we looked at your caseload together?",
+            "technique": "Practical help",
+            "next_node_id": "cautious_acceptance",
+            "feedback": "Offers practical help but might still feel directive. You are offering solution rather than empowering them to find their own."
+          }
+        ]
+      },
+      {
+        "id": "surface_response",
+        "patient_statement": "Not really. I barely have time to think, let alone try new strategies.",
+        "patient_context": "Colleague emphasizes time pressure, feels unable to implement strategies",
+        "practitioner_choices": [
+          {
+            "text": "The time pressure itself is part of what makes this overwhelming - you cannot even step back enough to consider how to manage things differently.",
+            "technique": "Reflection of the dilemma",
+            "next_node_id": "deeper_sharing",
+            "feedback": "Excellent! You capture the vicious cycle - no time to think about solutions because you are too busy dealing with the problem. This shows empathy."
+          }
+        ]
+      },
+      {
+        "id": "cautious_sharing",
+        "patient_statement": "Yeah, handling it but... tired. It is wearing me down.",
+        "patient_context": "Colleague acknowledges strain while maintaining appearance of coping",
+        "practitioner_choices": [
+          {
+            "text": "You are keeping things going but it is taking a toll. That wearing down is real and accumulating.",
+            "technique": "Reflection",
+            "next_node_id": "deeper_sharing",
+            "feedback": "Validates their effort and the cost. You acknowledge both their competence and the strain they are under."
+          }
+        ]
+      },
+      {
+        "id": "shuts_down",
+        "patient_statement": "You know what, forget I mentioned anything. I am fine.",
+        "patient_context": "Colleague disengages due to feeling judged",
+        "practitioner_choices": [
+          {
+            "text": "I apologize - I came across as judgmental rather than supportive. That was not my intention.",
+            "technique": "Apology",
+            "next_node_id": "cautious_sharing",
+            "feedback": "Acknowledgment of the error. This can help repair, but the relationship has been damaged."
+          }
+        ]
+      },
+      {
+        "id": "exploring_possibilities",
+        "patient_statement": "Yeah... maybe I could start by just organizing my tasks differently?",
+        "patient_context": "Colleague begins to identify their own potential solution",
+        "practitioner_choices": [
+          {
+            "text": "Organizing your tasks differently - that is something you are considering.",
+            "technique": "Affirmation",
+            "next_node_id": "empowered_response",
+            "feedback": "Affirms their idea rather than suggesting alternatives. You support their autonomy."
+          },
+          {
+            "text": "Have you tried prioritizing by urgency?",
+            "technique": "Advice",
+            "next_node_id": "moderate_outcome",
+            "feedback": "Jumps in with your own solution. You take over the problem-solving rather than empowering them."
+          }
+        ]
+      },
+      {
+        "id": "cautious_acceptance",
+        "patient_statement": "I suppose. But I do not want to take up your time.",
+        "patient_context": "Colleague hesitates to accept help due to concern about burdening others",
+        "practitioner_choices": [
+          {
+            "text": "You are considerate of my time while also needing support. We can figure out an approach that works for both of us.",
+            "technique": "Double-sided reflection",
+            "next_node_id": "collaborative_solution",
+            "feedback": "Acknowledges both their need and their consideration. You collaborate rather than direct."
+          }
+        ]
+      },
+      {
+        "id": "empowered_response",
+        "patient_statement": "Yeah, I think that might help. And maybe... I should talk to my manager about my concerns?",
+        "patient_context": "Colleague identifies their own next step - talking to manager",
+        "practitioner_choices": [
+          {
+            "text": "You are identifying some steps you want to take. That is your decision.",
+            "technique": "Affirmation + emphasizing autonomy",
+            "next_node_id": "module_complete",
+            "feedback": "Excellent! You affirm their decision-making without directing. You support their autonomy and their process."
+          },
+          {
+            "text": "Yes, you should definitely talk to them.",
+            "technique": "Agreement/direction",
+            "next_node_id": "moderate_outcome",
+            "feedback": "While supportive, this directs them. You are telling them what they should do rather than empowering their decision."
+          }
+        ]
+      },
+      {
+        "id": "moderate_outcome",
+        "patient_statement": "Thanks for the ideas. I will think about it.",
+        "patient_context": "Colleague is polite but less engaged",
+        "practitioner_choices": [
+          {
+            "text": "Take your time processing this. I am here if you want to talk more.",
+            "technique": "Open-ended support",
+            "next_node_id": "moderate_complete",
+            "feedback": "Respects their pace and autonomy. You remain available without pressure."
+          }
+        ]
+      },
+      {
+        "id": "collaborative_solution",
+        "patient_statement": "Okay. Maybe just a brief check-in would help. Someone to help me think through priorities.",
+        "patient_context": "Colleague identifies specific, manageable request",
+        "practitioner_choices": [
+          {
+            "text": "That sounds doable - a brief check-in to help you think through priorities. I can make time for that.",
+            "technique": "Collaborative agreement",
+            "next_node_id": "empowered_response",
+            "feedback": "Collaborative approach that agrees to their specific request. You meet them where they are."
+          }
+        ]
+      },
+      {
+        "id": "module_complete",
+        "patient_statement": "This has been helpful. I feel like I have some clarity about next steps, and knowing I can check in about priorities takes some pressure off.",
+        "is_ending": true,
+        "outcome": "Excellent engagement - Non-directive, empowering approach helped colleague identify their own solutions and maintain autonomy",
+        "learning_summary": "Supporting colleagues requires a non-directive approach that empowers them to identify their own solutions. Key skills include: empathic acknowledgment, complex reflections that capture both competence and strain, affirmations that support autonomy, and avoiding premature problem-solving. When colleagues feel heard and not directed, they are more likely to engage in problem-solving and take ownership of solutions."
+      },
+      {
+        "id": "moderate_complete",
+        "patient_statement": "Thanks for listening. I appreciate it.",
+        "is_ending": true,
+        "outcome": "Moderate engagement - Some support provided but could have been more empowering",
+        "learning_summary": "While support was offered, shifting too quickly to advice-giving or directing solutions can disempower colleagues. Staying with reflective listening and affirming their autonomy helps colleagues identify their own solutions rather than implementing ours."
+      }
+    ]
+  }
+}

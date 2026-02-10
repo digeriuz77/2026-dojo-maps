@@ -1,0 +1,201 @@
+{
+  "dialogue_tree": {
+    "title": "Probing Questions Practice",
+    "learning_objective": "Practice asking probing questions that invite the client to share their story and help identify their own issues and goals (MaPS 1.2.1, 1.2.3).",
+    "technique_focus": "Probing Questions",
+    "stage_of_change": "Engagement to Focusing",
+    "mi_process": "Engaging & Focusing",
+    "description": "Probing questions invite clients to explore their situation more deeply. Unlike closed questions that elicit yes/no responses, probing questions encourage elaboration and self-discovery. This module focuses on helping clients identify their own issues and goals through skilled questioning.",
+    "module_type": "external",
+    "maps_competencies": ["1.2.1: Probing questions", "1.2.3: Help identify goals and priorities", "B6: Communication"],
+    "start_node": "situation_setup",
+    "nodes": [
+      {
+        "id": "situation_setup",
+        "patient_statement": "I got another letter from the debt recovery people yesterday. I have not opened it.",
+        "patient_context": "Client seeking debt guidance is avoiding their letters, experiencing anxiety",
+        "practitioner_choices": [
+          {
+            "text": "Tell me about that.",
+            "technique": "Open question",
+            "next_node_id": "meeting_details",
+            "feedback": "Good open question that invites the client to share. This creates space for them to explore their experience."
+          },
+          {
+            "text": "How much do you owe?",
+            "technique": "Closed question",
+            "next_node_id": "limited_response",
+            "feedback": "Closed question puts focus on numbers rather than their experience. You miss an opportunity to understand their perspective."
+          },
+          {
+            "text": "Have you opened any of the previous letters?",
+            "technique": "Closed question",
+            "next_node_id": "brief_response",
+            "feedback": "This is specific but still closed. Client can only give brief answer. You jump to facts rather than exploring their experience."
+          }
+        ]
+      },
+      {
+        "id": "meeting_details",
+        "patient_statement": "Well, I know it is only going to get worse. The anxiety is really getting to me. I lie awake thinking about it.",
+        "patient_context": "Client shares emotional impact and anxiety",
+        "practitioner_choices": [
+          {
+            "text": "What goes through your mind when you are lying awake?",
+            "technique": "Probing question",
+            "next_node_id": "internal_experience",
+            "feedback": "Excellent probing question that explores internal experience. This invites them to articulate their fears and concerns."
+          },
+          {
+            "text": "How long has this been going on?",
+            "technique": "Closed question",
+            "next_node_id": "timeline_answer",
+            "feedback": "Shift to timeline rather than exploring the experience. You miss an opportunity to understand their internal world."
+          }
+        ]
+      },
+      {
+        "id": "limited_response",
+        "patient_statement": "Quite a bit. Across a few different creditors.",
+        "patient_context": "Client gives brief factual answer, engagement is limited",
+        "practitioner_choices": [
+          {
+            "text": "Having multiple creditors must feel overwhelming.",
+            "technique": "Reflection",
+            "next_node_id": "meeting_details",
+            "feedback": "Good reflection that acknowledges their situation. This can open up the emotional dimension."
+          },
+          {
+            "text": "What are the interest rates?",
+            "technique": "Closed question",
+            "next_node_id": "failed_engagement",
+            "feedback": "Another closed question continues the transactional approach. The client is unlikely to open up."
+          }
+        ]
+      },
+      {
+        "id": "brief_response",
+        "patient_statement": "No, not any of them.",
+        "patient_context": "Client gives minimal response",
+        "practitioner_choices": [
+          {
+            "text": "What makes it hard to open them?",
+            "technique": "Probing question",
+            "next_node_id": "meeting_details",
+            "feedback": "Good probing question that explores the barrier. This invites self-reflection."
+          },
+          {
+            "text": "It is important to open your letters.",
+            "technique": "Advice",
+            "next_node_id": "failed_engagement",
+            "feedback": "Advice-giving before understanding often increases resistance. You miss an opportunity to explore their perspective."
+          }
+        ]
+      },
+      {
+        "id": "internal_experience",
+        "patient_statement": "Honestly? I feel like such a failure. I always thought I would be more in control of things by now.",
+        "patient_context": "Client shares deep feelings about their situation",
+        "practitioner_choices": [
+          {
+            "text": "You feel like a failure and things have not turned out the way you expected.",
+            "technique": "Reflection",
+            "next_node_id": "deeper_exploration",
+            "feedback": "Accurate reflection shows understanding and helps client articulate feelings. You honor their vulnerability."
+          },
+          {
+            "text": "A lot of people feel like this when they have debt. It is more common than you think.",
+            "technique": "Normalization",
+            "next_node_id": "closed_down",
+            "feedback": "Normalization can shut down client exploration. You miss an opportunity to help them identify their specific feelings."
+          }
+        ]
+      },
+      {
+        "id": "timeline_answer",
+        "patient_statement": "About six months now, since I lost my job.",
+        "patient_context": "Client provides factual information but less emotional",
+        "practitioner_choices": [
+          {
+            "text": "Six months is a long time to carry this worry.",
+            "technique": "Reflection",
+            "next_node_id": "internal_experience",
+            "feedback": "Good reflection that acknowledges the emotional weight. This can open up deeper sharing."
+          }
+        ]
+      },
+      {
+        "id": "deeper_exploration",
+        "patient_statement": "Yeah, and the thing is, I actually have a good job now. I do not know why I am still struggling.",
+        "patient_context": "Client shares a discrepancy - good job but still struggling with debt",
+        "practitioner_choices": [
+          {
+            "text": "You have a good job but you are still struggling with debt. How does that make sense to you?",
+            "technique": "Probing discrepancy",
+            "next_node_id": "insight",
+            "feedback": "Excellent exploration that invites client insight into their own situation. This helps them identify the issue themselves."
+          },
+          {
+            "text": "What is your income?",
+            "technique": "Closed question",
+            "next_node_id": "moderate_engagement",
+            "feedback": "Returns to facts rather than exploring the meaning. You miss an opportunity for insight."
+          }
+        ]
+      },
+      {
+        "id": "closed_down",
+        "patient_statement": "I suppose. It does not really help knowing that though.",
+        "patient_context": "Client feels dismissed and less open to sharing",
+        "practitioner_choices": [
+          {
+            "text": "You are right. Tell me more about what this is like for you.",
+            "technique": "Open question",
+            "next_node_id": "internal_experience",
+            "feedback": "Good recovery - returns to exploring their experience. This attempts to repair the engagement."
+          }
+        ]
+      },
+      {
+        "id": "insight",
+        "patient_statement": "I guess... I keep spending to maintain a lifestyle I cannot afford. And then I feel worse about myself.",
+        "patient_context": "Customer gains important insight into their spending pattern",
+        "practitioner_choices": [
+          {
+            "text": "Spending to maintain a lifestyle that is beyond your means, and then feeling worse about yourself.",
+            "technique": "Complex reflection",
+            "next_node_id": "module_complete",
+            "feedback": "Good reflection that supports client self-awareness. You capture the cycle they have identified."
+          },
+          {
+            "text": "So you need to stop spending.",
+            "technique": "Directive",
+            "next_node_id": "moderate_engagement",
+            "feedback": "Jumps to solution rather than letting them explore. You interrupt their insight process."
+          }
+        ]
+      },
+      {
+        "id": "failed_engagement",
+        "patient_statement": "Look, I just need someone to help me sort this out. I do not want to talk about my feelings.",
+        "is_ending": true,
+        "outcome": "Poor engagement - Transactional approach created resistance. Client closed down emotional exploration.",
+        "learning_summary": "When we focus on facts and solutions rather than exploring the client's experience, we miss opportunities to help them identify their own issues. Probing questions that invite self-discovery build engagement and insight, while closed questions and premature advice-giving shut down exploration."
+      },
+      {
+        "id": "moderate_engagement",
+        "patient_statement": "Thanks. I appreciate you trying to help.",
+        "is_ending": true,
+        "outcome": "Moderate engagement - Some useful conversation but missed deeper opportunities.",
+        "learning_summary": "While we had some good exchanges, the over-reliance on closed questions and directive approaches limited the depth of exploration. Probing questions that invite clients to explore their own thinking and feelings create better engagement than fact-finding."
+      },
+      {
+        "id": "module_complete",
+        "patient_statement": "Yeah. I had not really thought about it that way before. That helps.",
+        "is_ending": true,
+        "outcome": "Excellent engagement - Probing questions helped client gain insight into their situation.",
+        "learning_summary": "Probing questions invite clients to explore their own experiences, identify their issues, and discover their own insights. By asking 'What goes through your mind?' 'How does that make sense to you?' and similar questions, we help people access their own wisdom and motivation. Closed questions and advice-giving interrupt this self-discovery process."
+      }
+    ]
+  }
+}

@@ -1,0 +1,220 @@
+{
+  "dialogue_tree": {
+    "title": "Working with Reluctance",
+    "learning_objective": "Practice recognizing and working with reluctance without becoming directive or argumentative (MaPS A3 Impartiality, A4 Diplomacy).",
+    "technique_focus": "Non-Directive Approach with Skeptics",
+    "stage_of_change": "Precontemplation to Contemplation",
+    "mi_process": "Engaging",
+    "description": "When someone expresses skepticism about whether they can change, they may be testing whether you will be directive. The key is to work with reluctance rather than against it - using reflections, avoiding arguments, and maintaining a collaborative stance.",
+    "module_type": "both",
+    "maps_competencies": ["A3: Impartiality", "A4: Diplomacy", "A5: Flexibility", "A6: Rapport building"],
+    "start_node": "resistance_intro",
+    "nodes": [
+      {
+        "id": "resistance_intro",
+        "patient_statement": "Look, I appreciate you meeting with me but I am not sure what the point is. I have heard all this before.",
+        "patient_context": "Person is skeptical, defensive, and has had previous unsuccessful experiences",
+        "practitioner_choices": [
+          {
+            "text": "You have heard it all before and you are skeptical this will be different.",
+            "technique": "Reflection",
+            "next_node_id": "skepticism_continues",
+            "feedback": "Good reflection that does not take sides or try to convince. You acknowledge their experience without arguing."
+          },
+          {
+            "text": "This time will be different. We have some new approaches.",
+            "technique": "Reassurance",
+            "next_node_id": "resistance_increases",
+            "feedback": "This directly contradicts their experience. Triggers more resistance. You are arguing rather than understanding."
+          },
+          {
+            "text": "What have you heard before?",
+            "technique": "Open question",
+            "next_node_id": "past_experiences",
+            "feedback": "Open question is neutral but does not address the resistance. You gather information but miss an opportunity to reflect their skepticism."
+          }
+        ]
+      },
+      {
+        "id": "skepticism_continues",
+        "patient_statement": "Yeah, I mean everyone keeps telling me to do things differently. But I have tried and it never works.",
+        "patient_context": "Person shares past attempts that failed, feels discouraged",
+        "practitioner_choices": [
+          {
+            "text": "You have tried different approaches and they have not worked out for you.",
+            "technique": "Reflection",
+            "next_node_id": "defending_position",
+            "feedback": "Good reflection that validates their perspective. Does not direct. You honor their experience."
+          },
+          {
+            "text": "But the approach matters.",
+            "technique": "Argument",
+            "next_node_id": "defensive_response",
+            "feedback": "Direct statement. Will trigger defensive response. You are telling them they are wrong rather than understanding."
+          }
+        ]
+      },
+      {
+        "id": "resistance_increases",
+        "patient_statement": "That is what everyone says. I am done wasting my time.",
+        "patient_context": "Person is ready to disengage due to feeling dismissed",
+        "practitioner_choices": [
+          {
+            "text": "I apologize - I jumped to telling you rather than understanding. You have had experiences that led to your skepticism.",
+            "technique": "Apology + reflection",
+            "next_node_id": "skepticism_continues",
+            "feedback": "Good recovery! Apologizing and reflecting their experience can help repair the engagement."
+          }
+        ]
+      },
+      {
+        "id": "past_experiences",
+        "patient_statement": "Well, I have had people tell me what to do differently without understanding my situation.",
+        "patient_context": "Person shares what did not work in the past",
+        "practitioner_choices": [
+          {
+            "text": "Those approaches did not really work for you.",
+            "technique": "Reflection",
+            "next_node_id": "exploring_approach",
+            "feedback": "Simple reflection that acknowledges their experience. Does not argue or direct."
+          },
+          {
+            "text": "Maybe you just were not ready to change then.",
+            "technique": "Blaming",
+            "next_node_id": "more_resistance",
+            "feedback": "Implicitly blames them. Not collaborative. Will increase resistance."
+          }
+        ]
+      },
+      {
+        "id": "defending_position",
+        "patient_statement": "Right. It felt like they were just telling me what to do differently without understanding my situation.",
+        "patient_context": "Person elaborates on why previous attempts failed",
+        "practitioner_choices": [
+          {
+            "text": "So what would be different this time?",
+            "technique": "Open question",
+            "next_node_id": "curiosity",
+            "feedback": "Invites collaboration but does not address the concern directly. Gentle exploration."
+          },
+          {
+            "text": "I am not here to tell you what to do. I want to understand your situation first.",
+            "technique": "Non-directive statement",
+            "next_node_id": "engagement",
+            "feedback": "Excellent! Emphasizes collaboration and autonomy. Builds alliance. Addresses their concern directly."
+          }
+        ]
+      },
+      {
+        "id": "defensive_response",
+        "patient_statement": "Oh really? And what makes your approach so special?",
+        "patient_context": "Person challenges the practitioner, testing if they will be defensive",
+        "practitioner_choices": [
+          {
+            "text": "That is a fair question. I do not know if my approach is special, but I do know I want to understand your experience rather than tell you what to do.",
+            "technique": "Non-defensive + collaborative",
+            "next_node_id": "engagement",
+            "feedback": "Excellent! You avoid defending yourself and return to collaboration. This shows you can handle skepticism."
+          },
+          {
+            "text": "We focus on your strengths and work at your pace.",
+            "technique": "Selling the approach",
+            "next_node_id": "more_resistance",
+            "feedback": "This starts arguing for your approach. You are selling rather than collaborating."
+          }
+        ]
+      },
+      {
+        "id": "exploring_approach",
+        "patient_statement": "Right. It felt like they were just telling me what to do differently without understanding my situation.",
+        "patient_context": "Person repeats their concern about not being understood",
+        "practitioner_choices": [
+          {
+            "text": "So what would be different this time?",
+            "technique": "Open question",
+            "next_node_id": "curiosity",
+            "feedback": "Invites collaboration but does not address the concern directly."
+          },
+          {
+            "text": "I am not here to tell you what to do. I want to understand your situation first.",
+            "technique": "Non-directive statement",
+            "next_node_id": "engagement",
+            "feedback": "Excellent! Emphasizes collaboration and autonomy. Builds alliance."
+          }
+        ]
+      },
+      {
+        "id": "more_resistance",
+        "patient_statement": "You know what, I think I made a mistake coming here.",
+        "patient_context": "Person is disengaging due to feeling blamed or sold to",
+        "practitioner_choices": [
+          {
+            "text": "I hear your frustration, and I apologize if I have not been helpful. What do you need right now?",
+            "technique": "Apology + collaboration",
+            "next_node_id": "cautious_engagement",
+            "feedback": "Good attempt to repair. Apologizes and returns control to them."
+          }
+        ]
+      },
+      {
+        "id": "curiosity",
+        "patient_statement": "I do not know. That is kind of the problem.",
+        "patient_context": "Person expresses uncertainty but stays in conversation",
+        "practitioner_choices": [
+          {
+            "text": "You are uncertain what could help, and you have been through enough attempts that the uncertainty makes sense.",
+            "technique": "Reflection",
+            "next_node_id": "engagement",
+            "feedback": "Validates their uncertainty and connects it to their experience. This builds understanding."
+          }
+        ]
+      },
+      {
+        "id": "engagement",
+        "patient_statement": "Okay... that is different. What do you want to understand?",
+        "patient_context": "Person's skepticism softens, they become curious",
+        "practitioner_choices": [
+          {
+            "text": "Tell me about a time when you did manage things well. What was different about that?",
+            "technique": "Exploring strengths",
+            "next_node_id": "resistance_reduced",
+            "feedback": "Excellent shift to exploring exceptions. Builds on their strengths. Takes a positive, non-directive approach."
+          }
+        ]
+      },
+      {
+        "id": "cautious_engagement",
+        "patient_statement": "I need you to not judge me and to not tell me what to do.",
+        "patient_context": "Person sets clear boundaries for continuing",
+        "practitioner_choices": [
+          {
+            "text": "I can commit to that. No judgment, no directions. Just understanding.",
+            "technique": "Commitment to boundaries",
+            "next_node_id": "engagement",
+            "feedback": "Explicit agreement to their terms. This builds trust and shows respect."
+          }
+        ]
+      },
+      {
+        "id": "resistance_reduced",
+        "patient_statement": "Well, a few years ago I started going to the gym regularly. That stuck. I guess because I decided to do it for myself, not because anyone told me to.",
+        "patient_context": "Person identifies a success and what made it work",
+        "practitioner_choices": [
+          {
+            "text": "You found something that worked when it came from your own decision rather than outside pressure.",
+            "technique": "Reflection",
+            "next_node_id": "module_complete",
+            "feedback": "Excellent reflection that captures the key insight. They identified what works for them - autonomous motivation."
+          }
+        ]
+      },
+      {
+        "id": "module_complete",
+        "patient_statement": "Yeah. Maybe if we could approach things that way, I would be more open to trying.",
+        "is_ending": true,
+        "outcome": "Excellent engagement - By working with reluctance rather than against it, practitioner maintained a non-directive stance and built collaboration",
+        "learning_summary": "Working with reluctance means avoiding arguments, contradictions, and attempts to convince. Instead, use reflections to acknowledge their experience, apologize when you misstep, and emphasize collaboration over direction. When people feel heard and not pushed, skepticism often softens into curiosity. The key is to flow with resistance rather than opposing it."
+      }
+    ]
+  }
+}

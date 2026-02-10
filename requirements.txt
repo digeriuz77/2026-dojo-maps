@@ -1,0 +1,30 @@
+# FastAPI + Supabase Requirements
+# Core Framework
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
+
+# Pydantic (data validation)
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+email-validator>=2.1.0  # Required for pydantic EmailStr type
+
+# Supabase - Python client library
+# Supabase - Python client library
+supabase>=2.10.0  # Upgrade to newer version that supports httpx>=0.24.0
+# httpx and gotrue will be installed as dependencies of supabase
+
+# Database
+# psycopg2-binary is optional - using Supabase REST API instead
+# psycopg2-binary==2.9.9
+
+# Authentication
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# Utilities
+python-dotenv>=1.0.0
+python-multipart>=0.0.6  # Required for form data
+httpx>=0.24.0  # Required for OpenAI API calls in chat practice
+
+# Templates
+jinja2>=3.1.2

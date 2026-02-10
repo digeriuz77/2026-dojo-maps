@@ -1,0 +1,169 @@
+{
+  "dialogue_tree": {
+    "title": "Building Rapport",
+    "learning_objective": "Establish connection and create safety before discussing financial or work matters. Practice empathy and rapport-building skills (MaPS A6).",
+    "technique_focus": "Rapport Building & Empathy",
+    "stage_of_change": "Engagement",
+    "mi_process": "Engaging",
+    "description": "Building rapport is about creating a safe space where the other person feels heard and understood. This module focuses on the first conversation with someone who has been referred for support and is unsure about discussing their situation.",
+    "module_type": "internal",
+    "maps_competencies": ["A6: Rapport building", "B6: Communication", "A3: Impartiality"],
+    "start_node": "greeting",
+    "nodes": [
+      {
+        "id": "greeting",
+        "patient_statement": "Hi, I was told you wanted to talk to me about how I have been doing. I am not really sure why this is necessary.",
+        "patient_context": "Colleague is guarded and uncertain about the purpose of this conversation",
+        "practitioner_choices": [
+          {
+            "text": "Thanks for taking the time. Tell me a bit about what has been going on for you.",
+            "technique": "Open question + empathic listening",
+            "next_node_id": "context_sharing",
+            "feedback": "Good open question that invites them to share on their own terms. This honors their autonomy and builds rapport from the start."
+          },
+          {
+            "text": "I understand this might feel awkward. Let us just get to know each other a bit first.",
+            "technique": "Empathic acknowledgment + agenda-free",
+            "next_node_id": "agenda_free",
+            "feedback": "Validates their discomfort but stays at surface level. You acknowledge their feelings without pushing."
+          },
+          {
+            "text": "Your manager is concerned about you. You seem really stressed.",
+            "technique": "Interpretation (non-impartial)",
+            "next_node_id": "defensive_response",
+            "feedback": "This comes across as colluding with management rather than being supportive. You risk breaking trust and appearing to report back."
+          }
+        ]
+      },
+      {
+        "id": "context_sharing",
+        "patient_statement": "Well, the pensions team has been really busy lately. With the auto-enrolment changes and everything, I do not know if I can keep up.",
+        "patient_context": "Colleague begins to share about workload challenges",
+        "practitioner_choices": [
+          {
+            "text": "Things have changed and you are not sure if you can keep up.",
+            "technique": "Reflection",
+            "next_node_id": "deeper_explore",
+            "feedback": "Accurate reflection shows you are listening and understand. This builds trust and encourages deeper sharing."
+          },
+          {
+            "text": "What specifically has changed with the workload?",
+            "technique": "Closed question",
+            "next_node_id": "brief_response",
+            "feedback": "Closed question stops the flow of sharing. You miss an opportunity to reflect and build rapport."
+          }
+        ]
+      },
+      {
+        "id": "agenda_free",
+        "patient_statement": "Yeah, I did not really want to have this conversation. I have too much going on already.",
+        "patient_context": "Colleague expresses reluctance but showed up",
+        "practitioner_choices": [
+          {
+            "text": "You did not want to come and yet you are here. That takes something.",
+            "technique": "Complex reflection + affirmation",
+            "next_node_id": "engagement",
+            "feedback": "Notices the contradiction and affirms their effort. This builds alliance and acknowledges their autonomy."
+          },
+          {
+            "text": "I appreciate you taking the time. Maybe we can make this useful for you.",
+            "technique": "Affirmation",
+            "next_node_id": "cautious_engagement",
+            "feedback": "Good affirmation but does not dig deeper. You acknowledge them but miss an opportunity to explore the ambivalence."
+          }
+        ]
+      },
+      {
+        "id": "defensive_response",
+        "patient_statement": "Look, I know I have not been performing at my best but I do not need someone reporting back to my manager.",
+        "patient_context": "Colleague becomes defensive and concerned about confidentiality",
+        "practitioner_choices": [
+          {
+            "text": "This is your time. What we talk about stays here.",
+            "technique": "Establishing boundaries",
+            "next_node_id": "skeptical",
+            "feedback": "Attempts to establish confidentiality but they may not believe yet. You may need to demonstrate trustworthiness through actions."
+          }
+        ]
+      },
+      {
+        "id": "deeper_explore",
+        "patient_statement": "Yeah, I mean I have been doing this job for years and suddenly everything feels different. The clients are more complex.",
+        "patient_context": "Colleague shares more depth about the changes they're experiencing",
+        "practitioner_choices": [
+          {
+            "text": "You have experience and now things feel different. Tell me more about that.",
+            "technique": "Reflection + open question",
+            "next_node_id": "rapport_established",
+            "feedback": "Good invitation to explore. Acknowledges their experience and invites deeper sharing."
+          }
+        ]
+      },
+      {
+        "id": "brief_response",
+        "patient_statement": "The auto-enrolment changes, new regulations, more complex cases...",
+        "patient_context": "Colleague gives a factual list but stays surface-level",
+        "practitioner_choices": [
+          {
+            "text": "There are a lot of changes happening at once.",
+            "technique": "Reflection",
+            "next_node_id": "deeper_explore",
+            "feedback": "Good reflection that summarizes their experience. This can help open up deeper exploration."
+          }
+        ]
+      },
+      {
+        "id": "engagement",
+        "patient_statement": "I suppose. I just do not want to waste time when I have so much to do.",
+        "patient_context": "Colleague acknowledges the contradiction but remains guarded about time",
+        "practitioner_choices": [
+          {
+            "text": "You want to be respectful of your time while also getting support.",
+            "technique": "Complex reflection",
+            "next_node_id": "rapport_established",
+            "feedback": "Reflects both their concern and their openness. This validates their dilemma."
+          }
+        ]
+      },
+      {
+        "id": "cautious_engagement",
+        "patient_statement": "I guess we can try. I have about 15 minutes.",
+        "patient_context": "Colleague agrees but sets boundaries",
+        "practitioner_choices": [
+          {
+            "text": "I appreciate you giving me some time. What would be most useful for you?",
+            "technique": "Collaborative agenda-setting",
+            "next_node_id": "rapport_established",
+            "feedback": "Good collaborative approach that respects their time and autonomy."
+          }
+        ]
+      },
+      {
+        "id": "skeptical",
+        "patient_statement": "That is easy to say. How do I know this will not get back to people?",
+        "patient_context": "Colleague remains skeptical about confidentiality",
+        "practitioner_choices": [
+          {
+            "text": "That is a fair concern. What would help you feel more comfortable?",
+            "technique": "Reflection + collaborative question",
+            "next_node_id": "engagement",
+            "feedback": "Validates their concern and invites them to set the terms. This demonstrates respect."
+          },
+          {
+            "text": "I understand. This is a supportive space, not a reporting one.",
+            "technique": "Reassurance",
+            "next_node_id": "cautious_engagement",
+            "feedback": "Provides information but does not address their underlying skepticism as effectively."
+          }
+        ]
+      },
+      {
+        "id": "rapport_established",
+        "patient_statement": "I appreciate you actually listening. Maybe this could be helpful after all.",
+        "is_ending": true,
+        "outcome": "Good rapport established - Colleague feels heard and is open to continued support",
+        "learning_summary": "Building rapport starts with acknowledging the person's experience, validating their feelings, and respecting their autonomy. Open questions and reflections demonstrate understanding, while avoiding interpretations or collusion with management helps build trust. When people feel heard and understood, they become more open to support."
+      }
+    ]
+  }
+}

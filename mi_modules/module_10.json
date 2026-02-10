@@ -1,0 +1,214 @@
+{
+  "dialogue_tree": {
+    "title": "Module 10: Planning & Implementation Intentions",
+    "learning_objective": "Check readiness before moving to planning; Elicit the colleague's ideas for plans first; Use if-then implementation intentions; Link plans to existing routines and check confidence",
+    "technique_focus": "Planning & Implementation Intentions",
+    "stage_of_change": "Preparation",
+    "mi_process": "Planning",
+    "description": "A colleague has decided to apply for a promotion and wants to create an action plan. Practice helping them create specific, realistic plans using implementation intentions.",
+    "module_type": "internal",
+    "maps_competencies": ["B4", "B5", "A6", "B6"],
+    "start_node": "plan_1",
+    "nodes": [
+      {
+        "id": "plan_1",
+        "patient_statement": "I've decided - I'm going to apply for the Team Lead position. I want to make this happen.",
+        "patient_context": "Colleague expresses clear decision and readiness",
+        "practitioner_choices": [
+          {
+            "text": "Great! Here's what you need to do: update your resume by Friday, schedule a meeting with HR on Monday, and start preparing for the interview next week.",
+            "technique": "Directive approach (ineffective)",
+            "next_node_id": "plan_2a",
+            "feedback": "This jumps immediately to a practitioner-generated plan without exploring their ideas."
+          },
+          {
+            "text": "It sounds like you're feeling ready to take this step. Would you like to think about what a plan might look like?",
+            "technique": "Reflection + Permission + Invitation",
+            "next_node_id": "plan_2b",
+            "feedback": "Perfect - acknowledges readiness, asks permission, and invites their ideas."
+          },
+          {
+            "text": "Are you sure? This is a big step.",
+            "technique": "Undermining readiness (ineffective)",
+            "next_node_id": "plan_2c",
+            "feedback": "This undermines their expressed readiness rather than supporting it."
+          }
+        ]
+      },
+      {
+        "id": "plan_2a",
+        "patient_statement": "That sounds intense. I'm not sure I can do all that in that timeframe.",
+        "patient_context": "Colleague overwhelmed by imposed plan",
+        "practitioner_choices": [
+          {
+            "text": "If you're serious about this position, you need to make the time. These are the steps.",
+            "technique": "Creating pressure (ineffective)",
+            "next_node_id": "plan_end_poor",
+            "feedback": "This creates pressure and treats planning as fixed rather than collaborative."
+          },
+          {
+            "text": "That does sound like a lot. What would feel like a realistic pace for you?",
+            "technique": "Validating + Returning control",
+            "next_node_id": "plan_2b",
+            "feedback": "Good recovery - validates concern and returns to their planning."
+          }
+        ]
+      },
+      {
+        "id": "plan_2b",
+        "patient_statement": "Yes, I think so. I was thinking I should update my resume first. Maybe reach out to the current team lead to ask about the role? And prepare some examples of my work?",
+        "patient_context": "Colleague proposes their own plan ideas",
+        "practitioner_choices": [
+          {
+            "text": "Those are thoughtful, specific ideas. Would it be okay to think about when and how these steps might happen?",
+            "technique": "Affirmation + Permission",
+            "next_node_id": "plan_3a",
+            "feedback": "Excellent - affirms their ideas and seeks permission to make plans concrete."
+          },
+          {
+            "text": "That's a good start, but you'll need to do more than that.",
+            "technique": "Devaluing their plan (ineffective)",
+            "next_node_id": "plan_2a",
+            "feedback": "This devalues what they proposed as insufficient."
+          },
+          {
+            "text": "You need to also prepare for interviews and talk to HR. Let me add those.",
+            "technique": "Overriding their plan (ineffective)",
+            "next_node_id": "plan_2c",
+            "feedback": "This overrides their plan rather than building on it."
+          }
+        ]
+      },
+      {
+        "id": "plan_2c",
+        "patient_statement": "Well, when you question me like that, I'm not sure I'm ready after all.",
+        "patient_context": "Colleague pulls back after readiness questioned",
+        "practitioner_choices": [
+          {
+            "text": "I didn't mean to question you. You know you're ready. Let's make the plan.",
+            "technique": "Dismissive (ineffective)",
+            "next_node_id": "plan_end_poor",
+            "feedback": "This dismisses the concern without addressing the relationship."
+          },
+          {
+            "text": "I apologize - I undermined your readiness when you were clear about it. What steps feel right to you?",
+            "technique": "Taking responsibility + Returning collaboration",
+            "next_node_id": "plan_2b",
+            "feedback": "Good - practitioner takes responsibility and returns to collaboration."
+          }
+        ]
+      },
+      {
+        "id": "plan_3a",
+        "patient_statement": "Sure. I usually have quiet time in the mornings before my shift starts. I could work on my resume then.",
+        "patient_context": "Colleague identifies specific time and routine",
+        "practitioner_choices": [
+          {
+            "text": "So if it's a quiet morning before your shift, what could you do specifically on your resume during that time?",
+            "technique": "If-then implementation intention",
+            "next_node_id": "plan_4a",
+            "feedback": "Perfect - uses if-then format to create a concrete implementation intention."
+          },
+          {
+            "text": "You should work on it for an hour every morning.",
+            "technique": "Directive advice (ineffective)",
+            "next_node_id": "plan_2a",
+            "feedback": "This gives directive advice without eliciting their own ideas."
+          }
+        ]
+      },
+      {
+        "id": "plan_4a",
+        "patient_statement": "I could commit to 30 minutes each morning. I'd start with updating my skills section, then work on my achievements. That seems manageable.",
+        "patient_context": "Colleague specifies concrete plan",
+        "practitioner_choices": [
+          {
+            "text": "30 minutes each morning on your resume - that's a specific, realistic commitment. How confident do you feel about sticking with that plan?",
+            "technique": "Affirmation + Confidence check",
+            "next_node_id": "plan_5a",
+            "feedback": "Excellent - affirms the plan and checks confidence before finalizing."
+          },
+          {
+            "text": "30 minutes isn't enough. You should do at least an hour.",
+            "technique": "Changing their plan (ineffective)",
+            "next_node_id": "plan_end_poor",
+            "feedback": "This changes their plan rather than honoring their realistic assessment."
+          }
+        ]
+      },
+      {
+        "id": "plan_5a",
+        "patient_statement": "Pretty confident. 30 minutes is doable even on busy days. And I can always do more on weekends if I get behind.",
+        "patient_context": "Colleague expresses confidence with flexibility",
+        "practitioner_choices": [
+          {
+            "text": "High confidence and a built-in flexibility for weekends - that's a well-thought-out plan. What about reaching out to the current team lead?",
+            "technique": "Affirmation + Transition",
+            "next_node_id": "plan_6a",
+            "feedback": "Good - reinforces confidence and moves to next step naturally."
+          },
+          {
+            "text": "You should commit to an hour to be safe.",
+            "technique": "Undermining confidence (ineffective)",
+            "next_node_id": "plan_2a",
+            "feedback": "This undermines their confidence-appropriate plan."
+          }
+        ]
+      },
+      {
+        "id": "plan_6a",
+        "patient_statement": "I was thinking I could email her to schedule a quick chat. Maybe next Tuesday during her office hours?",
+        "patient_context": "Colleague specifies next step with timing",
+        "practitioner_choices": [
+          {
+            "text": "So your plan is: if it's Tuesday during office hours, then you'll have reached out to schedule a chat. When do you think you'll send that email?",
+            "technique": "If-then + Timeline",
+            "next_node_id": "plan_7a",
+            "feedback": "Perfect - helps make the if-then plan concrete and timeline-specific."
+          },
+          {
+            "text": "Tuesday is fine. Send the email today.",
+            "technique": "Directive timeline (ineffective)",
+            "next_node_id": "plan_2a",
+            "feedback": "This directive approach takes over their timeline."
+          }
+        ]
+      },
+      {
+        "id": "plan_7a",
+        "patient_statement": "I can send it this afternoon. I'm usually done with my main tasks by 3pm, so that would work. And if she's free next Tuesday, great. If not, we can find another time.",
+        "patient_context": "Colleague specifies concrete time and shows flexibility",
+        "practitioner_choices": [
+          {
+            "text": "You're thinking ahead about both the reminder (3pm when tasks are done) and flexibility (if not Tuesday, another time). That's a thoughtful approach. How confident do you feel about this overall plan?",
+            "technique": "Affirmation + Confidence check",
+            "next_node_id": "plan_end_good",
+            "feedback": "Perfect - affirms planning and checks confidence before finalizing."
+          },
+          {
+            "text": "You need to be more specific. Set a backup day now.",
+            "technique": "Creating rigidity (ineffective)",
+            "next_node_id": "plan_end_poor",
+            "feedback": "This creates unrealistic rigidity rather than flexibility."
+          }
+        ]
+      },
+      {
+        "id": "plan_end_good",
+        "patient_statement": "I feel good about it. Resume work each morning, email this afternoon to schedule a chat. It feels manageable. I have a clear next step.",
+        "patient_context": "Successful collaborative planning",
+        "is_ending": true,
+        "outcome": "Good engagement - Through patient-led planning with clear implementation intentions and confidence checks, a realistic and achievable plan emerged.",
+        "learning_summary": "Effective planning in MI involves: (1) confirming readiness before planning, (2) eliciting the colleague's own ideas first, (3) creating specific if-then implementation intentions, (4) linking to existing routines, and (5) checking confidence. Plans should be colleague-generated, realistic, and flexible."
+      },
+      {
+        "id": "plan_end_poor",
+        "patient_statement": "This feels overwhelming. Maybe I'm not as ready as I thought.",
+        "patient_context": "Poor outcome from directive or rigid planning",
+        "is_ending": true,
+        "outcome": "Poor engagement - Imposing plans, pressuring commitment, or creating rigid rules led to the colleague withdrawing from the planning process.",
+        "learning_summary": "Imposing practitioner-generated plans, pressuring for commitment, creating rigid rules, and overloading with multiple changes all undermine the planning process. Effective MI planning is collaborative, colleague-generated, confidence-appropriate, and allows for flexibility."
+      }
+    ]
+  }
+}

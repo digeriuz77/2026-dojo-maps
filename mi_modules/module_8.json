@@ -1,0 +1,176 @@
+{
+  "dialogue_tree": {
+    "title": "Module 8: Confidence Scaling",
+    "learning_objective": "Use confidence rulers to assess readiness for action; Explore what supports current confidence; Identify small steps that build confidence; Avoid over-reassurance or minimizing doubts",
+    "technique_focus": "Confidence Scaling",
+    "stage_of_change": "Contemplation/Preparation",
+    "mi_process": "Focusing",
+    "description": "A colleague is considering applying for a specialist role but is uncertain. Practice using scaling questions to assess and explore their confidence.",
+    "module_type": "internal",
+    "maps_competencies": ["B1", "A6", "B6", "B2"],
+    "start_node": "conf_1",
+    "nodes": [
+      {
+        "id": "conf_1",
+        "patient_statement": "I've been thinking about applying for the Senior Debt Advisor position that's opening up. I think I want to go for it.",
+        "patient_context": "Colleague expresses interest in promotion",
+        "practitioner_choices": [
+          {
+            "text": "That's great! You'd be perfect for it. I have full confidence in you!",
+            "technique": "Over-reassurance (ineffective)",
+            "next_node_id": "conf_2a",
+            "feedback": "This over-reassurance doesn't actually assess or build their genuine confidence. You're projecting your view onto them."
+          },
+          {
+            "text": "On a scale from 0 to 10, how confident do you feel about applying for and succeeding in that role?",
+            "technique": "Confidence scaling",
+            "next_node_id": "conf_2b",
+            "feedback": "Perfect use of scaling to assess their actual confidence level."
+          },
+          {
+            "text": "Are you sure you're ready? It's a significant step up from your current role.",
+            "technique": "Introducing doubt (ineffective)",
+            "next_node_id": "conf_2c",
+            "feedback": "This introduces doubt rather than exploring their actual confidence."
+          }
+        ]
+      },
+      {
+        "id": "conf_2a",
+        "patient_statement": "I hope so. But I've seen people struggle when they move up too fast. I don't want to set myself up to fail.",
+        "patient_context": "Colleague expresses concern despite reassurance",
+        "practitioner_choices": [
+          {
+            "text": "You won't fail! You just need to believe in yourself more.",
+            "technique": "Cheerleading without substance (ineffective)",
+            "next_node_id": "conf_end_poor",
+            "feedback": "This dismissal and cheerleading doesn't address legitimate concerns or build real confidence."
+          },
+          {
+            "text": "Past attempts haven't gone as you'd hoped. On a scale of 0 to 10, how confident do you feel about this role?",
+            "technique": "Acknowledging concern + Confidence scaling",
+            "next_node_id": "conf_2b",
+            "feedback": "Good - you acknowledge the concern and now assess actual confidence with a ruler."
+          }
+        ]
+      },
+      {
+        "id": "conf_2b",
+        "patient_statement": "Honestly? Maybe a 6. I have the technical knowledge, but I'm not sure about the coaching and mentoring parts of the role.",
+        "patient_context": "Colleague rates confidence moderately and identifies gap",
+        "practitioner_choices": [
+          {
+            "text": "A 6 is pretty low. You need to get that number up before you can apply.",
+            "technique": "Treating score as failure (ineffective)",
+            "next_node_id": "conf_end_poor",
+            "feedback": "This judges their score negatively and creates pressure. 6 indicates they have some confidence - work with that."
+          },
+          {
+            "text": "A 6 - so you have some confidence, based on your technical knowledge, but also some doubts about the coaching and mentoring aspects. What makes it a 6 and not a 3?",
+            "technique": "Reflection + Scaling follow-up",
+            "next_node_id": "conf_3a",
+            "feedback": "Excellent! You accept the score, reflect both sides, and explore what supports their confidence."
+          },
+          {
+            "text": "Don't worry, you'll get more confident once you start. Your number will go up.",
+            "technique": "Dismissal of current assessment (ineffective)",
+            "next_node_id": "conf_2a",
+            "feedback": "This skips the important work of understanding and building confidence now."
+          }
+        ]
+      },
+      {
+        "id": "conf_2c",
+        "patient_statement": "Well, now I'm not sure. Maybe I should wait longer?",
+        "patient_context": "Colleague uncertain after doubt introduced",
+        "practitioner_choices": [
+          {
+            "text": "Let's think about what you actually feel confident about. On a scale of 0 to 10, how confident are you in your ability to grow into this role?",
+            "technique": "Reframing + Confidence scaling",
+            "next_node_id": "conf_2b",
+            "feedback": "Good recovery - you move away from doubt-inducing to assessment."
+          },
+          {
+            "text": "Yes, maybe waiting is safer. You don't want to rush.",
+            "technique": "Reinforcing doubt (ineffective)",
+            "next_node_id": "conf_end_poor",
+            "feedback": "This takes over their decision-making rather than exploring their confidence."
+          }
+        ]
+      },
+      {
+        "id": "conf_3a",
+        "patient_statement": "Well, I've been handling complex debt cases for 5 years now. I know the regulations inside out. And I've had good outcomes with my customers. So that gives me confidence.",
+        "patient_context": "Colleague identifies sources of confidence",
+        "practitioner_choices": [
+          {
+            "text": "So you have deep technical expertise and a track record of good client outcomes - those are solid foundations. What accounts for the other side - what makes it not an 8 or 9?",
+            "technique": "Affirmation + Scaling follow-up",
+            "next_node_id": "conf_4a",
+            "feedback": "Perfect! You affirm their strengths and explore what holds confidence back."
+          },
+          {
+            "text": "Right, so there's no reason you can't do it. You just need to apply.",
+            "technique": "Minimizing concerns (ineffective)",
+            "next_node_id": "conf_end_poor",
+            "feedback": "This dismisses the legitimate concerns that keep confidence at 6."
+          }
+        ]
+      },
+      {
+        "id": "conf_4a",
+        "patient_statement": "I guess it's the people management side. I've never had to coach someone else through a difficult case. What if I give bad advice? What if I can't explain things clearly?",
+        "patient_context": "Colleague identifies confidence barrier",
+        "practitioner_choices": [
+          {
+            "text": "What would help move your confidence up even one point - say from a 6 to a 7?",
+            "technique": "Scaling question for small increment",
+            "next_node_id": "conf_5a",
+            "feedback": "Excellent - focuses on realistic, small improvements in confidence."
+          },
+          {
+            "text": "You need to just practice. Everyone is nervous at first.",
+            "technique": "Minimizing concern (ineffective)",
+            "next_node_id": "conf_end_poor",
+            "feedback": "This minimizes their concern without collaborative problem-solving."
+          }
+        ]
+      },
+      {
+        "id": "conf_5a",
+        "patient_statement": "Maybe if I could shadow the current senior advisor for a bit? Or co-facilitate some training sessions before being fully on my own? That would help me feel more prepared.",
+        "patient_context": "Colleague identifies confidence-building steps",
+        "practitioner_choices": [
+          {
+            "text": "Shadowing and co-facilitating - those are smart ways to build confidence gradually. On that plan, where would your confidence be now?",
+            "technique": "Affirmation + Re-scaling",
+            "next_node_id": "conf_end_good",
+            "feedback": "Perfect! Affirms their adaptive thinking and reassesses confidence on the revised plan."
+          },
+          {
+            "text": "But those take time. You should just apply and learn on the job.",
+            "technique": "Dismissive of confidence-appropriate approach (ineffective)",
+            "next_node_id": "conf_end_poor",
+            "feedback": "This dismisses their confidence-appropriate approach."
+          }
+        ]
+      },
+      {
+        "id": "conf_end_good",
+        "patient_statement": "With shadowing and co-facilitating first? I'd say my confidence is more like an 8 now. That feels realistic. I think I'd be ready to apply after that preparation.",
+        "patient_context": "Successful confidence exploration and building",
+        "is_ending": true,
+        "outcome": "Good engagement - Through thoughtful confidence scaling, the colleague identified realistic steps that increased their confidence meaningfully.",
+        "learning_summary": "Confidence scaling involves asking the colleague to rate their confidence on a scale (typically 0-10), then exploring what supports that confidence and what might increase it slightly. The focus is on understanding and building the colleague's own assessment, not imposing external judgments about readiness."
+      },
+      {
+        "id": "conf_end_poor",
+        "patient_statement": "I guess I'll try, but I'm not feeling great about it. Maybe I'm not ready for this after all.",
+        "patient_context": "Poor outcome from ineffective confidence work",
+        "is_ending": true,
+        "outcome": "Poor engagement - Ineffective handling of confidence assessment led to decreased motivation and self-efficacy.",
+        "learning_summary": "Over-reassurance, dismissing concerns, imposing goals, and treating confidence scores as tests all undermine the scaling process. Effective confidence work accepts the colleague's rating, explores what gives them that confidence, and helps them identify realistic next steps."
+      }
+    ]
+  }
+}

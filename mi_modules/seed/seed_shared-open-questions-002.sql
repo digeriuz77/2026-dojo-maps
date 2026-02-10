@@ -1,0 +1,66 @@
+-- supabase/seed/seed_shared-open-questions-002.sql
+-- MAPS Practice Module: Open-Ended Questions - Core Skill Practice
+-- Content Type: shared
+--
+-- Usage:
+--   supabase db execute --file supabase/seed/seed_shared-open-questions-002.sql
+-- Or paste into Supabase SQL Editor
+
+-- ============================================
+-- INSERT MAPS PRACTICE MODULE
+-- ============================================
+INSERT INTO mi_practice_modules (
+    id,
+    code,
+    title,
+    content_type,
+    mi_focus_area,
+    difficulty_level,
+    estimated_minutes,
+    learning_objective,
+    scenario_context,
+    persona_config,
+    dialogue_structure,
+    target_competencies,
+    maps_rubric,
+    maps_framework_alignment,
+    is_active
+) VALUES (
+    '00000000-0000-0001-0001-000000000002',
+    'shared-open-questions-002',
+    'Open-Ended Questions - Core Skill Practice',
+    'shared',
+    'Building Rapport',
+    'beginner',
+    10,
+    'Learn to ask open-ended questions that invite exploration rather than closed questions that limit responses',
+    'Open-ended questions invite elaboration and exploration. They typically start with ''What,'' ''How,'' or ''Tell me about...'' rather than requiring yes/no answers. The general rule is one open question followed by 2-3 reflections. This core skill applies universally to customer and colleague interactions.',
+    '{"name": "Casey", "role": "person", "background": "Is considering making a change but feels ambivalent. Has received advice from others but feels resistant to being told what to do.", "personality_traits": ["ambivalent", "thoughtful", "cautious", "autonomous"], "tone_spectrum": {"word_complexity": 0.4, "sentence_length": 0.4, "emotional_expressiveness": 0.4, "disclosure_level": 0.3, "response_latency": 0.5, "confidence_level": 0.4}, "starting_tone_position": 0.4, "triggers": ["direct criticism", "being told what to do", "lecturing", "judgment"], "comfort_topics": ["autonomy", "understanding", "being heard", "personal choice"]}'::jsonb,
+    '{"start_node_id": "node_1", "nodes": {"node_1": {"id": "node_1", "persona_text": "Someone close to me is really concerned about my situation. They say it''s becoming a problem, but I always handle it responsibly, so I''m not sure what they''re worried about.", "persona_mood": "ambivalent_contemplative", "themes": ["Concern", "Ambivalence", "Motivation"], "choice_points": [{"id": "cp_node_1_0", "option_text": "Does this person want you to make a change?", "preview_hint": "This closed question limits exploration", "rapport_impact": 0, "trust_impact": 0, "tone_shift": 0.0, "technique_tags": ["closed_question"], "competency_links": [], "feedback": {"immediate": "This closed question will likely get a yes/no answer, which limits exploration. Open-ended questions invite the person to share more.", "learning_note": "Open questions beginning with ''What'' or ''How'' open up conversation effectively."}, "next_node_id": "node_2a", "exploration_depth": "surface"}, {"id": "cp_node_1_1", "option_text": "What does this person say about your situation?", "preview_hint": "This open question invites exploration", "rapport_impact": 0, "trust_impact": 0, "tone_shift": 0.0, "technique_tags": ["open_question"], "competency_links": [], "feedback": {"immediate": "Excellent! This open-ended question invites them to explore the interpersonal dimension without limiting their response. ''What'' questions open up conversation.", "learning_note": "Open questions are the foundation of facilitative coaching - they invite autonomy and self-direction."}, "next_node_id": "node_2b", "exploration_depth": "surface"}, {"id": "cp_node_1_2", "option_text": "You''re concerned because someone close to you is worried.", "preview_hint": "This is a reflection, not a question", "rapport_impact": 1, "trust_impact": 1, "tone_shift": 0.15, "technique_tags": ["simple_reflection"], "competency_links": ["A6"], "feedback": {"immediate": "Good reflection! In facilitative coaching, the pattern is often one open question followed by reflections. You''ve reflected, which is good, but the question would come first.", "learning_note": "Both reflections and open questions work - the open question invites more exploration of important issues."}, "next_node_id": "node_2c", "exploration_depth": "surface"}], "is_endpoint": false, "endpoint_type": null}, "node_2a": {"id": "node_2a", "persona_text": "Yes, they do. They''ve been quite persistent about it.", "persona_mood": "neutral_uncertain", "themes": ["General"], "choice_points": [{"id": "cp_node_2a_0", "option_text": "Tell me more about what they say.", "preview_hint": "This open invitation encourages elaboration", "rapport_impact": 0, "trust_impact": 0, "tone_shift": 0.0, "technique_tags": ["open_question"], "competency_links": [], "feedback": {"immediate": "Good recovery! This open invitation encourages them to elaborate. ''Tell me more'' is simple but powerful.", "learning_note": "After closed questions, opening up with invitations helps restart exploration."}, "next_node_id": "node_3a", "exploration_depth": "surface"}, {"id": "cp_node_2a_1", "option_text": "Is their persistence bothering you?", "preview_hint": "Another closed question", "rapport_impact": 0, "trust_impact": 0, "tone_shift": 0.0, "technique_tags": ["closed_question"], "competency_links": [], "feedback": {"immediate": "Continuing with closed questions keeps the conversation stuck in brief exchanges. Open questions would help you understand their situation better.", "learning_note": "Closed questions tend to create distance. Open questions build partnership."}, "next_node_id": "node_3b", "exploration_depth": "surface"}], "is_endpoint": false, "endpoint_type": null}, "node_2b": {"id": "node_2b", "persona_text": "They say it''s affecting our relationship and my future prospects. They even got emotional last week, saying they''re scared of where things are heading. That hit me pretty hard.", "persona_mood": "open_receptive", "themes": ["Concern", "Goals", "Change"], "choice_points": [{"id": "cp_node_2b_0", "option_text": "Sounds like their emotion really affected you.", "preview_hint": "This reflects the emotional impact", "rapport_impact": 0, "trust_impact": 0, "tone_shift": 0.0, "technique_tags": ["complex_reflection"], "competency_links": [], "feedback": {"immediate": "Excellent! Following an open question with a reflection is ideal practice. You''ve captured the emotional impact.", "learning_note": "The OARS pattern: one open question, then reflections. You''ve demonstrated this well."}, "next_node_id": "node_3c", "exploration_depth": "surface"}, {"id": "cp_node_2b_1", "option_text": "What was it like for you when they said that?", "preview_hint": "This open question goes deeper", "rapport_impact": 0, "trust_impact": 0, "tone_shift": 0.0, "technique_tags": ["open_question"], "competency_links": [], "feedback": {"immediate": "Good open question that goes deeper. However, the guideline is one open question followed by reflections. You might save this question for after a reflection or two.", "learning_note": "Balance is key - questions invite exploration, reflections build understanding."}, "next_node_id": "node_3d", "exploration_depth": "surface"}], "is_endpoint": false, "endpoint_type": null}, "node_2c": {"id": "node_2c", "persona_text": "Exactly! You get it. I want to address their concerns, but I also need to maintain my autonomy. It''s my choice at the end of the day.", "persona_mood": "values_autonomy", "themes": ["Autonomy", "Values"], "choice_points": [{"id": "cp_node_2c_0", "option_text": "How would you describe the balance between addressing their concerns and maintaining your autonomy?", "preview_hint": "This open question explores values", "rapport_impact": 0, "trust_impact": 0, "tone_shift": 0.0, "technique_tags": ["open_question"], "competency_links": [], "feedback": {"immediate": "Excellent! This open question invites exploration of their values and priorities. ''How would you describe'' is a powerful opener.", "learning_note": "Questions that explore values and priorities help people access what matters most to them."}, "next_node_id": "node_3e", "exploration_depth": "deep"}, {"id": "cp_node_2c_1", "option_text": "You want to address their concerns while staying true to yourself.", "preview_hint": "This captures both sides", "rapport_impact": 0, "trust_impact": 0, "tone_shift": 0.0, "technique_tags": ["double_sided_reflection"], "competency_links": [], "feedback": {"immediate": "Good double-sided reflection. Since you just reflected, this would be a good time for an open question to explore further.", "learning_note": "Double-sided reflections honor complexity - open questions help explore that complexity."}, "next_node_id": "node_3f", "exploration_depth": "surface"}], "is_endpoint": false, "endpoint_type": null}, "node_3a": {"id": "node_3a", "persona_text": "Well, they talk about how this is affecting our relationship and my future. I can see their point, but I also feel like this is my life to live.", "persona_mood": "ambivalent_open", "themes": ["Relationship", "Change", "Autonomy"], "choice_points": [{"id": "cp_node_3a_0", "option_text": "So you can see their concern about the relationship and your future, but you also value your autonomy in making this decision.", "preview_hint": "This reflects both sides", "rapport_impact": 0, "trust_impact": 0, "tone_shift": 0.0, "technique_tags": ["double_sided_reflection"], "competency_links": [], "feedback": {"immediate": "Perfect! This reflection honors both their emerging awareness and their need for autonomy. Both are valid and important.", "learning_note": "Double-sided reflections are essential when working with ambivalence."}, "next_node_id": "node_end_good", "exploration_depth": "surface"}], "is_endpoint": false, "endpoint_type": null}, "node_3b": {"id": "node_3b", "persona_text": "A bit, yes. But I don''t want to talk about it anymore.", "persona_mood": "closed_defensive", "themes": ["Avoidance"], "choice_points": [], "is_endpoint": true, "endpoint_type": "failed_engagement"}, "node_3c": {"id": "node_3c", "persona_text": "It really did. It made me realize that my choices don''t just affect me.", "persona_mood": "insightful", "themes": ["Insight", "Change"], "choice_points": [], "is_endpoint": true, "endpoint_type": "good_engagement"}, "node_3d": {"id": "node_3d", "persona_text": "Honestly? It scared me a bit. But it also made me realize that maybe I do need to think about this more seriously.", "persona_mood": "vulnerable_hopeful", "themes": ["Vulnerability", "Opening"], "choice_points": [], "is_endpoint": true, "endpoint_type": "excellent_engagement"}, "node_3e": {"id": "node_3e", "persona_text": "I think that''s what I''m trying to figure out. What matters most to me, and what I''m willing to change, and what I''m not.", "persona_mood": "reflective_deep", "themes": ["Values", "Clarity"], "choice_points": [], "is_endpoint": true, "endpoint_type": "excellent_engagement"}, "node_3f": {"id": "node_3f", "persona_text": "Exactly. And talking about it openly like this helps me think more clearly. Thanks for asking.", "persona_mood": "appreciative_open", "themes": ["Collaboration", "Trust"], "choice_points": [], "is_endpoint": true, "endpoint_type": "excellent_engagement"}, "node_end_good": {"id": "node_end_good", "persona_text": "This conversation has been really helpful. I feel like I can think more clearly about my options now.", "persona_mood": "neutral_confident", "themes": ["Empowerment"], "choice_points": [], "is_endpoint": true, "endpoint_type": "neutral_end"}}}'::jsonb,
+    ARRAY'[\"A6\", \"B6\"]',
+    '{"dimensions": {"A6": {"description": "Rapport Building", "weight": 1.5, "positive_signals": ["open_question", "reflection", "affirmation"], "negative_signals": ["closed_question", "multiple_questions", "advice"]}, "B6": {"description": "Communication", "weight": 1.5, "positive_signals": ["open_questions", "reflectiveListening", "clarity"], "negative_signals": ["closed_questions", "jargon", "lecturing"]}}, "overall_scoring_logic": "weighted_average"}'::jsonb,
+    '{"framework_name": "MaPS Money Guidance Competency Framework", "framework_version": "September 2022", "sections": ["A6", "B6"], "tier_relevance": "All Tiers", "domains": ["Universal Skill"]}'::jsonb,
+    true
+) ON CONFLICT (code) DO UPDATE SET
+    title = EXCLUDED.title,
+    content_type = EXCLUDED.content_type,
+    mi_focus_area = EXCLUDED.mi_focus_area,
+    difficulty_level = EXCLUDED.difficulty_level,
+    estimated_minutes = EXCLUDED.estimated_minutes,
+    learning_objective = EXCLUDED.learning_objective,
+    scenario_context = EXCLUDED.scenario_context,
+    persona_config = EXCLUDED.persona_config,
+    dialogue_structure = EXCLUDED.dialogue_structure,
+    target_competencies = EXCLUDED.target_competencies,
+    maps_rubric = EXCLUDED.maps_rubric,
+    maps_framework_alignment = EXCLUDED.maps_framework_alignment,
+    is_active = EXCLUDED.is_active,
+    updated_at = NOW();
+
+-- ============================================
+-- VERIFICATION QUERY
+-- ============================================
+-- Uncomment to verify insertion:
+-- SELECT code, title, content_type, mi_focus_area, difficulty_level, estimated_minutes, is_active
+-- FROM mi_practice_modules
+-- WHERE code = 'shared-open-questions-002';

@@ -1,0 +1,195 @@
+{
+  "dialogue_tree": {
+    "title": "Module 12: Anticipatory Coping & Relapse Prevention",
+    "learning_objective": "Identify situations that might make change harder; Create flexible coping responses; Normalize setbacks and focus on learning; Separate behavior from identity",
+    "technique_focus": "Anticipatory Coping & Relapse Prevention",
+    "stage_of_change": "Action/Maintenance",
+    "mi_process": "Planning/Following",
+    "description": "A colleague has started in a new role and is preparing for challenges. Practice helping them anticipate difficulties and plan for setbacks.",
+    "module_type": "internal",
+    "maps_competencies": ["B4", "B5", "A6", "B6"],
+    "start_node": "anti_1",
+    "nodes": [
+      {
+        "id": "anti_1",
+        "patient_statement": "I've been in the Team Lead role for a few weeks now and it's going well. I feel good about my progress.",
+        "patient_context": "Colleague reports initial success in new role",
+        "practitioner_choices": [
+          {
+            "text": "That's great! Just make sure you keep it up. You have to maintain this level of performance.",
+            "technique": "Pressure without preparation (ineffective)",
+            "next_node_id": "anti_2a",
+            "feedback": "This creates pressure without actually preparing for challenges."
+          },
+          {
+            "text": "That's really wonderful progress. As you continue, what situations might make it harder to maintain this momentum?",
+            "technique": "Affirmation + Anticipatory coping question",
+            "next_node_id": "anti_2b",
+            "feedback": "Perfect - affirms success and proactively prepares for challenges without being pessimistic."
+          },
+          {
+            "text": "Be careful. Most new leads struggle after the first month.",
+            "technique": "Pessimistic warning (ineffective)",
+            "next_node_id": "anti_2a",
+            "feedback": "This emphasizes failure rather than building preparation skills."
+          }
+        ]
+      },
+      {
+        "id": "anti_2a",
+        "patient_statement": "Oh, now I'm worried. Maybe I was being too optimistic.",
+        "patient_context": "Colleague discouraged after pressure approach",
+        "practitioner_choices": [
+          {
+            "text": "I didn't mean to worry you. Your success so far shows you're capable. What I meant was, what challenges do you think might come up?",
+            "technique": "Good recovery + Reframe",
+            "next_node_id": "anti_2b",
+            "feedback": "Good recovery - affirms capability and reframes to constructive problem-solving."
+          },
+          {
+            "text": "You should be worried. Most new leads struggle after month one.",
+            "technique": "Reinforcing discouragement (ineffective)",
+            "next_node_id": "anti_end_poor",
+            "feedback": "This reinforces discouragement rather than building coping skills."
+          }
+        ]
+      },
+      {
+        "id": "anti_2b",
+        "patient_statement": "Well, we have some complex cases coming up. And performance reviews are next month - I'll be doing those for the first time. There might be some difficult conversations there.",
+        "patient_context": "Colleague identifies realistic upcoming challenges",
+        "practitioner_choices": [
+          {
+            "text": "You can't let those be excuses. You need to prioritize your leadership responsibilities.",
+            "technique": "Judgmental approach (ineffective)",
+            "next_node_id": "anti_2a",
+            "feedback": "This labels legitimate challenges as 'excuses' rather than problem-solving."
+          },
+          {
+            "text": "Complex cases and first-time performance reviews - those are real challenges many new leads face. What has helped you handle difficult situations in the past?",
+            "technique": "Normalization + Resource elicitation",
+            "next_node_id": "anti_3a",
+            "feedback": "Excellent - normalizes challenges and explores colleague's existing coping resources."
+          },
+          {
+            "text": "Don't worry about it. Just do your best.",
+            "technique": "Minimizing without problem-solving (ineffective)",
+            "next_node_id": "anti_end_poor",
+            "feedback": "This minimizes the challenge without collaboratively problem-solving."
+          }
+        ]
+      },
+      {
+        "id": "anti_3a",
+        "patient_statement": "In the past, I've found that preparing really helps. For difficult client conversations, I would think through my approach beforehand. And asking for advice when I was stuck - that's helped me too.",
+        "patient_context": "Colleague identifies past coping strategies",
+        "practitioner_choices": [
+          {
+            "text": "So preparation and seeking support are strategies that have worked for you before. For these upcoming challenges, what might preparation look like?",
+            "technique": "Affirmation + Planning",
+            "next_node_id": "anti_4a",
+            "feedback": "Perfect - reinforces existing coping and creates implementation intention for the challenge."
+          },
+          {
+            "text": "You need to do more than prepare. You need to execute perfectly.",
+            "technique": "Unrealistic pressure (ineffective)",
+            "next_node_id": "anti_2a",
+            "feedback": "This creates unrealistic pressure and doesn't acknowledge that flexibility might be needed."
+          }
+        ]
+      },
+      {
+        "id": "anti_4a",
+        "patient_statement": "For the performance reviews, I could prepare by reviewing each person's file beforehand, and maybe talk to another lead about their approach. For the complex cases, I could bring in more experienced colleagues for consultation.",
+        "patient_context": "Colleague creates specific coping plan",
+        "practitioner_choices": [
+          {
+            "text": "Those are smart, proactive strategies - preparing thoroughly and seeking expert consultation when needed. How would you feel about yourself if, despite all this preparation, something didn't go as planned?",
+            "technique": "Affirmation + Setback normalization",
+            "next_node_id": "anti_5a",
+            "feedback": "Excellent - reinforces the adaptive plan and proactively addresses potential self-judgment."
+          },
+          {
+            "text": "Those are good plans. You need to stick to them perfectly.",
+            "technique": "Creating unrealistic expectations (ineffective)",
+            "next_node_id": "anti_end_poor",
+            "feedback": "This creates unrealistic expectations about flawless execution."
+          }
+        ]
+      },
+      {
+        "id": "anti_5a",
+        "patient_statement": "Honestly? I'd probably feel like I failed. That I'm not cut out for leadership if I can't handle it perfectly.",
+        "patient_context": "Colleague reveals self-judgment pattern",
+        "practitioner_choices": [
+          {
+            "text": "If things don't go perfectly, you've failed. That's just the reality of leadership.",
+            "technique": "Reinforcing all-or-nothing thinking (ineffective)",
+            "next_node_id": "anti_end_poor",
+            "feedback": "This reinforces unhelpful all-or-nothing thinking about setbacks."
+          },
+          {
+            "text": "Setbacks are a common part of any new role, not failure. Something not going perfectly doesn't mean you're not capable. What would you tell a team member who was being hard on themselves after a mistake?",
+            "technique": "Normalization + Perspective",
+            "next_node_id": "anti_6a",
+            "feedback": "Perfect - normalizes setbacks and uses perspective to challenge self-judgment."
+          }
+        ]
+      },
+      {
+        "id": "anti_6a",
+        "patient_statement": "I'd tell them that everyone makes mistakes, especially in a new role. I'd say the important thing is to learn from it and keep going. I guess I'm harder on myself than I'd be on them.",
+        "patient_context": "Colleague recognizes double standard",
+        "practitioner_choices": [
+          {
+            "text": "You'd be compassionate with a team member. What would it be like to extend that same kindness to yourself if things don't go perfectly?",
+            "technique": "Reflection + Self-compassion invitation",
+            "next_node_id": "anti_7a",
+            "feedback": "Good - highlights the insight and invites applying it to self."
+          },
+          {
+            "text": "Well, you should be hard on yourself. That's what creates excellence.",
+            "technique": "Contradicting the insight (ineffective)",
+            "next_node_id": "anti_end_poor",
+            "feedback": "This contradicts the helpful insight they just had."
+          }
+        ]
+      },
+      {
+        "id": "anti_7a",
+        "patient_statement": "That would be... different. I think it would help me recover faster instead of spiraling into self-doubt. Maybe I'd be more willing to try again instead of giving up.",
+        "patient_context": "Colleague sees value in self-compassion",
+        "practitioner_choices": [
+          {
+            "text": "So if you do have a setback during these performance reviews or with a complex case, what might help you recover and keep going?",
+            "technique": "Planning for recovery",
+            "next_node_id": "anti_end_good",
+            "feedback": "Perfect - creates a specific plan for recovery from setback."
+          },
+          {
+            "text": "Good, but try not to have setbacks. Just do everything right.",
+            "technique": "Undoing the helpful work (ineffective)",
+            "next_node_id": "anti_end_poor",
+            "feedback": "This undoes the helpful work on normalizing and planning for setbacks."
+          }
+        ]
+      },
+      {
+        "id": "anti_end_good",
+        "patient_statement": "I think reminding myself that mistakes are part of learning would help. And reaching out for support instead of isolating myself. Also, focusing on what went well, not just what didn't. That balanced approach would keep me moving forward.",
+        "patient_context": "Successful anticipatory coping and relapse prevention",
+        "is_ending": true,
+        "outcome": "Good engagement - Through anticipatory coping and normalizing setbacks, the colleague developed flexible strategies and a compassionate approach to challenges.",
+        "learning_summary": "Anticipatory coping involves proactively identifying challenges and planning flexible responses. Relapse prevention work includes: normalizing setbacks as part of change, separating behavior from identity ('I made a mistake' not 'I'm a failure'), and creating specific recovery plans. This builds resilience and maintains motivation through the inevitable challenges of role transitions."
+      },
+      {
+        "id": "anti_end_poor",
+        "patient_statement": "I feel like if I make a mistake, I'll have failed. This conversation has actually made me more nervous about the challenges ahead.",
+        "patient_context": "Poor outcome from pressure-based approach",
+        "is_ending": true,
+        "outcome": "Poor engagement - Creating rigid expectations and treating setbacks as failures increased pressure and decreased resilience.",
+        "learning_summary": "Creating rigid all-or-nothing expectations, treating lapses as failures, reinforcing harsh self-judgment, and pressuring perfect adherence all undermine resilience. Effective relapse prevention requires flexibility, self-compassion, and recognition that setbacks are normal opportunities for learning rather than evidence of failure."
+      }
+    ]
+  }
+}

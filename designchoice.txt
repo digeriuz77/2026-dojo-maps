@@ -1,0 +1,28 @@
+Design Choices
+
+Colours
+The palette combines professional authority with approachability:
+
+Deep royal blue dominates as the primary brand color (evident in the "Who we are" section banner), conveying trust, stability, and institutional credibility
+Magenta/pink accents for interactive elements (search button, "Cymraeg" link) add warmth and accessibility, preventing the design from feeling overly corporate
+Multi-color gradient logo (purple to blue tones) suggests inclusivity and modern public service
+Clean white backgrounds maintain clarity and readability
+Warm, natural tones in the photography (orange, burgundy) humanize the service
+
+Spacing
+The layout demonstrates confident restraint:
+
+Generous white space throughout creates a calm, unintimidating environment
+Navigation is well-proportioned with clear separation between items
+The hero image is given substantial vertical real estate, emphasizing the human-centered approach
+Strong horizontal bands (photo, blue banner, content) create clear visual hierarchy
+Text blocks appear comfortable rather than cramped, supporting readability for diverse audiences
+
+Tone
+The design communicates accessible expertise:
+
+Photography shows diverse, real people in casual outdoor conversation—warm, relatable, non-institutional
+The deep blue conveys seriousness and competence without coldness
+Clean typography and layout suggest professionalism and clarity
+The balance between visual warmth and structural formality mirrors their stated values of empathy, impartiality, and integrity
+Overall impression: trustworthy public service that puts people first, not intimidating financial bureaucracy

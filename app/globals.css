@@ -1,0 +1,290 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Neutral foundation - cool slate for professional trust */
+    --background: #ffffff;
+    --foreground: #0f172a;
+
+    /* Semantic colors */
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+
+    /* Borders */
+    --border: #e2e8f0;
+    --input-border: #cbd5e1;
+
+    /* Primary brand - teal for growth */
+    --primary: #14b8a6;
+    --primary-foreground: #ffffff;
+
+    /* Surface colors */
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
+
+    /* Semantic color values */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --info: #3b82f6;
+
+    /* MAPS brand colors */
+    --maps-navy: #1e3a5f;
+    --maps-navy-light: #2a4a73;
+    --maps-navy-lighter: #3d5a80;
+    --maps-teal: #14b8a6;
+    --maps-teal-light: #5ceadc;
+    --maps-teal-dark: #0d9488;
+    --maps-blue: #3b82f6;
+    --maps-purple: #8b5cf6;
+    --maps-gray-light: #e2e8f0;
+  }
+
+  body {
+    @apply bg-white text-slate-900;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Better focus styles */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-teal-500/20 ring-offset-2;
+  }
+}
+
+/* MAPS Design System - Custom Classes */
+@layer components {
+  /* Background colors */
+  .bg-maps-background {
+    background-color: #f8fafc;
+  }
+
+  .bg-maps-surface {
+    background-color: #ffffff;
+  }
+
+  /* Text colors */
+  .text-maps-teal {
+    color: #14b8a6;
+  }
+
+  .text-maps-teal-light {
+    color: #5ceadc;
+  }
+
+  .text-maps-teal-dark {
+    color: #0d9488;
+  }
+
+  .text-maps-navy {
+    color: #1e3a5f;
+  }
+
+  /* Background color variants */
+  .bg-maps-teal {
+    background-color: #14b8a6;
+  }
+
+  .bg-maps-teal-dark {
+    background-color: #0d9488;
+  }
+
+  .bg-maps-blue {
+    background-color: #3b82f6;
+  }
+
+  .bg-maps-purple {
+    background-color: #8b5cf6;
+  }
+
+  /* Border colors */
+  .border-maps-gray-light {
+    border-color: #e2e8f0;
+  }
+}
+
+@layer components {
+  /* Card component - consistent surface treatment */
+  .card {
+    @apply bg-white rounded-lg shadow-sm border border-neutral-200;
+  }
+
+  /* Button components - isolated controls */
+  .btn {
+    @apply inline-flex items-center justify-center whitespace-nowrap;
+    @apply rounded-md text-sm font-medium transition-all duration-150;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/20;
+    @apply disabled:pointer-events-none disabled:opacity-50;
+    @apply h-10 px-4 py-2;
+  }
+
+  .btn-primary {
+    @apply bg-teal-500 text-white hover:bg-teal-600;
+    @apply shadow-sm;
+  }
+
+  .btn-secondary {
+    @apply bg-neutral-100 text-neutral-700 hover:bg-neutral-200;
+    @apply shadow-sm;
+  }
+
+  .btn-outline {
+    @apply border border-neutral-300 bg-transparent hover:bg-neutral-50;
+    @apply text-neutral-700;
+  }
+
+  .btn-ghost {
+    @apply hover:bg-neutral-100 text-neutral-700;
+  }
+
+  /* Input components - isolated controls */
+  .input {
+    @apply flex h-10 w-full rounded-md border border-neutral-300 bg-transparent px-3 py-2;
+    @apply text-sm placeholder:text-neutral-400;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/20;
+    @apply focus-visible:border-teal-500/50;
+    @apply transition-all duration-150;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-neutral-700 mb-1;
+  }
+
+  /* Text hierarchy */
+  .text-h {
+    @apply text-lg font-semibold tracking-tight text-neutral-900;
+  }
+
+  .text-body {
+    @apply text-sm text-neutral-600;
+  }
+
+  .text-caption {
+    @apply text-xs text-neutral-500;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5;
+    @apply text-xs font-medium;
+  }
+
+  .badge-default {
+    @apply bg-neutral-100 text-neutral-700;
+  }
+
+  .badge-primary {
+    @apply bg-teal-50 text-teal-700;
+  }
+
+  .badge-success {
+    @apply bg-green-50 text-green-700;
+  }
+
+  .badge-warning {
+    @apply bg-amber-50 text-amber-700;
+  }
+
+  .badge-error {
+    @apply bg-red-50 text-red-700;
+  }
+
+  /* Separator */
+  .separator {
+    @apply border-t border-neutral-200;
+  }
+
+  /* Skeleton loading */
+  .skeleton {
+    @apply animate-pulse bg-neutral-200 rounded;
+  }
+
+  /* Code/mono */
+  .code {
+    @apply font-mono text-xs tabular-nums text-neutral-600;
+    @apply bg-neutral-100 px-1.5 py-0.5 rounded;
+  }
+}
+
+@layer utilities {
+  /* Shadow variants */
+  .shadow-small {
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  }
+
+  .shadow-medium {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+
+  .shadow-large {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+
+  /* Border left utilities */
+  .border-l-4 {
+    border-left-width: 4px;
+    border-left-style: solid;
+  }
+
+  .border-l-green-500 {
+    border-left-color: #22c55e;
+  }
+
+  .border-l-amber-500 {
+    border-left-color: #f59e0b;
+  }
+
+  /* Scrollbar styling */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8;
+  }
+
+  /* Text balance for headings */
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Truncate utilities */
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+}

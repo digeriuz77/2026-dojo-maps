@@ -1,0 +1,573 @@
+{
+  "dialogue_tree": {
+    "title": "Module 6: Recognizing and Evoking Change Talk (DARN-CAT)",
+    "learning_objective": "Learn to recognize different types of change talk, selectively reflect change talk to strengthen it, and use strategic questions to evoke change talk across the DARN-CAT spectrum",
+    "technique_focus": "Change Talk Recognition and Evocation (DARN-CAT)",
+    "stage_of_change": "Contemplation to Preparation",
+    "mi_process": "Evoking",
+    "description": "A colleague is considering stepping into a team leadership role but feels ambivalent. Practice recognizing and evoking change talk using the DARN-CAT framework (Desire, Ability, Reasons, Need, Commitment, Activation, Taking steps).",
+    "module_type": "internal",
+    "maps_competencies": ["3.2.1", "B6", "1.2.1", "1.2.2", "A6", "3.1.1"],
+    "start_node": "node_1",
+    "nodes": [
+      {
+        "id": "node_1",
+        "patient_statement": "I've been thinking more about the team lead role since we last talked. One of the newer team members came to me yesterday with a complex case - I helped them figure it out and they were so grateful. It felt good to guide them.",
+        "patient_context": "Colleague expresses positive experience helping others - Desire change talk",
+        "change_talk_present": "Desire (D)",
+        "practitioner_choices": [
+          {
+            "text": "That's great! You should definitely apply for the role then.",
+            "technique": "Jumping to advice (ineffective)",
+            "next_node_id": "node_2a",
+            "feedback": "This jumps straight to advice without exploring their change talk. You missed the opportunity to reflect the Desire change talk ('felt good'). Always reflect change talk when it appears to strengthen it."
+          },
+          {
+            "text": "You felt good helping that team member figure things out. There was something satisfying about guiding them through that complex case.",
+            "technique": "Selective reflection of change talk (Desire)",
+            "next_node_id": "node_2b",
+            "feedback": "Excellent! This selectively reflects the Desire change talk ('felt good') and the positive experience. Reflecting change talk strengthens it."
+          },
+          {
+            "text": "You're already doing leadership work informally. Might as well make it official.",
+            "technique": "Pushing to commitment too fast (ineffective)",
+            "next_node_id": "node_2c",
+            "feedback": "This pushes toward commitment when they're only expressing Desire. The pace is too fast - stay with and reflect what they've offered."
+          }
+        ]
+      },
+      {
+        "id": "node_2a",
+        "patient_statement": "I don't know. It's just one example. Being a team lead is a lot more than helping with one case.",
+        "patient_context": "Colleague backs away when change talk wasn't reflected",
+        "practitioner_choices": [
+          {
+            "text": "You're right, there's much more to it. But tell me more about that moment when you helped them - what was satisfying about it?",
+            "technique": "Recovery + Redirecting to change talk",
+            "next_node_id": "node_3a",
+            "feedback": "Good recovery! You acknowledge their concern while redirecting back to the Desire change talk they offered."
+          },
+          {
+            "text": "Well, you can learn the rest. Everyone has to start somewhere.",
+            "technique": "Minimizing concern (ineffective)",
+            "next_node_id": "node_end_poor",
+            "feedback": "This dismisses their concern and pushes a solution. You're missing the opportunity to explore their ambivalence."
+          }
+        ]
+      },
+      {
+        "id": "node_2b",
+        "patient_statement": "It really did. I like sharing what I've learned over the years. And seeing them get it - that lightbulb moment - that was rewarding. But then I also think about all the other stuff that comes with being a lead.",
+        "patient_context": "More Desire change talk, then ambivalence emerges",
+        "change_talk_present": "Desire (D) + Ambivalence",
+        "practitioner_choices": [
+          {
+            "text": "You enjoy mentoring and seeing others succeed. The teaching part appeals to you.",
+            "technique": "Reflecting only one side (partial)",
+            "next_node_id": "node_3b",
+            "feedback": "Good - this reflects the Desire change talk about mentoring. But it ignores the ambivalence they just expressed."
+          },
+          {
+            "text": "There's something real that draws you to leadership - the mentoring, seeing others grow. And at the same time, you're aware of the other responsibilities and what they would entail.",
+            "technique": "Double-sided reflection",
+            "next_node_id": "node_3c",
+            "feedback": "Perfect! This reflects both the Desire change talk AND their ambivalence. This honors the full complexity of their position."
+          },
+          {
+            "text": "What concerns you about the other responsibilities?",
+            "technique": "Focusing on sustain talk (ineffective)",
+            "next_node_id": "node_3d",
+            "feedback": "This question focuses on the sustain talk side. You want to elicit change talk, not sustain talk."
+          }
+        ]
+      },
+      {
+        "id": "node_2c",
+        "patient_statement": "Maybe. But I'm not sure informal helping is the same as formal leadership. There's performance reviews, schedules, conflict resolution... lots I haven't done.",
+        "patient_context": "Colleague expresses Ability concerns",
+        "practitioner_choices": [
+          {
+            "text": "Those are all skills you can learn. What makes you think you couldn't learn them?",
+            "technique": "Challenging concern (ineffective)",
+            "next_node_id": "node_end_poor",
+            "feedback": "This challenges their concern and pushes them to justify themselves. It doesn't evoke Ability change talk in a collaborative way."
+          },
+          {
+            "text": "You're recognizing there are new responsibilities you haven't taken on before - performance reviews, scheduling, managing conflicts. And you're wondering whether you have the ability to handle those.",
+            "technique": "Reflection of Ability concern",
+            "next_node_id": "node_3e",
+            "feedback": "Good reflection that captures their concern about Ability. Now you could evoke Ability change talk by asking about related skills."
+          }
+        ]
+      },
+      {
+        "id": "node_3a",
+        "patient_statement": "It was satisfying to see them solve the problem themselves. I just pointed them in the right direction. That's what I like - helping people find answers, not giving them answers.",
+        "patient_context": "Desire and Ability change talk",
+        "change_talk_present": "Desire (D) + Ability (A)",
+        "practitioner_choices": [
+          {
+            "text": "That's exactly what good leadership is - guiding people to find their own answers. You have a natural approach to it.",
+            "technique": "Affirmation + Reflection of Ability",
+            "next_node_id": "node_4a",
+            "feedback": "Excellent! This is an affirmation that also reflects their Ability change talk. It builds confidence while connecting to leadership skills."
+          },
+          {
+            "text": "So you think you could be a good leader then?",
+            "technique": "Closed question (ineffective)",
+            "next_node_id": "node_4b",
+            "feedback": "This is a closed question that demands a yes/no answer. Open questions that evoke more change talk are more effective."
+          }
+        ]
+      },
+      {
+        "id": "node_3b",
+        "patient_statement": "Right, I do enjoy that part. It's rewarding when someone you've helped succeeds. I've been doing this 8 years - I have a lot to share.",
+        "patient_context": "Desire and Ability change talk",
+        "change_talk_present": "Desire (D) + Ability (A)",
+        "practitioner_choices": [
+          {
+            "text": "Eight years of experience gives you a wealth of knowledge to draw on. What else makes you think you might be ready for this step?",
+            "technique": "Affirmation + Open question evoking change talk",
+            "next_node_id": "node_4c",
+            "feedback": "Good! This reflects their Ability (experience) and asks an open question to evoke more change talk."
+          },
+          {
+            "text": "With 8 years of experience, you're definitely qualified. You should go for it.",
+            "technique": "Reassurance + Advice (ineffective)",
+            "next_node_id": "node_4d",
+            "feedback": "This reassurance and advice doesn't evoke their own change talk. It takes control away from them."
+          }
+        ]
+      },
+      {
+        "id": "node_3c",
+        "patient_statement": "Exactly. Part of me wants it. I can see myself growing into that role. But I also worry about the time commitment, the responsibility for others' performance...",
+        "patient_context": "Desire change talk alongside sustain talk",
+        "change_talk_present": "Desire (D) + Activation (A)",
+        "practitioner_choices": [
+          {
+            "text": "So you can see yourself growing as a leader. What does that growth look like to you?",
+            "technique": "Selective reflection + Eliciting change talk",
+            "next_node_id": "node_4e",
+            "feedback": "Perfect! You focus on the Desire/Ability change talk ('can see myself growing') and use an open question to evoke more."
+          },
+          {
+            "text": "The time commitment isn't that bad. Most team leads manage it fine.",
+            "technique": "Arguing for change (ineffective)",
+            "next_node_id": "node_4f",
+            "feedback": "This dismisses their concern rather than exploring it. You're arguing for change instead of evoking their own motivation."
+          }
+        ]
+      },
+      {
+        "id": "node_3d",
+        "patient_statement": "Performance reviews mainly. I've never had to give feedback on someone's work. What if I mess that up? What if someone complains?",
+        "patient_context": "Ability concerns expressed",
+        "practitioner_choices": [
+          {
+            "text": "You're concerned about managing performance conversations. What skills do you think might help with that?",
+            "technique": "Focusing on concern (ineffective)",
+            "next_node_id": "node_4g",
+            "feedback": "This question focuses on their concern (sustain talk). It would be better to evoke Ability change talk."
+          },
+          {
+            "text": "Managing difficult conversations is a skill. What experience do you already have that might relate to performance discussions?",
+            "technique": "Evoking Ability change talk",
+            "next_node_id": "node_4h",
+            "feedback": "Better! This asks about existing Ability while acknowledging their concern. It evokes Ability change talk."
+          }
+        ]
+      },
+      {
+        "id": "node_3e",
+        "patient_statement": "Yeah, exactly. I've done customer service for 8 years, I can handle difficult conversations with customers. Maybe some of those skills transfer?",
+        "patient_context": "Ability change talk emerging",
+        "change_talk_present": "Ability (A)",
+        "practitioner_choices": [
+          {
+            "text": "Eight years of handling difficult client conversations - that's a lot of relevant experience. What from those conversations might help with performance discussions?",
+            "technique": "Affirmation + Eliciting Ability change talk",
+            "next_node_id": "node_4i",
+            "feedback": "Excellent! This affirms their existing Ability and asks an open question to help them see the transferability of their skills."
+          },
+          {
+            "text": "Of course they transfer! You're clearly qualified.",
+            "technique": "Reassurance (ineffective)",
+            "next_node_id": "node_4j",
+            "feedback": "This reassures rather than helping them discover it themselves. Let them make the connection."
+          }
+        ]
+      },
+      {
+        "id": "node_4a",
+        "patient_statement": "That's kind of you to say. Maybe I do have some of the skills already. I know the systems inside and out, I know the common issues clients face...",
+        "patient_context": "Ability change talk growing",
+        "change_talk_present": "Ability (A)",
+        "practitioner_choices": [
+          {
+            "text": "So you have deep technical knowledge and years of client experience. Those are foundations that would help you succeed as a team lead.",
+            "technique": "Complex reflection of Ability change talk",
+            "next_node_id": "node_5a",
+            "feedback": "Perfect! This reflects their Ability change talk and connects it to the leadership role. This builds confidence."
+          },
+          {
+            "text": "What about your concerns? What if you're not ready?",
+            "technique": "Shifting to sustain talk (ineffective)",
+            "next_node_id": "node_5b",
+            "feedback": "This shifts to sustain talk concerns when Ability change talk is flowing. Stay with and strengthen the change talk."
+          }
+        ]
+      },
+      {
+        "id": "node_4b",
+        "patient_statement": "I... I don't know. Maybe. I'm just thinking about it.",
+        "patient_context": "Colleague pulls back from closed question",
+        "practitioner_choices": [
+          {
+            "text": "You're in the thinking stage, considering what leadership might mean for you. What's drawing you to consider it?",
+            "technique": "Reflection + Open question evoking Desire",
+            "next_node_id": "node_5c",
+            "feedback": "Good recovery! You accept their pace and ask an open question to evoke Desire change talk."
+          }
+        ]
+      },
+      {
+        "id": "node_4c",
+        "patient_statement": "Well, I've been a mentor to new hires before. I usually get assigned the trainees because I'm patient and thorough. People seem to trust me.",
+        "patient_context": "Ability change talk with evidence",
+        "change_talk_present": "Ability (A)",
+        "practitioner_choices": [
+          {
+            "text": "So mentoring trainees - that's something you're already doing, and people respond well to your approach. That's evidence you can lead others.",
+            "technique": "Complex reflection affirming Ability",
+            "next_node_id": "node_5d",
+            "feedback": "Excellent! This reflects their existing leadership experience as evidence of Ability. This builds on past success."
+          },
+          {
+            "text": "That's great! So when do you want to apply?",
+            "technique": "Jumping to commitment too fast (ineffective)",
+            "next_node_id": "node_5e",
+            "feedback": "Moving to action planning too quickly. They're sharing Ability change talk but haven't expressed commitment."
+          }
+        ]
+      },
+      {
+        "id": "node_4e",
+        "patient_statement": "I guess I imagine myself having more impact. Instead of just handling my own cases, I could help shape how the whole team approaches things. I could share best practices, help newer advisors develop faster.",
+        "patient_context": "Strong Desire and Reason change talk",
+        "change_talk_present": "Desire (D) + Reason (R)",
+        "practitioner_choices": [
+          {
+            "text": "That's a clear vision - having broader impact beyond your own cases. You could shape team approach and accelerate others' development. That matters to you.",
+            "technique": "Complex reflection of Desire/Reason change talk",
+            "next_node_id": "node_5f",
+            "feedback": "Perfect! This reflects the Desire change talk about the impact they want to have. Vision is powerful motivation."
+          },
+          {
+            "text": "What's stopping you from doing that now?",
+            "technique": "Evoking sustain talk (ineffective)",
+            "next_node_id": "node_5g",
+            "feedback": "This question challenges them and evokes sustain talk. Change talk was flowing - stay with it."
+          }
+        ]
+      },
+      {
+        "id": "node_4f",
+        "patient_statement": "I guess so. But I value my work-life balance. What if the role consumes me?",
+        "patient_context": "Sustain talk about work-life balance",
+        "practitioner_choices": [
+          {
+            "text": "Work-life balance is important to you. You don't want a role that would take that away.",
+            "technique": "Reflection of sustain talk (partial)",
+            "next_node_id": "node_5h",
+            "feedback": "This reflects the sustain talk. To evoke change talk, you might ask what they want or how they see themselves maintaining balance."
+          },
+          {
+            "text": "So balance matters to you. What would a leadership role need to look like for you to maintain that balance?",
+            "technique": "Acknowledging concern + Evoking change talk",
+            "next_node_id": "node_5i",
+            "feedback": "Better! This acknowledges their concern while evoking change talk about what they want/need from the role."
+          }
+        ]
+      },
+      {
+        "id": "node_4g",
+        "patient_statement": "I don't know. Being direct but respectful? Listening? Those are things I do with customers.",
+        "patient_context": "Some Ability acknowledgment but uncertain",
+        "practitioner_choices": [
+          {
+            "text": "Exactly - being direct, respectful, listening. Those are skills you use every day. They apply to performance conversations too.",
+            "technique": "Confirming skill transfer",
+            "next_node_id": "node_5j",
+            "feedback": "Good - this helps them see their existing skills transfer. But you're telling rather than asking."
+          }
+        ]
+      },
+      {
+        "id": "node_4h",
+        "patient_statement": "Well, I handle escalated complaints all the time. Those are basically performance conversations - helping someone understand what went wrong and how to fix it. And I stay calm in those.",
+        "patient_context": "Strong Ability change talk",
+        "change_talk_present": "Ability (A)",
+        "practitioner_choices": [
+          {
+            "text": "That's a great connection - escalated complaints involve similar skills to performance discussions. And you stay calm in difficult conversations. That says something about your abilities.",
+            "technique": "Affirmation + Reflection of Ability",
+            "next_node_id": "node_5k",
+            "feedback": "Excellent! You affirm their insight, connect their existing experience to the new challenge, and highlight their Ability."
+          }
+        ]
+      },
+      {
+        "id": "node_4i",
+        "patient_statement": "I guess listening is huge. In customer service, you have to really hear what the issue is before you can help. And staying calm when someone's upset - that's something I've learned. Also explaining things clearly and patiently.",
+        "patient_context": "Detailed Ability change talk",
+        "change_talk_present": "Ability (A)",
+        "practitioner_choices": [
+          {
+            "text": "So you have several relevant skills - listening, staying calm under pressure, explaining things patiently. These are all things that would help you in performance conversations.",
+            "technique": "Complex reflection of Ability change talk",
+            "next_node_id": "node_5l",
+            "feedback": "Perfect! This reflects their Ability change talk and confirms how it transfers to leadership responsibilities."
+          },
+          {
+            "text": "Those are good skills. But performance reviews are different from client conversations.",
+            "technique": "Undermining Ability change talk (ineffective)",
+            "next_node_id": "node_5m",
+            "feedback": "This undermines the Ability change talk they just expressed. Focus on strengthening, not weakening their confidence."
+          }
+        ]
+      },
+      {
+        "id": "node_4j",
+        "patient_statement": "I suppose. But I also need to think about whether I want the extra responsibility right now. My personal life is busy too.",
+        "patient_context": "Mixed Desire and sustain talk",
+        "practitioner_choices": [
+          {
+            "text": "There's a lot to consider - the role, your personal life, timing. What feels most important to think through?",
+            "technique": "Reflection + Open question",
+            "next_node_id": "node_5n",
+            "feedback": "Good - this is an open question that lets them decide what to explore. It honors their process."
+          }
+        ]
+      },
+      {
+        "id": "node_5a",
+        "patient_statement": "Those are good points. I hadn't really thought about it that way - that I already have foundations to build on. Maybe I'm underselling myself.",
+        "patient_context": "Growing Ability change talk and self-awareness",
+        "change_talk_present": "Ability (A) + Activation (A)",
+        "practitioner_choices": [
+          {
+            "text": "You're recognizing that you have more relevant experience than you'd acknowledged. That's an important realization.",
+            "technique": "Reflection + Affirmation",
+            "next_node_id": "node_end_good",
+            "feedback": "Excellent! This reflects their insight and affirms their growing self-awareness about their abilities."
+          }
+        ]
+      },
+      {
+        "id": "node_5b",
+        "patient_statement": "Those are good points. I hadn't really thought about it that way - that I already have foundations to build on. Maybe I'm underselling myself.",
+        "patient_context": "Growing Ability change talk and self-awareness",
+        "change_talk_present": "Ability (A) + Activation (A)",
+        "practitioner_choices": [
+          {
+            "text": "You're recognizing that you have more relevant experience than you'd acknowledged. That's an important realization.",
+            "technique": "Reflection + Affirmation",
+            "next_node_id": "node_end_good",
+            "feedback": "Excellent! This reflects their insight and affirms their growing self-awareness about their abilities."
+          }
+        ]
+      },
+      {
+        "id": "node_5c",
+        "patient_statement": "I think it's the chance to grow. I've been in my role a while and I'm ready for something new. I want to be challenged more.",
+        "patient_context": "Strong Desire change talk",
+        "change_talk_present": "Desire (D) + Reason (R)",
+        "practitioner_choices": [
+          {
+            "text": "So growth and new challenges - you're feeling ready to stretch beyond your current role. That's what's drawing you toward leadership.",
+            "technique": "Complex reflection of Desire/Reason change talk",
+            "next_node_id": "node_end_good",
+            "feedback": "Perfect! This reflects the Desire change talk about growth and challenge."
+          }
+        ]
+      },
+      {
+        "id": "node_5d",
+        "patient_statement": "I never really thought of it that way. Being assigned trainees because I'm good at it... that is kind of evidence, isn't it?",
+        "patient_context": "Ability change talk with evidence recognition",
+        "change_talk_present": "Ability (A)",
+        "practitioner_choices": [
+          {
+            "text": "It is evidence - both that others see leadership qualities in you, and that you've successfully helped others develop. Those are real abilities you've already demonstrated.",
+            "technique": "Affirmation + Reflection of Ability",
+            "next_node_id": "node_end_good",
+            "feedback": "Excellent! This affirms their insight and strengthens their Ability change talk with evidence."
+          }
+        ]
+      },
+      {
+        "id": "node_5e",
+        "patient_statement": "Whoa, slow down. I'm just thinking out loud here. I haven't decided anything.",
+        "patient_context": "Colleague pulls back from pressure",
+        "practitioner_choices": [
+          {
+            "text": "You're absolutely right - I got ahead of myself. You're exploring what this might mean, not deciding yet. Tell me more about what you're thinking.",
+            "technique": "Apology + Reflection + Open question",
+            "next_node_id": "node_end_moderate",
+            "feedback": "Good recovery! You acknowledge jumping ahead and return to exploring their thoughts."
+          }
+        ]
+      },
+      {
+        "id": "node_5f",
+        "patient_statement": "Exactly. I want to contribute more. To leave things better than I found them. That's important to me - to have impact beyond my own cases.",
+        "patient_context": "Strong values-based Desire change talk",
+        "change_talk_present": "Desire (D) + Reason (R)",
+        "practitioner_choices": [
+          {
+            "text": "Leaving things better - having broader impact - that's a value that matters to you. Leadership could be a way to express that value.",
+            "technique": "Complex reflection of values-based Desire",
+            "next_node_id": "node_end_good",
+            "feedback": "Perfect! This reflects their values-based Desire change talk. Values are powerful motivators."
+          }
+        ]
+      },
+      {
+        "id": "node_5g",
+        "patient_statement": "I mean, I could share ideas now. But there's something about formal leadership - having the authority to make changes. That's different.",
+        "patient_context": "Desire for formal authority",
+        "change_talk_present": "Desire (D)",
+        "practitioner_choices": [
+          {
+            "text": "So there's a difference between informal influence and formal authority to implement changes. That's part of what appeals to you about the role.",
+            "technique": "Reflection of Desire change talk",
+            "next_node_id": "node_end_good",
+            "feedback": "Good - this reflects the Desire change talk about wanting formal authority."
+          }
+        ]
+      },
+      {
+        "id": "node_5h",
+        "patient_statement": "Yeah. I've seen some team leads burn out. I don't want that to be me.",
+        "patient_context": "Sustain talk about burnout",
+        "practitioner_choices": [
+          {
+            "text": "You've seen others struggle with balance and that concerns you. You want to protect yourself from burnout.",
+            "technique": "Reflection of sustain talk",
+            "next_node_id": "node_end_moderate",
+            "feedback": "This reflects their concern (sustain talk). To evoke change talk, you could ask what they'd want or how they'd approach it differently."
+          }
+        ]
+      },
+      {
+        "id": "node_5i",
+        "patient_statement": "I'd need clear boundaries. And realistic expectations. Maybe part-time to start? Or a clear understanding of what's expected outside office hours.",
+        "patient_context": "Ability change talk - problem-solving",
+        "change_talk_present": "Ability (A)",
+        "practitioner_choices": [
+          {
+            "text": "So you're already thinking about how to make the role work for you - clear boundaries, realistic expectations, maybe a gradual transition. You have ideas about what would help.",
+            "technique": "Complex reflection of Ability change talk",
+            "next_node_id": "node_end_good",
+            "feedback": "Excellent! This reflects their Ability change talk (ideas for making it work) and their proactive thinking."
+          }
+        ]
+      },
+      {
+        "id": "node_5j",
+        "patient_statement": "That makes sense. I guess I do have relevant experience. Maybe I'm being too hard on myself.",
+        "patient_context": "Growing Ability change talk and self-awareness",
+        "change_talk_present": "Ability (A)",
+        "practitioner_choices": [
+          {
+            "text": "You're recognizing that you might be judging yourself more harshly than warranted. That's an important insight.",
+            "technique": "Reflection + Affirmation",
+            "next_node_id": "node_end_good",
+            "feedback": "Perfect! This affirms their self-awareness and reflects their insight about their harsh self-judgment."
+          }
+        ]
+      },
+      {
+        "id": "node_5k",
+        "patient_statement": "I never thought about it that way. Handling escalations really does involve similar skills. And I'm good at it - I usually resolve things calmly.",
+        "patient_context": "Strong Ability change talk",
+        "change_talk_present": "Ability (A)",
+        "practitioner_choices": [
+          {
+            "text": "You're seeing the connection between skills you already use successfully and what would be needed in leadership. That's building your confidence that you have relevant abilities.",
+            "technique": "Complex reflection of growing Ability",
+            "next_node_id": "node_end_good",
+            "feedback": "Excellent! This reflects their growing Ability change talk and confidence."
+          }
+        ]
+      },
+      {
+        "id": "node_5l",
+        "patient_statement": "That makes me feel more confident actually. I do have relevant skills. Maybe the gap isn't as big as I thought.",
+        "patient_context": "Activation change talk - shift in perspective",
+        "change_talk_present": "Ability (A) + Activation (A)",
+        "practitioner_choices": [
+          {
+            "text": "Your confidence is growing as you recognize the skills you already have. The transition to leadership feels more achievable than you initially thought.",
+            "technique": "Complex reflection of Activation change talk",
+            "next_node_id": "node_end_good",
+            "feedback": "Perfect! This reflects their emerging Activation change talk - the shift in how they view the possibility."
+          }
+        ]
+      },
+      {
+        "id": "node_5m",
+        "patient_statement": "Well, that's discouraging. I thought I was making connections, but maybe I'm overestimating myself.",
+        "patient_context": "Confidence undermined",
+        "practitioner_choices": [
+          {
+            "text": "I didn't mean to discourage you. The skills are relevant - they're just not identical. Your listening and calm under pressure would absolutely help in performance conversations.",
+            "technique": "Apology + Reaffirming Ability",
+            "next_node_id": "node_end_moderate",
+            "feedback": "Good recovery - you take responsibility and affirm the Ability change they expressed."
+          }
+        ]
+      },
+      {
+        "id": "node_5n",
+        "patient_statement": "I think timing is big. And whether I want to commit to something bigger when my personal life is demanding. But also... I don't want to stay in my current role forever. I need to grow.",
+        "patient_context": "Ambivalence with Desire change talk",
+        "change_talk_present": "Desire (D) + sustain talk",
+        "practitioner_choices": [
+          {
+            "text": "So there's tension between wanting to grow and the demands of your personal life right now. Both are real considerations for you.",
+            "technique": "Double-sided reflection",
+            "next_node_id": "node_end_good",
+            "feedback": "Excellent! This reflects both their Desire for growth AND their legitimate concern about timing."
+          }
+        ]
+      },
+      {
+        "id": "node_end_good",
+        "patient_statement": "This conversation has been helpful. I came in uncertain, and now I have a clearer picture of what I want and what I'm capable of. I think I'm ready to explore this opportunity more seriously.",
+        "patient_context": "Successful recognition and evocation of change talk",
+        "is_ending": true,
+        "outcome": "Strong engagement - Skilled recognition and reflection of change talk strengthened the colleague's motivation and moved them from ambivalence toward readiness for change.",
+        "learning_summary": "Effective MI practitioners recognize change talk across the DARN-CAT spectrum: Desire, Ability, Reasons, Need (preparatory), and Commitment, Activation, Taking Steps (mobilizing). They selectively reflect change talk to strengthen it, avoid reflecting sustain talk unnecessarily, and use strategic questions to evoke change talk when it's not flowing. The progression from DARN to CAT represents movement from contemplation toward action."
+      },
+      {
+        "id": "node_end_moderate",
+        "patient_statement": "I appreciate you helping me think through this. I need to consider it more carefully before making any decisions.",
+        "patient_context": "Moderate engagement with some course corrections",
+        "is_ending": true,
+        "outcome": "Moderate engagement - Some missteps in recognizing change talk occurred but were corrected, ultimately helping the colleague explore their motivation.",
+        "learning_summary": "When practitioners miss change talk or focus on sustain talk, colleagues often redirect them. Being willing to acknowledge these misses and refocus on change talk strengthens the relationship and the process. Change talk recognition is a skill that requires practice - listen for DARN-CAT language and reflect it preferentially over sustain talk."
+      },
+      {
+        "id": "node_end_poor",
+        "patient_statement": "I don't think you really understand my concerns. I need to figure this out on my own.",
+        "patient_context": "Poor outcome from missing change talk",
+        "is_ending": true,
+        "outcome": "Poor engagement - Consistent missing or minimizing of change talk left the colleague feeling unheard and decreased motivation.",
+        "learning_summary": "Missing change talk or responding primarily to sustain talk can undermine motivation and damage the relationship. Colleagues offer change talk as signals of readiness and motivation - when practitioners don't recognize and reflect these signals, colleagues often disengage or their motivation weakens. Learning to selectively attend to and reflect change talk is fundamental to effective MI."
+      }
+    ]
+  }
+}

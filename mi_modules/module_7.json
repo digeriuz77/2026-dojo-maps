@@ -1,0 +1,196 @@
+{
+  "dialogue_tree": {
+    "title": "Module 7: Collaborative Climate & Agenda Setting",
+    "learning_objective": "Create a collaborative rather than authoritative conversational climate; Invite the colleague to set priorities collaboratively; Use transparency about time and structure; Balance flexibility with focus",
+    "technique_focus": "Collaborative Climate & Agenda Setting",
+    "stage_of_change": "Precontemplation/Contemplation",
+    "mi_process": "Engaging/Focusing",
+    "description": "A development discussion with a colleague about their career goals. Practice establishing a collaborative partnership and setting a shared agenda.",
+    "module_type": "internal",
+    "maps_competencies": ["B1", "B2", "B6", "A2", "A6", "A1"],
+    "start_node": "collab_1",
+    "nodes": [
+      {
+        "id": "collab_1",
+        "patient_statement": "Thanks for meeting with me. I've been thinking about my career path lately. I've been in my current role for about 3 years and wondering what's next.",
+        "patient_context": "Initial conversation about career development",
+        "practitioner_choices": [
+          {
+            "text": "Great! I have some ideas about where you could go. Let me tell you about the options.",
+            "technique": "Directive approach (ineffective)",
+            "next_node_id": "collab_2a",
+            "feedback": "This jumps straight to giving advice and taking control of the agenda. You missed the opportunity to establish collaboration."
+          },
+          {
+            "text": "You're thinking about your next steps after 3 years in your current role. What's been on your mind about where you might want to go?",
+            "technique": "Reflection + Collaborative agenda setting",
+            "next_node_id": "collab_2b",
+            "feedback": "Perfect! This reflects their statement and invites them to set the direction. You're establishing collaboration from the start."
+          },
+          {
+            "text": "Well, you need to decide soon. Opportunities don't wait forever.",
+            "technique": "Pressure approach (ineffective)",
+            "next_node_id": "collab_2c",
+            "feedback": "This creates pressure rather than collaboration. You're taking an authoritative stance."
+          }
+        ]
+      },
+      {
+        "id": "collab_2a",
+        "patient_statement": "That sounds a bit overwhelming. I'm not sure I'm ready to make big decisions yet.",
+        "patient_context": "Colleague overwhelmed by directive approach",
+        "practitioner_choices": [
+          {
+            "text": "If you don't act, you'll get stuck in your career. Is that what you want?",
+            "technique": "Pressure and judgment (ineffective)",
+            "next_node_id": "collab_end_poor",
+            "feedback": "This is pressure and judgment disguised as a question. It damages the collaborative climate."
+          },
+          {
+            "text": "I hear that this feels like a lot. Let me step back - what would feel most useful to focus on today?",
+            "technique": "Rolling with discord + Refocusing collaboratively",
+            "next_node_id": "collab_3b",
+            "feedback": "Good recovery! You acknowledge the discord and return control to them."
+          }
+        ]
+      },
+      {
+        "id": "collab_2b",
+        "patient_statement": "I guess I'm wondering if I should look at leadership roles, or maybe specialize in a certain area, or even switch departments entirely. There are so many possibilities.",
+        "patient_context": "Colleague shares multiple possibilities",
+        "practitioner_choices": [
+          {
+            "text": "Lots of options indeed. We have about 30 minutes - would it help to narrow down what feels most interesting to explore?",
+            "technique": "Reflection + Transparent structure + Permission",
+            "next_node_id": "collab_3c",
+            "feedback": "Excellent! You're transparent about time, seek permission, and invite them to focus."
+          },
+          {
+            "text": "Let me tell you about each option so you can decide.",
+            "technique": "Taking expert role (ineffective)",
+            "next_node_id": "collab_2a",
+            "feedback": "This takes control rather than collaborating. You're positioning yourself as the expert."
+          },
+          {
+            "text": "We need to cover all of them. You can't make an informed decision without knowing everything.",
+            "technique": "Overloading the agenda (ineffective)",
+            "next_node_id": "collab_3d",
+            "feedback": "This creates pressure and doesn't honor their pace. Too many topics can overwhelm."
+          }
+        ]
+      },
+      {
+        "id": "collab_2c",
+        "patient_statement": "I know. But I'm not sure rushing is the right approach for me.",
+        "patient_context": "Colleague resistant to pressure",
+        "patient_mood": "withdrawn_disengaged",
+        "practitioner_choices": [
+          {
+            "text": "You're right that you need to move at your own pace. What would be most helpful for you in this conversation?",
+            "technique": "Validating + Returning control",
+            "next_node_id": "collab_3b",
+            "feedback": "Good pivot - you acknowledge their perspective and return control."
+          },
+          {
+            "text": "Well, you can't wait forever. Let's at least outline some options.",
+            "technique": "Continuing pressure (ineffective)",
+            "next_node_id": "collab_end_poor",
+            "feedback": "This continues the pressure dynamic. You're not truly collaborating."
+          }
+        ]
+      },
+      {
+        "id": "collab_3b",
+        "patient_statement": "I think I just want to explore what's out there. Maybe get a sense of what might fit my strengths. I'm not ready to make decisions today.",
+        "patient_context": "Colleague clarifies their needs",
+        "practitioner_choices": [
+          {
+            "text": "Exploration sounds good. You want to understand possibilities and what might align with your strengths. Should we focus on that for today?",
+            "technique": "Reflection + Confirmation",
+            "next_node_id": "collab_4",
+            "feedback": "Perfect! You affirm their approach and confirm the agenda collaboratively."
+          },
+          {
+            "text": "But we should also look at development plans and timelines.",
+            "technique": "Adding without permission (ineffective)",
+            "next_node_id": "collab_3d",
+            "feedback": "The 'but' dismisses what they said they want. This isn't collaborative."
+          }
+        ]
+      },
+      {
+        "id": "collab_3c",
+        "patient_statement": "Yes, 30 minutes is good. I think leadership might be interesting to explore. I've had good feedback when I've helped train new team members.",
+        "patient_context": "Colleague narrows focus with interest",
+        "practitioner_choices": [
+          {
+            "text": "So you're curious about leadership, and you've had positive experiences mentoring others. What else would you like to explore about that path?",
+            "technique": "Reflection + Open question staying on focus",
+            "next_node_id": "collab_4",
+            "feedback": "Excellent! You stay within the agreed focus and invite further exploration."
+          },
+          {
+            "text": "Leadership is great. Let me tell you about all the leadership opportunities available.",
+            "technique": "Expert mode (ineffective)",
+            "next_node_id": "collab_2a",
+            "feedback": "This shifts to expert mode rather than collaborative exploration."
+          }
+        ]
+      },
+      {
+        "id": "collab_3d",
+        "patient_statement": "That feels like a lot. I'm not sure I can focus on everything at once.",
+        "patient_context": "Colleague feeling overwhelmed",
+        "practitioner_choices": [
+          {
+            "text": "You're right, that is a lot. What feels like the most important place to start?",
+            "technique": "Validating + Narrowing focus collaboratively",
+            "next_node_id": "collab_3b",
+            "feedback": "Good recovery - validates concern and invites the colleague to prioritize."
+          },
+          {
+            "text": "We need to cover everything or you won't have the full picture.",
+            "technique": "Pushing the overloaded agenda (ineffective)",
+            "next_node_id": "collab_end_poor",
+            "feedback": "This ignores the colleague's stated concern and maintains practitioner control."
+          }
+        ]
+      },
+      {
+        "id": "collab_4",
+        "patient_statement": "I guess I'm wondering what a leadership role would actually look like day-to-day. And whether my skills really translate. Part of me thinks I could do it, but I also have doubts.",
+        "patient_context": "Colleague explores within agreed focus",
+        "practitioner_choices": [
+          {
+            "text": "So there's some confidence that you could lead, and also some uncertainty about whether your skills fully translate. What would help you explore that?",
+            "technique": "Double-sided reflection + Open question",
+            "next_node_id": "collab_end_good",
+            "feedback": "Excellent! You reflect both sides and invite them to direct the exploration."
+          },
+          {
+            "text": "Actually, we should also talk about specialization options since leadership isn't the only path.",
+            "technique": "Shifting focus without permission (ineffective)",
+            "next_node_id": "collab_3d",
+            "feedback": "This abandons the agreed focus without checking. Not collaborative."
+          }
+        ]
+      },
+      {
+        "id": "collab_end_good",
+        "patient_statement": "I think understanding what leadership actually involves day-to-day would help. And maybe talking to someone currently in a lead role? That would give me a better sense of whether it's right for me.",
+        "patient_context": "Successful collaborative conversation",
+        "is_ending": true,
+        "outcome": "Good engagement - Through collaborative agenda-setting and staying focused on what mattered to the colleague, they identified a realistic first step.",
+        "learning_summary": "Collaborative climate and focusing involve inviting the colleague to set priorities, being transparent about time and structure, and staying within agreed-upon topics. This builds partnership and increases colleague engagement in the development process."
+      },
+      {
+        "id": "collab_end_poor",
+        "patient_statement": "I don't think this is helping. Maybe I'll figure it out on my own.",
+        "patient_context": "Colleague disengages due to non-collaborative approach",
+        "is_ending": true,
+        "outcome": "Poor engagement - The non-collaborative, directive approach damaged engagement and the colleague withdrew from the conversation.",
+        "learning_summary": "Directive approaches, imposing agendas, lecturing, and shifting focus without permission damage the collaborative relationship. When colleagues feel unheard or controlled, they often disengage from the conversation."
+      }
+    ]
+  }
+}

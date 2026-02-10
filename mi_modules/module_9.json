@@ -1,0 +1,189 @@
+{
+  "dialogue_tree": {
+    "title": "Module 9: Decisional Balance",
+    "learning_objective": "Explore pros and cons of both changing and staying the same; Give equal attention to both sides of ambivalence; Avoid using decisional balance to persuade; Let the colleague draw their own conclusions",
+    "technique_focus": "Decisional Balance",
+    "stage_of_change": "Contemplation",
+    "mi_process": "Focusing",
+    "description": "A colleague is ambivalent about applying for a promotion. Practice exploring both sides of the decision balance.",
+    "module_type": "internal",
+    "maps_competencies": ["B1", "A6", "B6", "B2"],
+    "start_node": "dec_1",
+    "nodes": [
+      {
+        "id": "dec_1",
+        "patient_statement": "I know the team lead position is open, and I've been encouraged to apply. But I'm honestly not sure if I want it. I go back and forth.",
+        "patient_context": "Colleague expresses ambivalence about promotion",
+        "practitioner_choices": [
+          {
+            "text": "The promotion would be great for your career. You should definitely go for it.",
+            "technique": "Persuasive approach (ineffective)",
+            "next_node_id": "dec_2a",
+            "feedback": "This tries to argue them out of ambivalence rather than exploring it."
+          },
+          {
+            "text": "You're feeling torn about this. What are some of the good things about staying in your current role?",
+            "technique": "Open question + Exploring status quo benefits",
+            "next_node_id": "dec_2b",
+            "feedback": "Excellent - acknowledges ambivalence and starts by exploring one side openly."
+          },
+          {
+            "text": "You're just being indecisive. You need to make up your mind.",
+            "technique": "Judgmental approach (ineffective)",
+            "next_node_id": "dec_2a",
+            "feedback": "This treats normal ambivalence as a character flaw, damaging the relationship."
+          }
+        ]
+      },
+      {
+        "id": "dec_2a",
+        "patient_statement": "It's not that simple. I have a lot to consider here. This is my career we're talking about.",
+        "patient_context": "Colleague defensive after being pushed",
+        "practitioner_choices": [
+          {
+            "text": "You need to prioritize your career growth. Staying put will hold you back.",
+            "technique": "Argumentative (ineffective)",
+            "next_node_id": "dec_end_poor",
+            "feedback": "This continues the argumentative dynamic and increases resistance."
+          },
+          {
+            "text": "You're right, this is an important decision that deserves careful consideration. What matters to you in making this choice?",
+            "technique": "Validation + Open question",
+            "next_node_id": "dec_3a",
+            "feedback": "Good recovery - validates the importance and invites exploration."
+          }
+        ]
+      },
+      {
+        "id": "dec_2b",
+        "patient_statement": "Well, I really enjoy the work I do now. I'm good at it, I have great relationships with my clients, and I can leave work at work without thinking about it constantly. Plus, I have time for my family and hobbies.",
+        "patient_context": "Colleague shares genuine benefits of status quo",
+        "practitioner_choices": [
+          {
+            "text": "Those things aren't as important as career advancement. You need to think about your future.",
+            "technique": "Devalues colleague's values (ineffective)",
+            "next_node_id": "dec_2a",
+            "feedback": "This devalues what matters to them, creating discord."
+          },
+          {
+            "text": "You enjoy your current work, you're good at it, you have good client relationships, and it allows you work-life balance with time for family and hobbies. Those are real benefits. And what, if anything, concerns you about staying where you are?",
+            "technique": "Reflection + Decisional balance - both sides",
+            "next_node_id": "dec_3b",
+            "feedback": "Perfect - gives equal weight to both sides without judgment."
+          }
+        ]
+      },
+      {
+        "id": "dec_3a",
+        "patient_statement": "I want to make the right choice. I don't want to regret this either way.",
+        "patient_context": "Colleague expresses desire for good outcome",
+        "practitioner_choices": [
+          {
+            "text": "Making the right choice matters to you. Let's explore both options so you can feel confident in whatever you decide.",
+            "technique": "Affirmation + Balanced exploration",
+            "next_node_id": "dec_3b",
+            "feedback": "Good - acknowledges their concern and offers balanced exploration."
+          },
+          {
+            "text": "Well, you can't predict the future. Just pick one.",
+            "technique": "Dismissive (ineffective)",
+            "next_node_id": "dec_end_poor",
+            "feedback": "This dismisses their concern and pressures for a decision."
+          }
+        ]
+      },
+      {
+        "id": "dec_3b",
+        "patient_statement": "I guess I worry about stagnating. If I stay in my current role, will I still be growing? And the salary increase would be nice. But then, what if I fail as a lead? What if I'm miserable?",
+        "patient_context": "Colleague shares both sides - pros of change and cons",
+        "practitioner_choices": [
+          {
+            "text": "Exactly! So clearly you need to take the promotion. The growth and salary are worth it.",
+            "technique": "Using decisional balance to persuade (ineffective)",
+            "next_node_id": "dec_2a",
+            "feedback": "This tries to use their concerns to argue rather than continuing balanced exploration."
+          },
+          {
+            "text": "So you have growth and financial reasons to consider the promotion, but also real concerns about whether you'd succeed and enjoy it. What else might be benefits of taking the lead role?",
+            "technique": "Reflection + Open question exploring change benefits",
+            "next_node_id": "dec_4a",
+            "feedback": "Good - acknowledges concerns and explores potential change benefits."
+          }
+        ]
+      },
+      {
+        "id": "dec_4a",
+        "patient_statement": "I could help shape the team. I have ideas about how we could improve things. And I'd be developing leadership skills, which could open more doors later.",
+        "patient_context": "Colleague identifies additional benefits of change",
+        "practitioner_choices": [
+          {
+            "text": "So there are benefits on both sides - the work-life balance and enjoyment of your current role, versus growth, leadership development, and ability to shape the team. What concerns you about staying where you are?",
+            "technique": "Complex reflection + Open question about costs of status quo",
+            "next_node_id": "dec_5a",
+            "feedback": "Excellent - summarizes both sides and explores costs of status quo."
+          },
+          {
+            "text": "Those are great reasons. You should definitely apply.",
+            "technique": "Moving to persuasion (ineffective)",
+            "next_node_id": "dec_2a",
+            "feedback": "This moves to persuasion rather than continuing balanced exploration."
+          }
+        ]
+      },
+      {
+        "id": "dec_5a",
+        "patient_statement": "I think about whether I'll regret not trying. Will I look back in 5 years and wonder 'what if?' That scares me more than failing, honestly.",
+        "patient_context": "Colleague expresses strong reason for change",
+        "practitioner_choices": [
+          {
+            "text": "So on one side you have stability and work-life balance, on the other you have growth, leadership development, shaping the team, and avoiding future regret. Where does all this leave you?",
+            "technique": "Summary reflection + Open question",
+            "next_node_id": "dec_6a",
+            "feedback": "Perfect - gives equal weight to both sides and lets colleague draw conclusions."
+          },
+          {
+            "text": "That's a good point. So you should apply then.",
+            "technique": "Taking over (ineffective)",
+            "next_node_id": "dec_2a",
+            "feedback": "This takes over rather than letting them work through the ambivalence."
+          }
+        ]
+      },
+      {
+        "id": "dec_6a",
+        "patient_statement": "I guess... I'm realizing that both options have real merit. Maybe I could talk to the current team lead about what the role is really like day-to-day? That might help me decide.",
+        "patient_context": "Colleague beginning to resolve ambivalence",
+        "practitioner_choices": [
+          {
+            "text": "That's a thoughtful next step - gathering more information to help with the decision. What would you want to learn from that conversation?",
+            "technique": "Affirmation + Open question",
+            "next_node_id": "dec_end_good",
+            "feedback": "Excellent - affirms their approach and invites exploration of what would help."
+          },
+          {
+            "text": "Sure, but honestly you should just apply. You're clearly qualified.",
+            "technique": "Taking over decision (ineffective)",
+            "next_node_id": "dec_end_poor",
+            "feedback": "This takes over the decision-making instead of letting them explore."
+          }
+        ]
+      },
+      {
+        "id": "dec_end_good",
+        "patient_statement": "I want to understand the time commitment and how much of the role is people management vs technical work. Also, what support is available for new leads. Having that information would help me weigh things better.",
+        "patient_context": "Successful decisional balance exploration",
+        "is_ending": true,
+        "outcome": "Good engagement - Through balanced exploration of both sides, the colleague resolved their ambivalence and generated their own approach to decision-making.",
+        "learning_summary": "Decisional balance explores both sides of ambivalence - the benefits of staying the same and the benefits of changing, as well as the costs of each. By giving equal weight to all sides without judging or persuading, colleagues can resolve their own ambivalence and find their own path forward."
+      },
+      {
+        "id": "dec_end_poor",
+        "patient_statement": "I don't think you understand what I'm wrestling with. I'll figure it out on my own.",
+        "patient_context": "Poor outcome from unbalanced decisional balance",
+        "is_ending": true,
+        "outcome": "Poor engagement - Trying to argue the colleague out of ambivalence increased resistance and damaged the relationship.",
+        "learning_summary": "Using decisional balance to persuade, dismissing the colleague's concerns on either side, or rushing to resolution before full exploration all undermine the process. Ambivalence is normal and must be explored fully before the colleague can resolve it."
+      }
+    ]
+  }
+}

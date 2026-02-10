@@ -1,0 +1,156 @@
+{
+  "dialogue_tree": {
+    "title": "Reflections Practice",
+    "learning_objective": "Practice using reflections to show understanding and help customers/colleagues articulate their own issues and priorities (MaPS 1.2.3).",
+    "technique_focus": "Reflections (Simple & Complex)",
+    "stage_of_change": "Engagement",
+    "mi_process": "Engaging",
+    "description": "Reflections are the heart of effective communication. They demonstrate that you are listening and understanding, while helping the other person hear their own thoughts and feelings more clearly. Simple reflections repeat or rephrase what was said, while complex reflections capture deeper meaning, emotions, or contradictions.",
+    "module_type": "both",
+    "maps_competencies": ["1.2.3: Help identify goals and priorities", "A6: Rapport building", "A2: Self-awareness"],
+    "start_node": "story_start",
+    "nodes": [
+      {
+        "id": "story_start",
+        "patient_statement": "I have been putting off making a decision about something important. There are so many options and I just do not know what to do.",
+        "patient_context": "Person is sharing about being stuck and overwhelmed by a decision",
+        "practitioner_choices": [
+          {
+            "text": "There are many options and you are feeling unsure about which direction to take.",
+            "technique": "Simple reflection of content",
+            "next_node_id": "emotion_sharing",
+            "feedback": "Simple reflection of content. Shows you are listening and understand the basic situation."
+          },
+          {
+            "text": "That sounds overwhelming.",
+            "technique": "Reflection with emotion acknowledgment",
+            "next_node_id": "emotion_sharing",
+            "feedback": "Reflection with emotion acknowledgment. Validates feeling. Slightly deeper than content-only reflection."
+          },
+          {
+            "text": "This can be complicated. What questions do you have?",
+            "technique": "Problem-solving mode",
+            "next_node_id": "content_only",
+            "feedback": "Jumps to problem-solving mode rather than exploring experience. Misses the emotional dimension."
+          }
+        ]
+      },
+      {
+        "id": "emotion_sharing",
+        "patient_statement": "Yeah, and honestly I feel really bad about it. I always thought I would handle things better.",
+        "patient_context": "Person shares guilt and self-judgment",
+        "practitioner_choices": [
+          {
+            "text": "You are already feeling guilty and this connects to something important from your past.",
+            "technique": "Complex reflection",
+            "next_node_id": "deeper_sharing",
+            "feedback": "Excellent complex reflection. Captures the guilt and the personal meaning. You've heard beneath the surface."
+          },
+          {
+            "text": "It sounds like you feel guilty.",
+            "technique": "Simple reflection of emotion",
+            "next_node_id": "acknowledgment",
+            "feedback": "Simple reflection of emotion. Accurate but could go deeper. You stay at surface level."
+          }
+        ]
+      },
+      {
+        "id": "content_only",
+        "patient_statement": "Well, I am trying to decide between a few job offers. They each have pros and cons.",
+        "patient_context": "Person stays factual and doesn't share emotions",
+        "practitioner_choices": [
+          {
+            "text": "You are weighing the options and each has both positives and negatives.",
+            "technique": "Reflection",
+            "next_node_id": "emotion_sharing",
+            "feedback": "Good reflection that can open up the emotional dimension. You reflect the complexity of their situation."
+          },
+          {
+            "text": "What are the pros and cons?",
+            "technique": "Questioning",
+            "next_node_id": "moderate_outcome",
+            "feedback": "Questioning continues the problem-solving approach. You miss an opportunity to explore their feelings about this."
+          }
+        ]
+      },
+      {
+        "id": "deeper_sharing",
+        "patient_statement": "Exactly. I know I should be grateful I even have options. A lot of people do not.",
+        "patient_context": "Person shares the conflict - gratitude vs. feeling stuck",
+        "practitioner_choices": [
+          {
+            "text": "You feel like you should be grateful, so it is hard to give yourself permission to feel stuck about this.",
+            "technique": "Complex reflection of dilemma",
+            "next_node_id": "validation",
+            "feedback": "Complex reflection that captures the internal conflict. You reflect both sides of their dilemma."
+          },
+          {
+            "text": "That sounds really hard.",
+            "technique": "Simple validation",
+            "next_node_id": "continues_sharing",
+            "feedback": "Simple validation. Misses opportunity to reflect deeper meaning. You stay at surface level."
+          }
+        ]
+      },
+      {
+        "id": "acknowledgment",
+        "patient_statement": "Yeah, I guess. I just do not want to make the wrong choice.",
+        "patient_context": "Person acknowledges feeling but stays somewhat surface",
+        "practitioner_choices": [
+          {
+            "text": "You are worried about making a mistake and that is keeping you stuck.",
+            "technique": "Reflection of meaning",
+            "next_node_id": "deeper_sharing",
+            "feedback": "Reflection that captures the meaning behind their feeling. This deepens the exploration."
+          }
+        ]
+      },
+      {
+        "id": "validation",
+        "patient_statement": "Yeah... and the thing is, I actually want to make good choices. I just do not know where to start.",
+        "patient_context": "Person acknowledges their desire to do well alongside being stuck",
+        "practitioner_choices": [
+          {
+            "text": "You want to make good choices and you are feeling stuck about where to begin.",
+            "technique": "Complex reflection of both motivation and barrier",
+            "next_node_id": "reflection_complete",
+            "feedback": "Good reflection that captures both the motivation and the barrier. You honor their ambivalence."
+          },
+          {
+            "text": "Have you tried making a list?",
+            "technique": "Advice",
+            "next_node_id": "moderate_outcome",
+            "feedback": "Jumps to advice. You interrupt their self-exploration and take over the problem-solving."
+          }
+        ]
+      },
+      {
+        "id": "continues_sharing",
+        "patient_statement": "It is. I have been thinking about this for weeks.",
+        "patient_context": "Person continues but doesn't go deeper",
+        "practitioner_choices": [
+          {
+            "text": "Weeks of thinking about this, and you are still not sure what to do.",
+            "technique": "Reflection",
+            "next_node_id": "validation",
+            "feedback": "Reflection that acknowledges how long this has been going on. This can open up the stakes."
+          }
+        ]
+      },
+      {
+        "id": "moderate_outcome",
+        "patient_statement": "Thanks. I will think about that.",
+        "is_ending": true,
+        "outcome": "Moderate engagement - Some reflection used but missed opportunities for deeper exploration.",
+        "learning_summary": "While we used some reflections, we missed opportunities to go deeper. Simple reflections of content are accurate but complex reflections that capture emotions, dilemmas, and deeper meanings help people articulate their own issues and priorities more effectively."
+      },
+      {
+        "id": "reflection_complete",
+        "patient_statement": "Yeah. Hearing you say that... it actually helps. Like I can acknowledge both parts of this.",
+        "is_ending": true,
+        "outcome": "Excellent engagement - Complex reflections helped person articulate their dilemma and find clarity.",
+        "learning_summary": "Reflections are powerful because they help people hear their own thoughts and feelings more clearly. Simple reflections show we are listening to the content, while complex reflections capture emotions, dilemmas, contradictions, and deeper meanings. When we reflect accurately, people often say 'Yes, exactly!' - and that moment of recognition can be transformative. Complex reflections that capture both sides of a dilemma ('You want X but you're feeling Y about it') are particularly powerful for helping people identify their own priorities."
+      }
+    ]
+  }
+}
