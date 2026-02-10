@@ -21,7 +21,7 @@ class Settings(BaseSettings):
         - SUPABASE_URL
         - SUPABASE_KEY: Publishable key (sb_publishable_xxx) or legacy anon key
         - SUPABASE_SECRET_KEY: Secret key (sb_secret_xxx) or legacy service_role key
-        - SUPABASE_JWT_SECRET: JWT secret for token verification
+        - SUPABASE_JWT_SECRET: JWT secret (still used by Supabase client for auth operations)
 
     Optional environment variables (Chat Practice):
         - OPENAI_API_KEY: API key for OpenAI (required for chat practice feature)
@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     SUPABASE_URL: str
     SUPABASE_KEY: str
     SUPABASE_SECRET_KEY: str
-    SUPABASE_JWT_SECRET: str
+    SUPABASE_JWT_SECRET: str = ""  # Optional when using JWKS
 
     # Server Settings
     PORT: int = 8000
