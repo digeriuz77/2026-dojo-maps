@@ -7,6 +7,7 @@ import os
 import logging
 from typing import Optional, Dict, Any, List
 from supabase import create_client, Client
+from supabase._sync.client import Client as SyncClient
 from app.config import settings
 
 # Clear proxy environment variables that might conflict with supabase client
@@ -131,3 +132,33 @@ async def test_connection() -> Dict[str, Any]:
                 "jwt_secret": bool(settings.SUPABASE_JWT_SECRET),
             },
         }
+
+
+def get_authenticated_supabase(jwt_token: str) -> Client:
+    """
+    Get a Supabase client with a specific JWT token for authenticated requests.
+
+    This client will use the provided JWT for RLS policies, allowing operations
+    that require the user's auth context (like inserting user_progress records).
+
+    Args:
+        jwt_token: The JWT token from the authenticated user
+
+    Returns:
+        Client: Initialized Supabase client with the provided JWT
+    """
+    for proxy_var in [
+        "HTTP_PROXY",
+        "HTTPS_PROXY",
+        "http_proxy",
+        "https_proxy",
+        "ALL_PROXY",
+        "all_proxy",
+        "NO_PROXY",
+        "no_proxy",
+    ]:
+        os.environ.pop(proxy_var, None)
+
+    client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+    client.auth.set_auth(jwt_token)
+    return client

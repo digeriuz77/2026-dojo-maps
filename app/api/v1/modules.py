@@ -4,12 +4,12 @@ Learning Modules API endpoints
 Handles listing modules, getting module details, and starting a module.
 """
 
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import Request, APIRouter, HTTPException, Depends, status
 from supabase import Client
 from typing import List
 import logging
 
-from app.core.supabase import get_supabase
+from app.core.supabase import get_supabase, get_authenticated_supabase
 from app.core.auth import get_current_user, AuthContext
 from app.models.modules import ModuleResponse, ModuleListResponse
 
@@ -22,9 +22,7 @@ logger = logging.getLogger(__name__)
 # =====================================================
 
 
-async def get_user_module_progress(
-    user_id: str, module_id: str, supabase: Client
-) -> dict:
+async def get_user_module_progress(user_id: str, module_id: str, supabase) -> dict:
     """Get user progress for a specific module"""
     response = (
         supabase.table("user_progress")
@@ -123,12 +121,28 @@ async def get_module(
 async def start_module(
     module_id: str,
     current_user: AuthContext = Depends(get_current_user),
-    supabase: Client = Depends(get_supabase),
+    request: Request = None,
 ):
     """
     Start a learning module. Creates a new progress record.
     """
     logger.info(f"[MODULES] User {current_user.user_id} starting module {module_id}")
+
+    # Get the JWT token from auth context or request
+    jwt_token = current_user.raw_token
+    if not jwt_token and request:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            jwt_token = auth_header[7:]
+
+    if not jwt_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No authentication token provided",
+        )
+
+    # Get authenticated Supabase client with user's JWT
+    supabase = get_authenticated_supabase(jwt_token)
 
     # Check if module exists
     logger.debug(f"[MODULES] Checking if module {module_id} exists")
