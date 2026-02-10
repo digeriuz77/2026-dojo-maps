@@ -1,59 +1,53 @@
-# MI Learning Platform
+# MAPS Learning Platform
 
-A modern FastAPI-based web application for learning Motivational Interviewing (MI) techniques through interactive dialogue scenarios, real-time feedback, and gamification.
+A FastAPI-based web application for practicing facilitative coaching through interactive dialogue scenarios, real-time feedback, and gamification.
 
 ## Overview
 
-The MI Learning Platform provides healthcare professionals, counselors, and students with an interactive environment to practice and master Motivational Interviewing techniques. Users navigate through realistic client dialogue scenarios, receive immediate feedback on their technique choices, and track their progress through a gamified learning system.
+The MAPS Learning Platform helps MaPS staff build foundational coaching skills through simulated conversations. Users navigate through realistic workplace scenarios, receive immediate feedback on their technique choices, and track their progress through a gamified learning system.
 
 ## Tech Stack
 
-- **Backend:** FastAPI 0.104.1 (Python 3.11)
+- **Backend:** FastAPI (Python)
 - **Database:** PostgreSQL via Supabase
 - **Authentication:** Supabase Auth with JWT tokens
 - **Frontend:** HTML5, CSS3, Vanilla JavaScript (SPA)
-- **Containerization:** Docker with docker-compose
-- **CI/CD:** GitHub Actions
+- **Deployment:** Docker / Railway
 
 ## Features
 
-- **Interactive Dialogue Trees** - Navigate branching client conversations with multiple response options
-- **Real-time Feedback** - Immediate guidance on MI technique effectiveness (OARS techniques)
-- **Progressive Learning** - 12-module curriculum covering stages of change
-- **Gamification** - Points, levels, achievements, and leaderboards
-- **Technique Mastery Tracking** - Monitor proficiency in reflections, open questions, affirmations, and summaries
-- **Row-Level Security** - User data isolation enforced at the database level
+- **Interactive Dialogue Trees** - Navigate branching workplace conversations
+- **Real-time Feedback** - Immediate guidance on coaching technique effectiveness
+- **Structured Learning** - 12-module curriculum covering MI skills
+- **Gamification** - Points, levels, and progress tracking
+- **Row-Level Security** - User data isolation at the database level
 
 ## Project Structure
 
 ```
-mi-learning-platform/
+maps-learning-platform/
 ├── app/
 │   ├── main.py                 # FastAPI application entry point
 │   ├── config.py               # Pydantic settings management
 │   ├── core/
 │   │   └── supabase.py         # Supabase client initialization
 │   ├── models/                 # Pydantic request/response models
-│   │   ├── auth.py
-│   │   ├── modules.py
-│   │   └── progress.py
 │   ├── api/v1/                 # API endpoint routers
 │   │   ├── auth.py             # Authentication endpoints
 │   │   ├── modules.py          # Module management
-│   │   ├── dialogue.py         # Dialogue interaction
-│   │   ├── progress.py         # Progress tracking
-│   │   └── leaderboard.py      # Rankings
-│   ├── services/
-│   │   └── scoring_service.py  # Points and level calculations
-│   └── db/
-│       └── migrations/         # SQL migration files
-│           └── 001_init_schema.sql
+│   │   ├── dialogue.py          # Dialogue interaction
+│   │   ├── progress.py          # Progress tracking
+│   │   └── leaderboard.py       # Rankings
+│   └── services/
+│       └── scoring_service.py   # Points and level calculations
 ├── mi_modules/                 # Learning module JSON content
 ├── static/                     # Frontend assets
 │   ├── css/style.css
 │   └── js/app.js
 ├── templates/                  # Jinja2 HTML templates
-├── tests/                      # pytest test suite
+├── scripts/                    # Utility scripts
+│   └── import_modules.py       # Import modules to Supabase
+├── supabase_setup.sql          # Database schema
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
@@ -70,8 +64,8 @@ mi-learning-platform/
 ### 1. Clone and Setup
 
 ```bash
-git clone <repository-url>
-cd mi-learning-platform
+git clone https://github.com/your-org/maps-learning-platform.git
+cd maps-learning-platform
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -86,11 +80,14 @@ cp .env.example .env
 
 ### 3. Setup Supabase Database
 
-See [SUPABASE_SETUP_GUIDE.md](./SUPABASE_SETUP_GUIDE.md) for detailed instructions on:
-- Creating a Supabase project
-- Running database migrations
-- Configuring authentication
-- Deploying to production
+1. Create a new Supabase project at [supabase.com](https://supabase.com)
+2. Run the database setup:
+   - Go to the SQL Editor in Supabase Dashboard
+   - Copy and run the contents of `supabase_setup.sql`
+3. Import learning modules:
+   ```bash
+   python scripts/import_modules.py
+   ```
 
 ### 4. Run Development Server
 
@@ -102,7 +99,6 @@ uvicorn app.main:app --reload --port 8000
 
 - **Web App:** http://localhost:8000
 - **API Docs:** http://localhost:8000/docs
-- **OpenAPI Spec:** http://localhost:8000/openapi.json
 
 ## API Endpoints
 
@@ -110,29 +106,17 @@ uvicorn app.main:app --reload --port 8000
 |--------|----------|-------------|
 | POST | `/api/v1/auth/register` | Register new user |
 | POST | `/api/v1/auth/login` | Authenticate user |
+| POST | `/api/v1/auth/logout` | Sign out user |
 | GET | `/api/v1/auth/me` | Get current user profile |
+| POST | `/api/v1/auth/forgot-password` | Request password reset |
 | GET | `/api/v1/modules` | List all learning modules |
 | GET | `/api/v1/modules/{id}` | Get module details |
 | POST | `/api/v1/modules/{id}/start` | Start a module |
 | GET | `/api/v1/dialogue/module/{id}/node/{node_id}` | Get dialogue node |
 | POST | `/api/v1/dialogue/submit` | Submit dialogue choice |
 | GET | `/api/v1/progress` | Get user progress stats |
+| GET | `/api/v1/progress/profile` | Get user profile |
 | GET | `/api/v1/leaderboard` | Get top users ranking |
-
-## Docker Deployment
-
-### Build and Run
-
-```bash
-docker-compose up --build
-```
-
-### Production Build
-
-```bash
-docker build -t mi-learning-platform .
-docker run -p 8000:8000 --env-file .env mi-learning-platform
-```
 
 ## Environment Variables
 
@@ -140,11 +124,14 @@ docker run -p 8000:8000 --env-file .env mi-learning-platform
 |----------|----------|-------------|
 | `SUPABASE_URL` | Yes | Your Supabase project URL |
 | `SUPABASE_KEY` | Yes | Supabase anon/public key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service role key (backend only) |
+| `SUPABASE_SECRET_KEY` | Yes | Supabase secret key (backend only) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service role key (for migrations) |
 | `SUPABASE_JWT_SECRET` | Yes | JWT secret for token verification |
 | `DEBUG` | No | Enable debug mode (default: false) |
 | `CORS_ORIGINS` | No | Allowed CORS origins (comma-separated) |
 | `ACCESS_TOKEN_EXPIRE_MINUTES` | No | JWT token expiration (default: 10080) |
+| `OPENAI_API_KEY` | No | OpenAI API key for chat practice |
+| `OPENAI_MODEL` | No | OpenAI model (default: gpt-4.1-mini) |
 
 ## Gamification System
 
@@ -170,37 +157,52 @@ docker run -p 8000:8000 --env-file .env mi-learning-platform
 | 9 | 25,000 |
 | 10 | 30,000 |
 
-## Testing
+## Training Modules
 
-```bash
-# Run all tests
-pytest
+The platform includes 12 structured learning modules:
 
-# Run with coverage
-pytest --cov=app --cov-report=html
-
-# Run specific test file
-pytest tests/test_api_auth.py -v
-```
+1. Building Rapport
+2. Probing Questions Practice
+3. Reflections Practice
+4. Rolling with Resistance
+5. Supporting Change
+6. Recognizing Change Talk (DARN-CAT)
+7. Evoking Change Talk
+8. Confidence Scaling
+9. Decisional Balance
+10. Action Planning
+11. Giving Information & Feedback
+12. Anticipatory Coping & Relapse Prevention
 
 ## Database Schema
 
-The platform uses four main tables with row-level security:
+The platform uses Supabase with Row-Level Security. Key tables:
 
-- **user_profiles** - User data with gamification stats
+- **users** - User accounts (extends Supabase auth)
 - **learning_modules** - Module content and metadata
 - **user_progress** - Individual module progress tracking
 - **dialogue_attempts** - Detailed interaction logging
+- **user_profiles** - Gamification stats
+- **user_score** - Aggregated user statistics
+- **conversation_analyses** - Chat practice session analysis
+- **user_feedback** - User feedback collection
+- **personas** - AI practice personas (optional)
 
-See `app/db/migrations/001_init_schema.sql` for the complete schema.
+See `supabase_setup.sql` for the complete schema.
 
-## Contributing
+## Deployment
 
-1. Create a feature branch from `main`
-2. Make your changes
-3. Run tests: `pytest`
-4. Run linting: `flake8 app/`
-5. Submit a pull request
+### Docker
+
+```bash
+docker-compose up --build
+```
+
+### Railway
+
+1. Connect your GitHub repository to Railway
+2. Set environment variables in Railway dashboard
+3. Deploy
 
 ## License
 
