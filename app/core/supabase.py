@@ -10,6 +10,8 @@ from supabase import create_client, Client
 from supabase._sync.client import Client as SyncClient
 from app.config import settings
 
+import httpx
+
 # Clear proxy environment variables that might conflict with supabase client
 for proxy_var in ["HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy"]:
     if proxy_var in os.environ:
@@ -160,5 +162,5 @@ def get_authenticated_supabase(jwt_token: str) -> Client:
         os.environ.pop(proxy_var, None)
 
     client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
-    client.auth.set_auth(jwt_token)
+    client.auth.set_session(jwt_token, "")
     return client
