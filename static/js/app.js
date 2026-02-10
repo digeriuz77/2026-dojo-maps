@@ -183,6 +183,14 @@ const dialogueAPI = {
                 technique: technique
             })
         });
+    },
+
+    async getContent(moduleId) {
+        return apiRequest(`/modules/${moduleId}/dialogue`);
+    },
+
+    async restart(moduleId) {
+        return apiRequest(`/modules/${moduleId}/restart`, { method: 'POST' });
     }
 };
 
@@ -443,8 +451,73 @@ async function renderHome() {
                 </div>
             `;
         } catch (error) {
-            showError(error.message);
-        }
+        showError(error.message);
+    }
+}
+
+/**
+ * Render an ending node (module complete)
+ */
+function renderEndingNode(moduleId, node, canRetry, progressId) {
+    const app = document.getElementById('app');
+
+    app.innerHTML = `
+        <div class="dialogue-page">
+            <div class="dialogue-header">
+                <a href="#" data-link="/modules/${moduleId}" class="back-link">&larr; Exit to Module</a>
+            </div>
+
+            <div class="module-hero" style="text-align: center; padding: 3rem;">
+                <h1 style="margin-bottom: 1rem;">Module Complete</h1>
+                
+                <div style="background: white; border-radius: 12px; padding: 2rem; margin: 1.5rem 0; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <h3 style="color: #1e3a5f; margin-bottom: 1rem;">${node.outcome}</h3>
+                    
+                    <p style="font-style: italic; color: #555; margin: 1.5rem 0; font-size: 1.1rem;">
+                        "${node.patient_statement}"
+                    </p>
+                    
+                    ${node.patient_context ? `<p style="font-size: 0.9rem; color: #777; margin-bottom: 1rem;">${node.patient_context}</p>` : ''}
+                </div>
+
+                <div style="background: #fef3c7; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0; text-align: left;">
+                    <h4 style="margin-bottom: 0.75rem;">💡 Learning Summary</h4>
+                    <p style="margin: 0; line-height: 1.6;">${node.learning_summary}</p>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                    <a href="#" data-link="/modules/${moduleId}" class="btn btn-outline">
+                        Back to Module
+                    </a>
+                    ${canRetry ? `
+                        <button id="retry-btn" class="btn btn-primary">
+                            Try Again
+                        </button>
+                    ` : `
+                        <a href="#" data-link="/progress" class="btn btn-secondary">
+                            View Progress
+                        </a>
+                    `}
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Handle retry button
+    if (canRetry && progressId) {
+        document.getElementById('retry-btn').addEventListener('click', async () => {
+            try {
+                const response = await dialogueAPI.restart(moduleId);
+                if (response.current_node_id) {
+                    showLoading();
+                    const nodeData = await dialogueAPI.getNode(moduleId, response.current_node_id);
+                    const dialogueContent = await dialogueAPI.getContent(moduleId);
+                    renderDialogueNode(moduleId, nodeData, dialogueContent);
+                }
+            } catch (error) {
+                showToast(error.message, 'error');
+            }
+        });
     }
 }
 
@@ -942,7 +1015,13 @@ async function renderDialogue(moduleId) {
  */
 function renderDialogueNode(moduleId, nodeData, dialogueContent) {
     const app = document.getElementById('app');
-    const { node, current_node_number, total_nodes } = nodeData;
+    const { node, current_node_number, total_nodes, can_retry, progress_id } = nodeData;
+
+    // Check if this is an ending node
+    if (node.is_ending) {
+        renderEndingNode(moduleId, node, can_retry, progress_id);
+        return;
+    }
 
     app.innerHTML = `
         <div class="dialogue-page">
