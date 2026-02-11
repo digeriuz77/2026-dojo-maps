@@ -54,6 +54,7 @@ CREATE TABLE public.user_progress (
     status VARCHAR(20) DEFAULT 'not_started' CHECK (status IN ('not_started', 'in_progress', 'completed')),
     current_node_id VARCHAR(50) DEFAULT 'node_1',
     nodes_completed TEXT[] DEFAULT '{}',
+    nodes_visited TEXT[] DEFAULT '{}',
     points_earned INTEGER DEFAULT 0,
     completion_score INTEGER DEFAULT 0,
     techniques_demonstrated JSONB DEFAULT '{}',
