@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAPS Learning Platform | Empowering Effective Coaching</title>
+    <style>
+        :root {
+            /* MAPS Brand Colors */
+            --royal-blue: #1D3A8F; /* Deep Royal Blue - Authority & Trust */
+            --magenta: #E6007E;    /* Magenta - Warmth & Action */
+            --text-dark: #2A2A2A;  /* Dark Grey for readability */
+            --text-light: #595959; /* Softer grey for body text */
+            --white: #FFFFFF;
+            --off-white: #F9FAFB;
+            --gradient-start: #6a1b9a; /* Purple tone for logo context */
+            --gradient-end: #1D3A8F;
+            
+            /* Spacing & Layout */
+            --container-width: 1200px;
+            --radius: 4px; /* Professional, slightly squared corners */
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            color: var(--text-dark);
+            line-height: 1.6;
+            background-color: var(--white);
+        }
+
+        /* Utilities */
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--magenta);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: #c4006b;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--royal-blue);
+            color: var(--royal-blue);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--royal-blue);
+            color: var(--white);
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo img {
+            height: 100%;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--royal-blue);
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links a {
+            color: var(--text-dark);
+            text-decoration: none;
+            margin-left: 2rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .nav-links a:hover {
+            color: var(--magenta);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 5rem 0;
+            background-color: var(--white);
+            overflow: hidden;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            color: var(--royal-blue);
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .hero-content p {
+            font-size: 1.125rem;
+            color: var(--text-light);
+            margin-bottom: 2.5rem;
+            max-width: 500px;
+        }
+
+        .hero-visual {
+            position: relative;
+        }
+
+        /* Simulating the mapspeople.png image style */
+        .hero-image-container {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .hero-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* Chat Simulation Overlay */
+        .chat-simulation {
+            position: absolute;
+            bottom: -20px;
+            left: -20px;
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            width: 320px;
+            border-left: 4px solid var(--magenta);
+        }
+
+        .chat-bubble {
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .chat-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .label-coach { color: var(--royal-blue); }
+        .label-ai { color: var(--magenta); }
+
+        .chat-text {
+            background: var(--off-white);
+            padding: 8px 12px;
+            border-radius: 4px;
+            border-top-left-radius: 0;
+            display: inline-block;
+        }
+
+        .analysis-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background-color: #e6fffa;
+            color: #047481;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        /* Mission Banner - The "Who we are" Blue Bar */
+        .mission-banner {
+            background-color: var(--royal-blue);
+            color: var(--white);
+            padding: 4rem 0;
+            margin: 4rem 0;
+        }
+
+        .mission-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 3rem;
+        }
+
+        .mission-title {
+            font-size: 2rem;
+            font-weight: 700;
+            border-bottom: 3px solid var(--magenta);
+            padding-bottom: 1rem;
+            align-self: start;
+            display: inline-block;
+        }
+
+        .mission-text {
+            font-size: 1.15rem;
+            opacity: 0.95;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 4rem 0 6rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 4rem auto;
+        }
+
+        .section-header h2 {
+            font-size: 2.25rem;
+            color: var(--royal-blue);
+            margin-bottom: 1rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .feature-card {
+            background: var(--white);
+            padding: 2rem;
+            border: 1px solid #eaeaea;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+            border-color: var(--magenta);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--royal-blue), #6a1b9a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-card h3 {
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .feature-card p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* AI Section */
+        .ai-section {
+            background-color: var(--off-white);
+            padding: 5rem 0;
+            text-align: center;
+        }
+
+        .ai-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .tech-badge {
+            background-color: #EDE7F6;
+            color: #6a1b9a;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #f3f3f3;
+            padding: 3rem 0;
+            margin-top: 4rem;
+            border-top: 4px solid var(--royal-blue);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .cymraeg-link {
+            color: var(--magenta);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-grid, .mission-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .hero-content h1 {
+                font-size: 2.25rem;
+            }
+
+            .chat-simulation {
+                position: relative;
+                bottom: 0;
+                left: 0;
+                margin-top: -2rem;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container nav-content">
+            <a href="#" class="navbar-brand">
+                <div class="logo">
+                    <!-- SVG Logo Placeholder -->
+                    <img src="maps-logo.svg" alt="MAPS Logo" onerror="this.style.display='none'">
+                    <div class="logo-text">
+                        <span style="color: var(--royal-blue)">MAPS</span>
+                        <span style="font-weight: 400; color: var(--text-light)">Learning</span>
+                    </div>
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="#" data-link="/login">Login</a>
+                <a href="#" data-link="/register" class="btn btn-primary" style="color: white; margin-left: 1.5rem;">Register</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container hero-grid">
+                <div class="hero-content">
+                    <h1>Empowering conversations that transform lives</h1>
+                    <p>Develop effective coaching skills through realistic practice. The MAPS Learning Platform helps you master collaborative, growth-focused guidance to better support colleagues and clients.</p>
+                    <div class="hero-buttons">
+                        <a href="#" data-link="/register" class="btn btn-primary">Start Training</a>
+                        <a href="#" data-link="/about" class="btn btn-outline" style="margin-left: 1rem;">Learn More</a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="hero-image-container">
+                        <!-- Hero Image -->
+                        <img src="mapspeople.png" alt="Two colleagues having a supportive conversation">
+                    </div>
+                    
+                    <!-- Chat Overlay -->
+                    <div class="chat-simulation">
+                        <div class="chat-bubble">
+                            <span class="chat-label label-ai">Coachee Persona</span>
+                            <div class="chat-text">"I feel overwhelmed with the new project timeline."</div>
+                        </div>
+                        <div class="chat-bubble">
+                            <span class="chat-label label-coach">You (Coach)</span>
+                            <div class="chat-text">"What support would be most helpful for you right now?"</div>
+                            <div class="analysis-pill">
+                                <span>✓ Open-ended Question</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mission Banner -->
+        <section class="mission-banner">
+            <div class="container mission-grid">
+                <div class="mission-title">
+                    Our Commitment
+                </div>
+                <div class="mission-text">
+                    <p>At the Money and Pensions Service, we are committed to giving the right guidance at the right time. This platform allows us to care for our colleagues and the people we serve by honing the skills needed to empower others to find their own solutions.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Professional Skill Development</h2>
+                    <p>A safe environment to practice non-directive coaching techniques that encourage reflection and active listening.</p>
+                </div>
+                
+                <div class="feature-grid">
+                    <!-- Feature 1 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>AI-Powered Practice</h3>
+                        <p>Test your skills in real-time against diverse AI personas representing a range of professional backgrounds and challenges.</p>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Insightful Analytics</h3>
+                        <p>Receive immediate analysis of your conversation style. Understand your balance of questioning vs. telling to improve engagement.</p>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="feature-card">
+                        <div class="feature-icon">🏆</div>
+                        <h3>Gamified Learning</h3>
+                        <p>Track your progress, earn levels, and develop consistency in your coaching practice through engaging, interactive scenarios.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Methodology / AI Highlight -->
+        <section class="ai-section">
+            <div class="container ai-container">
+                <span class="tech-badge">Powered by Advanced AI</span>
+                <h2 style="color: var(--royal-blue); margin-bottom: 1.5rem;">Practice Makes Professional</h2>
+                <p style="color: var(--text-light); font-size: 1.1rem; margin-bottom: 2rem;">
+                    Our simulated personas don't just read a script—they react to your emotional tone and choice of words. 
+                    This creates opportunities to practice empathy, impartiality, and integrity without the pressure of a live environment.
+                </p>
+                <a href="#" class="btn btn-outline">View Demo</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-content">
+            <div class="copyright">
+                &copy; 2026 Money and Pensions Service. All rights reserved.
+            </div>
+            <div class="footer-links">
+                <a href="#" class="cymraeg-link">Cymraeg</a>
+                <span style="margin: 0 1rem;">|</span>
+                <a href="#" style="color: inherit; text-decoration: none;">Privacy</a>
+                <span style="margin: 0 1rem;">|</span>
+                <a href="#" style="color: inherit; text-decoration: none;">Accessibility</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Supabase Logic Preserved -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        window.SUPABASE_URL = 'https://rvpckqidavppoxgvaqzs.supabase.co';
+        window.SUPABASE_ANON_KEY = 'sb_publishable_N0cY_X0fJ1EvhRtaDxIIlQ_jb5btAY5';
+    </script>
+    <script src="./MAPS Learning Platform_files/app.js.download"></script>
+</body>
+</html>
