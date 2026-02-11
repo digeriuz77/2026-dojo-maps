@@ -9,9 +9,10 @@ from supabase import Client
 from typing import List
 import logging
 
-from app.core.supabase import get_supabase, get_authenticated_client
+from app.core.supabase import get_supabase, get_authenticated_client, get_supabase_admin
 from app.core.auth import get_current_user, AuthContext
 from app.models.modules import ModuleResponse, ModuleListResponse
+from app.services.scoring_service import ScoringService
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -170,10 +171,16 @@ async def start_module(
     if existing_progress.data:
         progress = existing_progress.data[0]
         if progress["status"] == "completed":
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Module already completed. Start a new attempt?",
-            )
+            # Return information about completed module with option to restart
+            return {
+                "message": "Module already completed",
+                "progress_id": str(progress["id"]),
+                "current_node_id": progress["current_node_id"],
+                "status": "completed",
+                "completion_score": progress.get("completion_score", 0),
+                "points_earned": progress.get("points_earned", 0),
+                "can_restart": True
+            }
         logger.info(
             f"[MODULES] Returning existing progress for user {current_user.user_id}"
         )
@@ -181,6 +188,8 @@ async def start_module(
             "message": "Module already in progress",
             "progress_id": str(progress["id"]),
             "current_node_id": progress["current_node_id"],
+            "status": "in_progress",
+            "nodes_visited": progress.get("nodes_visited", []),
         }
 
     # Get dialogue content to find start node
@@ -308,6 +317,10 @@ async def restart_module(
     existing_progress = existing_progress_response.data[0] if existing_progress_response.data else None
 
     if existing_progress:
+        # Get the points that were earned in this module to deduct from user profile
+        old_points = existing_progress.get("points_earned", 0)
+        was_completed = existing_progress.get("status") == "completed"
+        
         # Reset existing progress using authenticated client
         try:
             update_response = (
@@ -328,6 +341,29 @@ async def restart_module(
                 .execute()
             )
             logger.info(f"[MODULES] Progress reset successfully for module {module_id}")
+            
+            # Deduct points from user profile if module was previously completed
+            if old_points > 0:
+                try:
+                    supabase_admin = get_supabase_admin()
+                    profile_response = supabase_admin.table("user_profiles").select("*").eq("user_id", current_user.user_id).execute()
+                    if profile_response.data:
+                        profile = profile_response.data[0]
+                        new_total = max(0, profile.get("total_points", 0) - old_points)
+                        new_modules_completed = profile.get("modules_completed", 0)
+                        if was_completed and new_modules_completed > 0:
+                            new_modules_completed -= 1
+                        
+                        supabase_admin.table("user_profiles").update({
+                            "total_points": new_total,
+                            "modules_completed": new_modules_completed,
+                            "level": ScoringService.calculate_level(new_total)
+                        }).eq("user_id", current_user.user_id).execute()
+                        logger.info(f"[MODULES] Deducted {old_points} points from user profile on restart")
+                except Exception as e:
+                    logger.warning(f"[MODULES] Failed to deduct points from profile: {e}")
+                    # Don't fail the restart if profile update fails
+                    
         except Exception as e:
             logger.error(f"[MODULES] Failed to reset progress: {e}")
             raise HTTPException(
@@ -339,6 +375,7 @@ async def restart_module(
             "message": "Module restarted",
             "progress_id": str(existing_progress["id"]),
             "current_node_id": start_node,
+            "points_deducted": old_points,
         }
     else:
         # Create new progress using authenticated client
