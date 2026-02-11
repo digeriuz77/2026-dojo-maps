@@ -142,6 +142,12 @@ h6 {
     letter-spacing: 0.5px;
 }
 
+.navbar-logo {
+    height: 40px;
+    width: auto;
+    border-radius: 4px;
+}
+
 .nav-links {
     display: flex;
     gap: 2rem;
@@ -470,6 +476,280 @@ p {
 .feature-card p {
     color: var(--gray);
     margin: 0;
+}
+
+/* =====================================================
+   Professional Landing Page Styles
+   ===================================================== */
+
+.landing-page {
+    width: 100%;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+/* Hero Section */
+.hero-section {
+    padding: 4rem 0;
+    background-color: var(--bg-white);
+    overflow: hidden;
+}
+
+.hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.hero-content .hero-title {
+    font-size: 3rem;
+    color: var(--primary);
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+}
+
+.hero-content .hero-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-light);
+    margin-bottom: 2.5rem;
+    max-width: 500px;
+    line-height: 1.7;
+}
+
+.hero-visual {
+    position: relative;
+}
+
+.hero-image-container {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+}
+
+.hero-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+
+/* Chat Simulation Overlay */
+.chat-simulation {
+    position: absolute;
+    bottom: -20px;
+    left: -20px;
+    background: var(--bg-white);
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    width: 320px;
+    border-left: 4px solid #E6007E;
+}
+
+.chat-bubble {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.chat-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.label-coachee { color: var(--primary); }
+.label-coach { color: #E6007E; }
+
+.chat-text {
+    background: var(--bg-light);
+    padding: 8px 12px;
+    border-radius: 4px;
+    border-top-left-radius: 0;
+    display: inline-block;
+}
+
+.analysis-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background-color: #e6fffa;
+    color: #047481;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-top: 5px;
+}
+
+/* Mission Banner */
+.mission-banner {
+    background-color: var(--primary);
+    color: var(--bg-white);
+    padding: 4rem 2rem;
+    margin: 4rem 0;
+}
+
+.mission-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 3rem;
+    max-width: var(--container-width);
+    margin: 0 auto;
+}
+
+.mission-title {
+    font-size: 2rem;
+    font-weight: 700;
+    border-bottom: 3px solid #E6007E;
+    padding-bottom: 1rem;
+    align-self: start;
+    display: inline-block;
+}
+
+.mission-text {
+    font-size: 1.15rem;
+    opacity: 0.95;
+    line-height: 1.7;
+}
+
+.mission-text p {
+    margin: 0;
+}
+
+/* Features Section */
+.features-section {
+    padding: 4rem 2rem 6rem 2rem;
+    max-width: var(--container-width);
+    margin: 0 auto;
+}
+
+.section-header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 4rem auto;
+}
+
+.section-header h2 {
+    font-size: 2.25rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.section-header p {
+    color: var(--text-light);
+    font-size: 1.1rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2.5rem;
+}
+
+.features-grid .feature-card {
+    background: var(--bg-white);
+    padding: 2rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.features-grid .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: #E6007E;
+}
+
+.features-grid .feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, var(--primary), #6a1b9a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.features-grid .feature-card h3 {
+    color: var(--text-main);
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+.features-grid .feature-card p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+}
+
+/* AI Section */
+.ai-section {
+    background-color: var(--bg-light);
+    padding: 5rem 2rem;
+    text-align: center;
+}
+
+.ai-section h2 {
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+}
+
+.ai-section p {
+    color: var(--text-light);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.7;
+}
+
+.tech-badge {
+    background-color: #EDE7F6;
+    color: #6a1b9a;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+}
+
+/* Responsive Landing Page */
+@media (max-width: 768px) {
+    .hero-grid, .mission-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .hero-content .hero-title {
+        font-size: 2.25rem;
+    }
+
+    .chat-simulation {
+        position: relative;
+        bottom: 0;
+        left: 0;
+        margin-top: 1.5rem;
+        width: 100%;
+    }
+
+    .mission-title {
+        font-size: 1.5rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.75rem;
+    }
 }
 
 /* Auth Pages */

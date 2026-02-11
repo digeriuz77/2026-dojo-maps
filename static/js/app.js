@@ -362,48 +362,83 @@ async function renderHome() {
 
     if (!state.user) {
         app.innerHTML = `
-            <div class="hero">
-                <div class="hero-content">
-                    <h1 class="hero-title">Master Motivational Interviewing</h1>
-                    <p class="hero-subtitle">Learn evidence-based communication techniques through interactive dialogue practice with virtual patients.</p>
-                    <div class="hero-buttons">
-                        <a href="#" data-link="/register" class="btn btn-primary btn-lg">Get Started</a>
-                        <a href="#" data-link="/login" class="btn btn-outline btn-lg">Sign In</a>
+            <div class="landing-page">
+                <!-- Hero Section -->
+                <section class="hero-section">
+                    <div class="hero-grid">
+                        <div class="hero-content">
+                            <h1 class="hero-title">Empowering conversations that transform lives</h1>
+                            <p class="hero-subtitle">Develop effective coaching skills through realistic practice. The MAPS Learning Platform helps you master collaborative, growth-focused guidance to better support colleagues and clients.</p>
+                            <div class="hero-buttons">
+                                <a href="#" data-link="/register" class="btn btn-primary btn-lg">Start Training</a>
+                                <a href="#" data-link="/about" class="btn btn-outline btn-lg">Learn More</a>
+                            </div>
+                        </div>
+                        <div class="hero-visual">
+                            <div class="hero-image-container">
+                                <img src="/static/images/mapspeople.png" alt="Two colleagues having a supportive conversation" class="hero-image">
+                            </div>
+                            <!-- Chat Overlay -->
+                            <div class="chat-simulation">
+                                <div class="chat-bubble">
+                                    <span class="chat-label label-coachee">Coachee Persona</span>
+                                    <div class="chat-text">"I feel overwhelmed with the new project timeline."</div>
+                                </div>
+                                <div class="chat-bubble">
+                                    <span class="chat-label label-coach">You (Coach)</span>
+                                    <div class="chat-text">"What support would be most helpful for you right now?"</div>
+                                    <div class="analysis-pill">
+                                        <span>✓ Open-ended Question</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="hero-visual">
-                    <div class="conversation-preview">
-                        <div class="message patient-message">
-                            <span class="message-sender">Patient</span>
-                            "I know I should exercise more, but I just don't have the time..."
-                        </div>
-                        <div class="message practitioner-message">
-                            <span class="message-sender">You</span>
-                            "What makes exercise important to you?"
-                        </div>
-                        <div class="message feedback-message correct">
-                            ✓ Good! Open question evokes change talk
-                        </div>
-                    </div>
-                </div>
-            </div>
+                </section>
 
-            <div class="features">
-                <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Interactive Scenarios</h3>
-                    <p>Practice with realistic patient dialogues across different stages of change</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>Instant Feedback</h3>
-                    <p>Learn from detailed feedback on your technique choices</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🏆</div>
-                    <h3>Gamified Learning</h3>
-                    <p>Earn points, level up, and compete on the leaderboard</p>
-                </div>
+                <!-- Mission Banner -->
+                <section class="mission-banner">
+                    <div class="mission-grid">
+                        <div class="mission-title">Our Commitment</div>
+                        <div class="mission-text">
+                            <p>At the Money and Pensions Service, we are committed to giving the right guidance at the right time. This platform allows us to care for our colleagues and the people we serve by honing the skills needed to empower others to find their own solutions.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Features Section -->
+                <section class="features-section">
+                    <div class="section-header">
+                        <h2>Professional Skill Development</h2>
+                        <p>A safe environment to practice non-directive coaching techniques that encourage reflection and active listening.</p>
+                    </div>
+                    
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">⚡</div>
+                            <h3>AI-Powered Practice</h3>
+                            <p>Test your skills in real-time against diverse AI personas representing a range of professional backgrounds and challenges.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">📊</div>
+                            <h3>Insightful Analytics</h3>
+                            <p>Receive immediate analysis of your conversation style. Understand your balance of questioning vs. telling to improve engagement.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🏆</div>
+                            <h3>Gamified Learning</h3>
+                            <p>Track your progress, earn levels, and develop consistency in your coaching practice through engaging, interactive scenarios.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- AI Section -->
+                <section class="ai-section">
+                    <span class="tech-badge">Powered by Advanced AI</span>
+                    <h2>Practice Makes Professional</h2>
+                    <p>Our simulated personas don't just read a script—they react to your emotional tone and choice of words. This creates opportunities to practice empathy, impartiality, and integrity without the pressure of a live environment.</p>
+                    <a href="#" data-link="/register" class="btn btn-outline">Get Started</a>
+                </section>
             </div>
         `;
     } else {
