@@ -215,9 +215,33 @@ class AuthenticatedTableQuery:
         return self
 
     def execute(self):
-        """Execute the query."""
+        """Execute the query (select or update depending on context)."""
         import httpx
 
+        # If we have a body, this is an update operation
+        if self._body is not None:
+            url = f"{self.base_url}/rest/v1/{self.table_name}"
+            if self._filters:
+                url += "?" + "&".join(self._filters)
+            
+            # Prefer header to return the updated record
+            headers = {**self.headers, "Prefer": "return=representation"}
+            
+            with httpx.Client() as client:
+                response = client.patch(url, json=self._body, headers=headers)
+                response.raise_for_status()
+                try:
+                    data = response.json()
+                    if isinstance(data, list):
+                        return type("Response", (), {"data": data})()
+                    elif isinstance(data, dict):
+                        return type("Response", (), {"data": [data]})()
+                    else:
+                        return type("Response", (), {"data": []})()
+                except Exception:
+                    return type("Response", (), {"data": []})()
+        
+        # Otherwise this is a select operation
         url = f"{self.base_url}/rest/v1/{self.table_name}?select={self._select}"
         if self._filters:
             url += "&" + "&".join(self._filters)
@@ -256,6 +280,11 @@ class AuthenticatedTableQuery:
                     )()
             except Exception:
                 return type("Response", (), {"data": [{"id": None, **self._body}]})()
+
+    def update(self, data: dict):
+        """Update data in table."""
+        self._body = data
+        return self
 
 
 def get_authenticated_client(jwt_token: str) -> AuthenticatedSupabaseClient:

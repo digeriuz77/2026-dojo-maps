@@ -3,11 +3,12 @@ Dialogue API endpoints
 
 Handles dialogue node retrieval and choice submission.
 """
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Request
 from supabase import Client
 from typing import Optional
+import logging
 
-from app.core.supabase import get_supabase, get_supabase_admin
+from app.core.supabase import get_supabase, get_supabase_admin, get_authenticated_client
 from app.core.auth import get_current_user, AuthContext
 from app.api.v1.modules import get_user_module_progress
 from app.services.scoring_service import ScoringService
@@ -15,6 +16,7 @@ from app.models.modules import NodeResponse, ChoiceSubmit, ChoiceFeedback
 from app.models.progress import UserProgress
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 # =====================================================
@@ -130,6 +132,7 @@ async def get_dialogue_node(
 @router.post("/submit", response_model=ChoiceFeedback)
 async def submit_choice(
     choice_data: ChoiceSubmit,
+    request: Request = None,
     current_user: AuthContext = Depends(get_current_user),
     supabase: Client = Depends(get_supabase)
 ):
@@ -137,7 +140,17 @@ async def submit_choice(
     Submit a dialogue choice and get feedback.
 
     Processes the user's choice, awards points, and returns the next node.
+    Uses authenticated client for progress updates to ensure RLS compliance.
     """
+    logger.info(f"[DIALOGUE] User {current_user.user_id} submitting choice for module {choice_data.module_id}, node {choice_data.node_id}")
+    
+    # Get the JWT token from auth context or request for authenticated operations
+    jwt_token = current_user.raw_token
+    if not jwt_token and request:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            jwt_token = auth_header[7:]
+
     supabase_admin = get_supabase_admin()
 
     # Get module and progress
@@ -145,9 +158,10 @@ async def submit_choice(
     progress = await get_user_module_progress(current_user.user_id, choice_data.module_id, supabase)
 
     if not progress:
+        logger.warning(f"[DIALOGUE] No progress found for user {current_user.user_id}, module {choice_data.module_id}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Module not started"
+            detail="Module not started. Call /modules/{id}/start first"
         )
 
     # Find the current node
@@ -180,8 +194,13 @@ async def submit_choice(
     is_correct = is_correct_technique(selected_choice)
     evoked_ct = evokes_change_talk(node, selected_choice)
 
-    # Determine if first attempt
-    nodes_completed = progress.get('nodes_completed', [])
+    # Get existing tracking lists
+    nodes_completed = progress.get('nodes_completed', []) or []
+    nodes_visited = progress.get('nodes_visited', []) or []
+    
+    # Track if this is the first visit to this node (for progress calculation)
+    is_first_visit = choice_data.node_id not in nodes_visited
+    # Track if this is the first attempt (for bonus points)
     is_first_attempt = choice_data.node_id not in nodes_completed
 
     # Calculate points
@@ -191,23 +210,33 @@ async def submit_choice(
         evoked_change_talk=evoked_ct
     )
 
-    # Record attempt
-    supabase.table('dialogue_attempts').insert({
-        'user_id': current_user.user_id,
-        'module_id': choice_data.module_id,
-        'progress_id': progress['id'],
-        'node_id': choice_data.node_id,
-        'choice_id': choice_data.choice_id,
-        'choice_text': choice_data.choice_text,
-        'technique': choice_data.technique,
-        'is_correct_technique': is_correct,
-        'feedback_text': selected_choice.get('feedback', ''),
-        'evoked_change_talk': evoked_ct,
-        'points_earned': points_earned
-    }).execute()
+    # Record attempt (use admin client to bypass RLS for dialogue_attempts)
+    try:
+        supabase_admin.table('dialogue_attempts').insert({
+            'user_id': current_user.user_id,
+            'module_id': choice_data.module_id,
+            'progress_id': progress['id'],
+            'node_id': choice_data.node_id,
+            'choice_id': choice_data.choice_id,
+            'choice_text': choice_data.choice_text,
+            'technique': choice_data.technique,
+            'is_correct_technique': is_correct,
+            'feedback_text': selected_choice.get('feedback', ''),
+            'evoked_change_talk': evoked_ct,
+            'points_earned': points_earned
+        }).execute()
+    except Exception as e:
+        logger.warning(f"[DIALOGUE] Failed to record attempt (may be duplicate): {e}")
 
-    # Update progress
+    # Update progress tracking
     new_nodes_completed = list(nodes_completed)
+    new_nodes_visited = list(nodes_visited)
+    
+    # Always add to visited nodes on first visit (for progress tracking)
+    if is_first_visit:
+        new_nodes_visited.append(choice_data.node_id)
+    
+    # Add to completed only if correct and first attempt (for scoring)
     if is_first_attempt and is_correct:
         new_nodes_completed.append(choice_data.node_id)
 
@@ -220,26 +249,31 @@ async def submit_choice(
         next_node_id == 'end'
     )
 
-    status = progress['status']
+    progress_status = progress['status']
     completion_score = progress.get('completion_score', 0)
 
     if is_module_complete:
-        status = 'completed'
+        progress_status = 'completed'
         total_nodes = len(dialogue_content.get('nodes', []))
         correct_attempts = len(new_nodes_completed)
+        visited_count = len(new_nodes_visited)
+        
+        # Calculate completion score based on visited nodes (progress) and correct choices (accuracy)
         completion_score = ScoringService.calculate_completion_score(
             total_nodes=total_nodes,
-            nodes_completed=len(new_nodes_completed),
-            correct_choices=correct_attempts
+            nodes_completed=visited_count,  # Use visited for progress
+            correct_choices=correct_attempts  # Use correct for accuracy
         )
 
         # Add completion bonus
         points_earned += ScoringService.MODULE_COMPLETION_BONUS
+        logger.info(f"[DIALOGUE] Module {choice_data.module_id} completed by user {current_user.user_id}. Score: {completion_score}%")
 
-    # Update progress record
+    # Update progress record - use authenticated client if available, otherwise admin
     update_data = {
         'current_node_id': next_node_id if not is_module_complete else choice_data.node_id,
         'nodes_completed': new_nodes_completed,
+        'nodes_visited': new_nodes_visited,
         'points_earned': progress.get('points_earned', 0) + points_earned,
     }
 
@@ -250,7 +284,18 @@ async def submit_choice(
             'completed_at': 'now()'
         })
 
-    supabase.table('user_progress').update(update_data).eq('id', progress['id']).execute()
+    # Use authenticated client for user_progress updates if we have a JWT token
+    if jwt_token:
+        try:
+            auth_client = get_authenticated_client(jwt_token)
+            auth_client.table('user_progress').update(update_data).eq('id', progress['id']).execute()
+            logger.debug(f"[DIALOGUE] Progress updated via authenticated client")
+        except Exception as e:
+            logger.warning(f"[DIALOGUE] Authenticated update failed, falling back to admin: {e}")
+            supabase_admin.table('user_progress').update(update_data).eq('id', progress['id']).execute()
+    else:
+        # Fallback to admin client if no JWT token
+        supabase_admin.table('user_progress').update(update_data).eq('id', progress['id']).execute()
 
     # Update user profile
     profile = await get_user_profile(current_user.user_id, supabase_admin)
