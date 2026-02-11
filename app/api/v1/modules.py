@@ -253,11 +253,33 @@ async def start_module(
 async def restart_module(
     module_id: str,
     current_user: AuthContext = Depends(get_current_user),
-    supabase: Client = Depends(get_supabase),
+    request: Request = None,
 ):
     """
     Restart a module by resetting progress.
+    Uses authenticated client to ensure RLS policies work correctly.
     """
+    import httpx
+    from app.config import settings
+
+    logger.info(f"[MODULES] User {current_user.user_id} restarting module {module_id}")
+
+    # Get the JWT token from auth context or request
+    jwt_token = current_user.raw_token
+    if not jwt_token and request:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            jwt_token = auth_header[7:]
+
+    if not jwt_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No authentication token provided",
+        )
+
+    # Use regular client for reading module data
+    supabase = get_supabase()
+    
     # Check if module exists
     module_response = (
         supabase.table("learning_modules").select("*").eq("id", module_id).execute()
@@ -272,24 +294,46 @@ async def restart_module(
     dialogue_content = module.get("dialogue_content", {})
     start_node = dialogue_content.get("start_node", "node_1")
 
-    # Check for existing progress
-    existing_progress = await get_user_module_progress(
-        current_user.user_id, module_id, supabase
+    # Use authenticated client for progress operations (RLS compliance)
+    auth_client = get_authenticated_client(jwt_token)
+    
+    # Check for existing progress using authenticated client
+    existing_progress_response = (
+        auth_client.table("user_progress")
+        .select("*")
+        .eq("user_id", current_user.user_id)
+        .eq("module_id", module_id)
+        .execute()
     )
+    existing_progress = existing_progress_response.data[0] if existing_progress_response.data else None
 
     if existing_progress:
-        # Reset existing progress
-        supabase.table("user_progress").update(
-            {
-                "status": "in_progress",
-                "current_node_id": start_node,
-                "nodes_completed": [],
-                "points_earned": 0,
-                "completion_score": 0,
-                "techniques_demonstrated": {},
-                "completed_at": None,
-            }
-        ).eq("id", existing_progress["id"]).execute()
+        # Reset existing progress using authenticated client
+        try:
+            update_response = (
+                auth_client.table("user_progress")
+                .update(
+                    {
+                        "status": "in_progress",
+                        "current_node_id": start_node,
+                        "nodes_completed": [],
+                        "nodes_visited": [],
+                        "points_earned": 0,
+                        "completion_score": 0,
+                        "techniques_demonstrated": {},
+                        "completed_at": None,
+                    }
+                )
+                .eq("id", existing_progress["id"])
+                .execute()
+            )
+            logger.info(f"[MODULES] Progress reset successfully for module {module_id}")
+        except Exception as e:
+            logger.error(f"[MODULES] Failed to reset progress: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to reset progress: {str(e)}",
+            )
 
         return {
             "message": "Module restarted",
@@ -297,19 +341,27 @@ async def restart_module(
             "current_node_id": start_node,
         }
     else:
-        # Create new progress
-        progress_response = (
-            supabase.table("user_progress")
-            .insert(
-                {
-                    "user_id": current_user.user_id,
-                    "module_id": module_id,
-                    "status": "in_progress",
-                    "current_node_id": start_node,
-                }
+        # Create new progress using authenticated client
+        try:
+            progress_response = (
+                auth_client.table("user_progress")
+                .insert(
+                    {
+                        "user_id": current_user.user_id,
+                        "module_id": module_id,
+                        "status": "in_progress",
+                        "current_node_id": start_node,
+                    }
+                )
+                .execute()
             )
-            .execute()
-        )
+            logger.info(f"[MODULES] New progress created for module {module_id}")
+        except Exception as e:
+            logger.error(f"[MODULES] Failed to create progress: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to create progress: {str(e)}",
+            )
 
         progress = progress_response.data[0]
 
