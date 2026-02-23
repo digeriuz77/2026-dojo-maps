@@ -184,13 +184,6 @@ async def submit_choice(
     nodes_completed = progress.get('nodes_completed', [])
     is_first_attempt = choice_data.node_id not in nodes_completed
 
-    # Calculate points
-    points_earned = ScoringService.calculate_choice_points(
-        is_correct=is_correct,
-        is_first_attempt=is_first_attempt,
-        evoked_change_talk=evoked_ct
-    )
-
     # Record attempt
     supabase.table('dialogue_attempts').insert({
         'user_id': current_user.user_id,
@@ -203,7 +196,6 @@ async def submit_choice(
         'is_correct_technique': is_correct,
         'feedback_text': selected_choice.get('feedback', ''),
         'evoked_change_talk': evoked_ct,
-        'points_earned': points_earned
     }).execute()
 
     # Update progress
@@ -233,14 +225,10 @@ async def submit_choice(
             correct_choices=correct_attempts
         )
 
-        # Add completion bonus
-        points_earned += ScoringService.MODULE_COMPLETION_BONUS
-
     # Update progress record
     update_data = {
         'current_node_id': next_node_id if not is_module_complete else choice_data.node_id,
         'nodes_completed': new_nodes_completed,
-        'points_earned': progress.get('points_earned', 0) + points_earned,
     }
 
     if is_module_complete:
@@ -255,15 +243,10 @@ async def submit_choice(
     # Update user profile
     profile = await get_user_profile(current_user.user_id, supabase_admin)
     if profile:
-        new_total_points = profile.get('total_points', 0) + points_earned
-        new_level = ScoringService.calculate_level(new_total_points)
-
         modules_completed = profile.get('modules_completed', 0)
         change_talk_evoked = profile.get('change_talk_evoked', 0) + (1 if evoked_ct else 0)
 
         supabase_admin.table('user_profiles').update({
-            'total_points': new_total_points,
-            'level': new_level,
             'modules_completed': modules_completed + (1 if is_module_complete else 0),
             'change_talk_evoked': change_talk_evoked,
             'last_active_at': 'now()'
@@ -272,20 +255,16 @@ async def submit_choice(
         return ChoiceFeedback(
             is_correct=is_correct,
             feedback_text=selected_choice.get('feedback', ''),
-            points_earned=points_earned,
             evoked_change_talk=evoked_ct,
             next_node_id=next_node_id if not is_module_complete else None,
             is_module_complete=is_module_complete,
             completion_score=completion_score if is_module_complete else None,
-            total_points=new_total_points,
-            level=new_level
         )
 
     # Fallback if no profile (shouldn't happen)
     return ChoiceFeedback(
         is_correct=is_correct,
         feedback_text=selected_choice.get('feedback', ''),
-        points_earned=points_earned,
         evoked_change_talk=evoked_ct,
         next_node_id=next_node_id,
         is_module_complete=is_module_complete

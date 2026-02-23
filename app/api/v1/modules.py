@@ -78,8 +78,6 @@ async def list_modules(
         if module["id"] in progress_map:
             progress = progress_map[module["id"]]
             module_data["user_status"] = progress["status"]
-            module_data["user_score"] = progress.get("completion_score", 0)
-            module_data["user_points_earned"] = progress.get("points_earned", 0)
 
         modules.append(ModuleResponse(**module_data))
 
@@ -111,8 +109,6 @@ async def get_module(
     progress = await get_user_module_progress(current_user.user_id, module_id, supabase)
     if progress:
         module_data["user_status"] = progress["status"]
-        module_data["user_score"] = progress.get("completion_score", 0)
-        module_data["user_points_earned"] = progress.get("points_earned", 0)
 
     return ModuleResponse(**module_data)
 
@@ -284,7 +280,6 @@ async def restart_module(
                 "status": "in_progress",
                 "current_node_id": start_node,
                 "nodes_completed": [],
-                "points_earned": 0,
                 "completion_score": 0,
                 "techniques_demonstrated": {},
                 "completed_at": None,

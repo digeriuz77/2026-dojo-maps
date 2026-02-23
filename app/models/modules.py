@@ -41,13 +41,10 @@ class ModuleResponse(BaseModel):
     technique_focus: str
     stage_of_change: str
     description: str
-    points: int = 500
     dialogue_content: Dict[str, Any]
 
     # User progress (optional)
     user_status: Optional[str] = None
-    user_score: Optional[int] = None
-    user_points_earned: Optional[int] = None
 
     class Config:
         from_attributes = True
@@ -82,10 +79,7 @@ class ChoiceFeedback(BaseModel):
     """Feedback for a submitted choice"""
     is_correct: bool
     feedback_text: str
-    points_earned: int
     evoked_change_talk: bool
     next_node_id: Optional[str] = None
     is_module_complete: bool = False
     completion_score: Optional[int] = None
-    total_points: Optional[int] = None
-    level: Optional[int] = None

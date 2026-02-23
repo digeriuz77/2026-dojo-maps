@@ -133,8 +133,6 @@ def create_user_profile(
                 {
                     "user_id": user_id,
                     "display_name": display_name,
-                    "total_points": 0,
-                    "level": 1,
                     "modules_completed": 0,
                     "change_talk_evoked": 0,
                     "reflections_offered": 0,

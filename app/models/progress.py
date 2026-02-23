@@ -14,7 +14,6 @@ class UserProgress(BaseModel):
     status: str  # not_started, in_progress, completed
     current_node_id: str
     nodes_completed: List[str]
-    points_earned: int
     completion_score: int
     techniques_demonstrated: dict
     started_at: datetime
@@ -27,8 +26,6 @@ class UserProgress(BaseModel):
 class ProgressListResponse(BaseModel):
     """List of user progress"""
     progress: List[UserProgress]
-    total_points: int
-    level: int
     modules_completed: int
 
 
@@ -36,8 +33,6 @@ class LeaderboardEntry(BaseModel):
     """Leaderboard entry"""
     rank: int
     display_name: str
-    total_points: int
-    level: int
     modules_completed: int
 
 
@@ -52,8 +47,6 @@ class UserProfile(BaseModel):
     id: str
     email: str
     display_name: Optional[str] = None
-    total_points: int = 0
-    level: int = 1
     modules_completed: int = 0
     created_at: datetime
     updated_at: datetime

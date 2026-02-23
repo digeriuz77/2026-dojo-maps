@@ -29,7 +29,7 @@ async def get_leaderboard(
     # Get top users
     response = supabase_admin.table('user_profiles') \
         .select('*') \
-        .order('total_points', desc=True) \
+        .order('modules_completed', desc=True) \
         .order('created_at', desc=False) \
         .limit(limit) \
         .execute()
@@ -41,8 +41,6 @@ async def get_leaderboard(
         entry = LeaderboardEntry(
             rank=i,
             display_name=profile.get('display_name') or f"User {profile['user_id'][:8]}",
-            total_points=profile.get('total_points', 0),
-            level=profile.get('level', 1),
             modules_completed=profile.get('modules_completed', 0)
         )
 
@@ -60,11 +58,11 @@ async def get_leaderboard(
             .execute()
 
         if user_profile_response.data:
-            # Get user's rank by counting users with more points
-            user_points = user_profile_response.data[0].get('total_points', 0)
+            # Get user's rank by counting users with more modules completed
+            user_modules = user_profile_response.data[0].get('modules_completed', 0)
             rank_response = supabase_admin.table('user_profiles') \
                 .select('id') \
-                .gt('total_points', user_points) \
+                .gt('modules_completed', user_modules) \
                 .execute()
 
             user_rank = len(rank_response.data) + 1
@@ -72,9 +70,7 @@ async def get_leaderboard(
             current_user_entry = LeaderboardEntry(
                 rank=user_rank,
                 display_name=user_profile_response.data[0].get('display_name') or f"You",
-                total_points=user_points,
-                level=user_profile_response.data[0].get('level', 1),
-                modules_completed=user_profile_response.data[0].get('modules_completed', 0)
+                modules_completed=user_modules
             )
 
     return LeaderboardResponse(

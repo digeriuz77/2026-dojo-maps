@@ -65,7 +65,6 @@ async def get_user_stats(
                 module_title=module_title,
                 status=p.get('status', 'not_started'),
                 completion_score=p.get('completion_score', 0),
-                points_earned=p.get('points_earned', 0),
                 current_node_id=p.get('current_node_id'),
                 nodes_completed=p.get('nodes_completed', []),
                 techniques_demonstrated=p.get('techniques_demonstrated', {}),
@@ -74,8 +73,6 @@ async def get_user_stats(
             ))
 
     return ProgressListResponse(
-        total_points=profile.get('total_points', 0),
-        level=profile.get('level', 1),
         modules_completed=profile.get('modules_completed', 0),
         progress=progress_list
     )
@@ -112,7 +109,6 @@ async def get_module_progress(
         module_title=module_title,
         status=p.get('status', 'not_started'),
         completion_score=p.get('completion_score', 0),
-        points_earned=p.get('points_earned', 0),
         current_node_id=p.get('current_node_id'),
         nodes_completed=p.get('nodes_completed', []),
         techniques_demonstrated=p.get('techniques_demonstrated', {}),

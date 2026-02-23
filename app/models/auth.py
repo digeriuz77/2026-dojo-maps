@@ -55,8 +55,6 @@ class UserProfileWithStats(BaseModel):
     id: str
     user_id: str
     display_name: Optional[str] = None
-    total_points: int = 0
-    level: int = 1
     modules_completed: int = 0
     change_talk_evoked: int = 0
     reflections_offered: int = 0

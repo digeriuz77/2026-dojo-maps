@@ -129,7 +129,6 @@ async def get_users(
                     "is_active": user.get("is_active", True),
                     "created_at": user.get("created_at"),
                     "modules_completed": 0,
-                    "total_points": 0,
                 }
             )
 
