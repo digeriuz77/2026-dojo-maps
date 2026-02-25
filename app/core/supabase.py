@@ -115,7 +115,7 @@ async def test_connection() -> Dict[str, Any]:
             "config_present": {
                 "supabase_url": bool(settings.SUPABASE_URL),
                 "supabase_key": bool(settings.SUPABASE_KEY),
-                "secret_key": bool(settings.SUPABASE_SECRET_KEY),
+                "secret_key": bool(settings.SUPABASE_SERVICE_ROLE_KEY),
                 "jwt_secret": bool(settings.SUPABASE_JWT_SECRET),
             },
         }
@@ -130,7 +130,7 @@ async def test_connection() -> Dict[str, Any]:
             "config_present": {
                 "supabase_url": bool(settings.SUPABASE_URL),
                 "supabase_key": bool(settings.SUPABASE_KEY),
-                "secret_key": bool(settings.SUPABASE_SECRET_KEY),
+                "secret_key": bool(settings.SUPABASE_SERVICE_ROLE_KEY),
                 "jwt_secret": bool(settings.SUPABASE_JWT_SECRET),
             },
         }

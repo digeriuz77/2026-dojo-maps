@@ -217,33 +217,6 @@ async def start_module(
         "current_node_id": progress["current_node_id"],
     }
 
-    # Get dialogue content to find start node
-    module = module_response.data[0]
-    dialogue_content = module.get("dialogue_content", {})
-    start_node = dialogue_content.get("start_node", "node_1")
-
-    # Create progress record
-    progress_response = (
-        supabase.table("user_progress")
-        .insert(
-            {
-                "user_id": current_user.user_id,
-                "module_id": module_id,
-                "status": "in_progress",
-                "current_node_id": start_node,
-            }
-        )
-        .execute()
-    )
-
-    progress = progress_response.data[0]
-
-    return {
-        "message": "Module started",
-        "progress_id": str(progress["id"]),
-        "current_node_id": progress["current_node_id"],
-    }
-
 
 @router.post("/{module_id}/restart")
 async def restart_module(
