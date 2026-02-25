@@ -12,19 +12,50 @@
     <nav class="navbar">
         <div class="container">
             <a href="#" class="navbar-brand" data-link>
+                <img src="/static/images/maps-logo.svg" alt="MAPS Logo" style="height: 40px;" />
                 <div class="logo-text">
-                    <span class="logo-title">MAPS</span>
-                    <span class="logo-subtitle">Learning Platform</span>
+                    <span class="logo-title">Money & Pensions Service</span>
+                    <span class="logo-subtitle">MAPS LEARNING PLATFORM</span>
                 </div>
             </a>
             <div class="nav-links" id="nav-items">
-                <!-- Dynamic nav items -->
+                <a href="/login" class="nav-link" style="color: white; text-decoration: none; font-weight: 500;">Login</a>
+                <a href="/register" class="nav-link" style="color: white; text-decoration: none; font-weight: 500;">Register</a>
             </div>
         </div>
     </nav>
 
     <main id="app" class="container">
-        <!-- Dynamic content -->
+        <!-- MAPS Hero Section -->
+        <section class="maps-hero-section">
+            <div class="maps-hero-grid grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="maps-hero-copy text-left">
+                    <h1 class="maps-hero-title text-4xl md:text-5xl font-extrabold text-white mb-4">Empowering conversations that transform lives</h1>
+                    <p class="maps-hero-subtitle text-white/90 text-lg max-w-2xl mb-6">Develop effective coaching skills through realistic practice. The MAPS Learning Platform helps you master collaborative, growth-focused guidance to better support colleagues and clients.</p>
+                    
+                    <div class="maps-cta flex flex-wrap gap-4">
+                        <a href="/login" class="btn btn-primary btn-lg">Start Training</a>
+                        <a href="/about" class="btn btn-outline btn-lg" style="color: white; border-color: white;">Learn More</a>
+                    </div>
+                </div>
+                
+                <div class="maps-hero-visual relative h-80 md:h-full" aria-label="Hero Visual">
+                    <div class="conversation-overlay absolute right-0 top-0 bg-white rounded-lg border border-gray-200 shadow-lg p-4 w-80">
+                        <div class="overlay-label font-semibold text-sm uppercase mb-1" style="color: #374151;">COACHEE PERSONA</div>
+                        <div class="overlay-quote mb-2 text-sm" style="color: #374151;">"I feel overwhelmed with the new project timeline."</div>
+                        <div class="overlay-label font-semibold text-sm uppercase mt-2" style="color: #374151;">YOU (COACH)</div>
+                        <div class="overlay-quote mb-2 text-sm" style="color: #374151;">"What support would be most helpful for you right now?"</div>
+                        <div class="tag-badge mt-2 inline-block bg-green-100 text-xs px-2 py-1 rounded" style="border: 1px solid #5ee7eb;">✓ Open-ended Question</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAPS Blue Banner Section -->
+        <section class="maps-blue-banner p-8">
+            <h2 class="section-title text-white text-center mb-2" style="border-bottom: 3px solid #ff69b4; display: inline-block;">Our Commitment</h2>
+            <p class="text-center max-w-3xl mx-auto leading-relaxed">At the Money and Pensions Service, we are committed to giving the right guidance at the right time. This platform allows us to care for our colleagues and the people we serve by honing the skills needed to empower others to find their own solutions.</p>
+        </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
