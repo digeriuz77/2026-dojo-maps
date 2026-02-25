@@ -124,8 +124,8 @@ uvicorn app.main:app --reload --port 8000
 |----------|----------|-------------|
 | `SUPABASE_URL` | Yes | Your Supabase project URL |
 | `SUPABASE_KEY` | Yes | Supabase anon/public key |
-| `SUPABASE_SECRET_KEY` | Yes | Supabase secret key (backend only) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service role key (for migrations) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service role key (backend only) |
+| `SUPABASE_JWT_SECRET` | Yes | JWT secret for token verification |
 | `SUPABASE_JWT_SECRET` | Yes | JWT secret for token verification |
 | `DEBUG` | No | Enable debug mode (default: false) |
 | `CORS_ORIGINS` | No | Allowed CORS origins (comma-separated) |

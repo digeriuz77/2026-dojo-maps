@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     Required environment variables (Supabase):
         - SUPABASE_URL
         - SUPABASE_KEY: Publishable key (sb_publishable_xxx) or legacy anon key
-        - SUPABASE_SECRET_KEY: Secret key (sb_secret_xxx) or legacy service_role key
+        - SUPABASE_SERVICE_ROLE_KEY: Service role key (sb_service_role_xxx)
         - SUPABASE_JWT_SECRET: JWT secret (still used by Supabase client for auth operations)
 
     Optional environment variables (Chat Practice):
@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     # Supabase Configuration (Required)
     SUPABASE_URL: str
     SUPABASE_KEY: str
-    SUPABASE_SECRET_KEY: str
+    SUPABASE_SERVICE_ROLE_KEY: str
     SUPABASE_JWT_SECRET: str = ""  # Optional when using JWKS
 
     # Server Settings
@@ -115,7 +115,7 @@ except ValidationError as e:
     print("Required variables:")
     print("  - SUPABASE_URL: Your Supabase project URL")
     print("  - SUPABASE_KEY: Your Supabase publishable key (sb_publishable_xxx)")
-    print("  - SUPABASE_SECRET_KEY: Your Supabase secret key (sb_secret_xxx)")
+    print("  - SUPABASE_SERVICE_ROLE_KEY: Your Supabase service role key")
     print("  - SUPABASE_JWT_SECRET: Your Supabase JWT secret")
     print()
     print("For Railway deployment, set these in your environment variables.")

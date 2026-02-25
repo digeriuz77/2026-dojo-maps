@@ -81,9 +81,9 @@ def get_supabase_admin() -> Client:
 
     global _supabase_admin_client
     if _supabase_admin_client is None:
-        logger.info("Initializing Supabase admin client with secret key")
+        logger.info("Initializing Supabase admin client with service role key")
         _supabase_admin_client = create_client(
-            settings.SUPABASE_URL, settings.SUPABASE_SECRET_KEY
+            settings.SUPABASE_URL, settings.SUPABASE_SERVICE_ROLE_KEY
         )
         logger.info("Supabase admin client initialized successfully")
     return _supabase_admin_client

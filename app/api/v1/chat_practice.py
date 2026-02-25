@@ -379,6 +379,54 @@ async def analyze_transcript(
             ),
         )
 
+        # Save analysis to database
+        try:
+            session_id = f"demo_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
+            analysis_id = save_conversation_analysis(
+                session_id=session_id,
+                analysis=analysis,
+                transcript=transcript,
+                persona_id=None,
+                persona_name=persona_name,
+                user_id=auth.user_id if auth else None,
+                total_turns=len([m for m in transcript if m.get("role") == "user"]),
+            )
+            if analysis_id:
+                logger.info(f"Analysis saved: {analysis_id}")
+
+                # Update user profile if authenticated
+                if auth and auth.user_id:
+                    try:
+                        supabase_admin = get_supabase_admin()
+                        profile_resp = (
+                            supabase_admin.table("user_profiles")
+                            .select("*")
+                            .eq("user_id", auth.user_id)
+                            .maybe_single()
+                            .execute()
+                        )
+
+                        if profile_resp and profile_resp.data:
+                            profile = profile_resp.data
+                            current_ct = profile.get("change_talk_evoked", 0) or 0
+                            current_reflections = profile.get("reflections_offered", 0) or 0
+                            technique_mastery = analysis.techniques_count or {}
+
+                            supabase_admin.table("user_profiles").update(
+                                {
+                                    "change_talk_evoked": current_ct + (1 if analysis.change_talk_evoked else 0),
+                                    "reflections_offered": current_reflections
+                                        + technique_mastery.get("simple_reflection", 0)
+                                        + technique_mastery.get("complex_reflection", 0),
+                                    "technique_mastery": technique_mastery,
+                                    "last_active_at": datetime.now(timezone.utc).isoformat(),
+                                }
+                            ).eq("user_id", auth.user_id).execute()
+                    except Exception as profile_err:
+                        logger.error(f"Failed to update user profile: {profile_err}")
+        except Exception as save_err:
+            logger.error(f"Failed to save analysis: {save_err}", exc_info=True)
+
         return {
             "session_id": "demo",
             "total_turns": len([m for m in transcript if m.get("role") == "user"]),

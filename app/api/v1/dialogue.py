@@ -88,6 +88,58 @@ async def get_dialogue_node(
     Get a dialogue node for a module.
 
     Returns the patient statement and available practitioner choices.
+    If module not started, automatically starts it.
+    """
+    # Get module
+    module = await get_module_by_id(module_id, supabase)
+
+    # Check user progress - if not started, auto-start the module
+    progress = await get_user_module_progress(current_user.user_id, module_id, supabase)
+    if not progress:
+        # Auto-start the module
+        logger.info(f"[DIALOGUE] Auto-starting module {module_id} for user {current_user.user_id}")
+        
+        # Get dialogue content to find start node
+        dialogue_content = module.get('dialogue_content', {})
+        start_node = dialogue_content.get('start_node', 'node_1')
+        
+        # Create progress record
+        try:
+            insert_response = (
+                supabase.table("user_progress")
+                .insert(
+                    {
+                        "user_id": current_user.user_id,
+                        "module_id": module_id,
+                        "status": "in_progress",
+                        "current_node_id": start_node,
+                    }
+                )
+                .execute()
+            )
+            if insert_response.data:
+                progress = insert_response.data[0]
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Failed to create module progress"
+                )
+        except Exception as e:
+            logger.error(f"[DIALOGUE] Auto-start failed: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Module not started. Please start the module first."
+            )
+async def get_dialogue_node(
+    module_id: str,
+    node_id: str,
+    current_user: AuthContext = Depends(get_current_user),
+    supabase: Client = Depends(get_supabase)
+):
+    """
+    Get a dialogue node for a module.
+
+    Returns the patient statement and available practitioner choices.
     """
     # Get module
     module = await get_module_by_id(module_id, supabase)
@@ -141,6 +193,42 @@ async def submit_choice(
     supabase_admin = get_supabase_admin()
 
     # Get module and progress
+    module = await get_module_by_id(choice_data.module_id, supabase)
+    progress = await get_user_module_progress(current_user.user_id, choice_data.module_id, supabase)
+
+    # Auto-start if not started
+    if not progress:
+        logger.info(f"[DIALOGUE] Auto-starting module {choice_data.module_id} for user {current_user.user_id}")
+        
+        dialogue_content = module.get('dialogue_content', {})
+        start_node = dialogue_content.get('start_node', 'node_1')
+        
+        try:
+            insert_response = (
+                supabase.table("user_progress")
+                .insert(
+                    {
+                        "user_id": current_user.user_id,
+                        "module_id": choice_data.module_id,
+                        "status": "in_progress",
+                        "current_node_id": start_node,
+                    }
+                )
+                .execute()
+            )
+            if insert_response.data:
+                progress = insert_response.data[0]
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="Failed to create module progress"
+                )
+        except Exception as e:
+            logger.error(f"[DIALOGUE] Auto-start failed: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Module not started. Please start the module first."
+            )
     module = await get_module_by_id(choice_data.module_id, supabase)
     progress = await get_user_module_progress(current_user.user_id, choice_data.module_id, supabase)
 
