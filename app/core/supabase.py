@@ -7,7 +7,7 @@ import os
 import logging
 from typing import Optional, Dict, Any, List
 from supabase import create_client, Client
-from supabase._sync.client import Client as SyncClient
+from supabase import Client
 from app.config import settings
 
 import httpx
