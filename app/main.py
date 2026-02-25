@@ -220,6 +220,42 @@ async def reset_password_page(request: Request):
     return {"error": "Templates not configured"}
 
 
+# SPA catch-all: serve index.html for all frontend routes so that direct
+# navigation (bookmarks, shared links, page refresh) does not 404.
+# API routes (/api/*), static files (/static/*), and specific pages above
+# are matched first by FastAPI's route priority.
+_SPA_ROUTES = [
+    "/login",
+    "/register",
+    "/about",
+    "/modules",
+    "/modules/{module_id}",
+    "/modules/{module_id}/dialogue",
+    "/progress",
+    "/leaderboard",
+    "/chat-practice",
+    "/chat-practice/session",
+    "/chat-practice/results",
+]
+
+
+async def _serve_spa(request: Request):
+    if templates:
+        return templates.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "supabase_url": getattr(settings, "SUPABASE_URL", ""),
+                "supabase_anon_key": getattr(settings, "SUPABASE_KEY", ""),
+            },
+        )
+    return JSONResponse(status_code=404, content={"error": "Not found"})
+
+
+for _spa_route in _SPA_ROUTES:
+    app.add_api_route(_spa_route, _serve_spa, methods=["GET"], include_in_schema=False)
+
+
 @app.get("/health")
 async def health_check():
     """Basic health check for Railway"""
