@@ -1,0 +1,266 @@
+# Security & Scoring Fix Recommendations
+
+**Generated**: 2026-02-25
+**Repositories**: dojo-2026 (current) vs mi-learning-platform (target)
+
+---
+
+## CRITICAL ISSUES (Fix Before Production)
+
+### 1. API Keys Exposed in Client-Side Code ⚠️
+**Severity**: CRITICAL
+**File**: `C:\builds\dojo-2026\templates\index.html:10-12`
+
+```html
+<script>
+    window.SUPABASE_URL = '{{ supabase_url or "" }}';
+    window.SUPABASE_ANON_KEY = '{{ supabase_anon_key or "" }}';
+</script>
+```
+
+**Risk**:
+- API keys visible in browser DevTools
+- Can be extracted by network inspection
+- Allows unauthorized access to Supabase anon operations
+
+**Fix**:
+```html
+<!-- DELETE the <script> block above -->
+<!-- Keys are already handled by backend via FastAPI templates -->
+```
+
+The FastAPI backend passes these values securely via Jinja2 templates for the root route (`app/main.py:172-183`). No client-side exposure is needed.
+
+---
+
+### 2. Missing Route Validation for Dialogue Submit ⚠️
+**Severity**: HIGH
+**File**: `C:\builds\dojo-2026\app\api\v1\dialogue.py:130-151`
+
+**Current Code**:
+```python
+# No validation that choice_data.node_id matches progress['current_node_id']
+```
+
+**Risk**: Race condition attacks - users can submit choices for any node in any order
+
+**Fix from mi-learning-platform**:
+```python
+# Add validation (lines 66-70 from mi-learning-platform)
+if choice_data.node_id != progress.get("current_node_id"):
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="Choice submission does not match your current node. Please refresh and try again.",
+    )
+```
+
+---
+
+### 3. Double-Counting Vulnerability in Scoring 🐛
+**Severity**: HIGH
+**Files**: `C:\builds\dojo-2026\app\api\v1\dialogue.py:183-186,241-253`
+
+**Issue**:
+```python
+# Lines 183-186
+is_first_attempt = choice_data.node_id not in nodes_completed
+
+# Lines 241-253
+if is_module_complete:
+    completion_score = ScoringService.calculate_completion_score(...)
+    # Completion score calculated but ALSO points_earned accumulates
+```
+
+**Problem**: `points_earned` in `user_progress` table can accumulate multiple times for same module completion
+
+**Fix from mi-learning-platform**:
+```python
+# Lines 308-310 from mi-learning-platform
+# Binary completion: if user earned points, they participated
+if points_earned and points_earned > 0:
+    return 100
+return 0
+
+# Lines 314-315 in dialogue.py
+# P1-10: Fixed double-counting. total_points_earned already includes current
+# choice points + previous points. Use it directly instead of adding again.
+points_earned = total_points_earned
+```
+
+---
+
+### 4. Missing Max Points Calculation 📊
+**Severity**: MEDIUM
+**File**: `C:\builds\dojo-2026\app\services\scoring_service.py`
+
+**Issue**: No `calculate_max_points_available()` function
+**Impact**: Progress percentage calculations inaccurate, users see confusing "X% complete"
+
+**Fix**: Port entire `calculate_max_points_available()` method from mi-learning-platform (lines 200-259)
+
+---
+
+## LANDING PAGE UPDATES
+
+### Required Content Structure:
+
+```tsx
+// Navigation Bar (All Pages)
+<img src="/static/images/maps-logo.svg" alt="Money & Pensions Service" />
+
+// Hero Section (Landing Page)
+<div className="hero">
+  <h1>Empowering conversations that transform lives</h1>
+  <p>Develop effective coaching skills through realistic practice. The MAPS Learning Platform helps you master collaborative, growth-focused guidance to better support colleagues and clients.</p>
+
+  <div className="hero-buttons">
+    <Link href="/login">Start Training</Link>
+    <Link href="/about">Learn More</Link>
+  </div>
+
+  <div className="conversation-card">
+    <label>COACHEE PERSONA</label>
+    <blockquote>"I feel overwhelmed with the new project timeline."</blockquote>
+
+    <label>YOU (COACH)</label>
+    <blockquote>"What support would be most helpful for you right now?"</blockquote>
+
+    <div className="feedback-tag">✓ Open-ended Question</div>
+  </div>
+</div>
+
+// Blue Banner Section
+<div className="blue-banner">
+  <h2>Our Commitment</h2>
+  <p>At the Money and Pensions Service, we are committed to giving the right guidance at the right time. This platform allows us to care for our colleagues and the people we serve by honing the skills needed to empower others to find their own solutions.</p>
+</div>
+```
+
+### CSS Classes to Add:
+
+```css
+/* Add to static/css/style.css */
+
+.hero {
+  /* ... existing styles ... */
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.conversation-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin: 2rem auto;
+  max-width: 600px;
+}
+
+.conversation-card label {
+  font-weight: bold;
+  color: #1e3a5f;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.conversation-card blockquote {
+  border-left: 4px solid #0077b6;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: #555;
+  background: #f8f9fa;
+  border-radius: 0 4px 4px 0;
+}
+
+.feedback-tag {
+  background: #d1fae5;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  display: inline-block;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.blue-banner {
+  background: linear-gradient(135deg, #0077b6 0%, #00a8e8 100%);
+  color: white;
+  padding: 3rem 2rem;
+  text-align: center;
+  border-radius: 12px;
+  margin: 3rem 0;
+}
+
+.blue-banner h2 {
+  border-bottom: 3px solid #ff69b4;
+  padding-bottom: 0.5rem;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.blue-banner p {
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+```
+
+---
+
+## DEPLOYMENT CHECKLIST
+
+### Pre-Production:
+- [ ] Remove `SUPABASE_URL` and `SUPABASE_ANON_KEY` from `templates/index.html`
+- [ ] Set `CORS_ORIGINS` to production domain (e.g., `["https://maps-learning-platform.com"]`)
+- [ ] Set `SITE_URL` in `.env` for email redirects
+- [ ] Set `DEBUG=False` in production
+- [ ] Add node validation to `dialogue.py`
+- [ ] Port `calculate_max_points_available()` from mi-learning-platform
+- [ ] Fix double-counting bug in dialogue submission
+- [ ] Update landing page with new hero section
+
+### Post-Deployment:
+- [ ] Test login/logout flow
+- [ ] Test password reset email delivery
+- [ ] Test module completion flow (all 12 modules)
+- [ ] Test leaderboard aggregation
+- [ ] Verify RLS policies in Supabase
+- [ ] Run `pytest` test suite
+- [ ] Monitor for any error logs in production
+
+---
+
+## FILES TO MODIFY
+
+1. `templates/index.html` - Remove API key script block
+2. `app/page.tsx` - Update landing page with new content
+3. `app/services/scoring_service.py` - Add `calculate_max_points_available()`
+4. `app/api/v1/dialogue.py` - Add node validation
+5. `static/css/style.css` - Add new CSS classes
+6. `.env` - Verify production variables set
+
+---
+
+## PRIORITY ORDER
+
+1. **CRITICAL**: Remove API keys from template (5 min)
+2. **HIGH**: Add node validation (15 min)
+3. **HIGH**: Fix double-counting (20 min)
+4. **MEDIUM**: Update landing page (30 min)
+5. **MEDIUM**: Port max points calculation (20 min)
+
+**Total Estimated Time**: ~1.5 hours

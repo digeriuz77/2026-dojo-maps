@@ -3,28 +3,31 @@ API routes for MI Chat Practice sessions.
 Allows users to practice Motivational Interviewing with simulated client personas.
 """
 
-from fastapi import APIRouter, HTTPException, Depends
-from typing import Optional
 import logging
+from datetime import datetime, timezone
+from typing import Optional
 
+from fastapi import APIRouter, Depends, HTTPException
+
+from app.core.auth import AuthContext, get_current_user
+from app.core.supabase import get_supabase_admin
 from app.models.chat import (
-    PersonaListResponse,
-    PersonaSummary,
-    ChatStartRequest,
-    ChatStartResponse,
-    ChatMessageRequest,
-    ChatMessageResponse,
     ChatEndRequest,
     ChatEndResponse,
+    ChatMessageRequest,
+    ChatMessageResponse,
+    ChatSessionStatus,
+    ChatStartRequest,
+    ChatStartResponse,
     ConversationAnalysis,
     MITechniqueUsed,
-    ChatSessionStatus,
+    PersonaListResponse,
+    PersonaSummary,
 )
-from app.services.personas import get_persona_list, get_persona
 from app.services import chat_service
 from app.services import conversation_analysis_service
 from app.services.analysis_persistence_service import save_conversation_analysis
-from app.core.auth import get_current_user, AuthContext
+from app.services.personas import get_persona, get_persona_list
 
 router = APIRouter(prefix="/chat-practice", tags=["Chat Practice"])
 logger = logging.getLogger(__name__)
@@ -52,7 +55,6 @@ async def get_persona_details(persona_id: str):
     if not persona:
         raise HTTPException(status_code=404, detail=f"Persona '{persona_id}' not found")
 
-    # Return limited info (not the full system prompts)
     return {
         "id": persona["id"],
         "name": persona["name"],
@@ -76,7 +78,9 @@ async def start_chat_session(
     Sessions are limited to 20 turns, after which analysis is provided.
     """
     try:
-        result = await chat_service.start_session(request.persona_id)
+        result = await chat_service.start_session(
+            request.persona_id, user_id=auth.user_id if auth else None
+        )
         return ChatStartResponse(**result)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -108,6 +112,9 @@ async def send_message(
     After 20 turns, the session will automatically end and provide analysis.
     """
     try:
+        if auth:
+            chat_service.validate_session_owner(request.session_id, auth.user_id)
+
         result = await chat_service.send_message(request.session_id, request.message)
         return ChatMessageResponse(**result)
     except ValueError as e:
@@ -133,19 +140,18 @@ async def end_chat_session(
     - Specific suggestions for future practice
     """
     try:
-        # Get session data
+        if auth:
+            chat_service.validate_session_owner(request.session_id, auth.user_id)
+
         session_data = chat_service.end_session(request.session_id)
 
-        # Get the persona name for formatting
         persona = get_persona(session_data["persona_id"])
         persona_name = persona["name"] if persona else "Client"
 
-        # Analyze the conversation
         analysis_result = await conversation_analysis_service.analyze_conversation(
             transcript=session_data["transcript"], persona_name=persona_name
         )
 
-        # Build the response
         techniques_used = [
             MITechniqueUsed(**t) for t in analysis_result.get("techniques_used", [])
         ]
@@ -184,15 +190,13 @@ async def end_chat_session(
             ),
         )
 
-        # Format transcript for response
         transcript = [
             {"role": msg["role"], "content": msg["content"]}
             for msg in session_data["transcript"]
         ]
 
-        # Save analysis to database (async background operation)
         try:
-            save_conversation_analysis(
+            analysis_id = save_conversation_analysis(
                 session_id=request.session_id,
                 analysis=analysis,
                 transcript=transcript,
@@ -201,9 +205,47 @@ async def end_chat_session(
                 user_id=auth.user_id if auth else None,
                 total_turns=session_data["total_turns"],
             )
+
+            if analysis_id and auth and auth.user_id:
+                try:
+                    supabase_admin = get_supabase_admin()
+                    profile_resp = (
+                        supabase_admin.table("user_profiles")
+                        .select("*")
+                        .eq("user_id", auth.user_id)
+                        .maybe_single()
+                        .execute()
+                    )
+
+                    if profile_resp and profile_resp.data:
+                        profile = profile_resp.data
+                        current_ct = profile.get("change_talk_evoked", 0) or 0
+                        current_reflections = profile.get("reflections_offered", 0) or 0
+                        technique_mastery = analysis.techniques_count or {}
+
+                        (
+                            supabase_admin.table("user_profiles")
+                            .update(
+                                {
+                                    "change_talk_evoked": current_ct
+                                    + (1 if analysis.change_talk_evoked else 0),
+                                    "reflections_offered": current_reflections
+                                    + technique_mastery.get("simple_reflection", 0)
+                                    + technique_mastery.get("complex_reflection", 0),
+                                    "technique_mastery": technique_mastery,
+                                    "last_active_at": datetime.now(
+                                        timezone.utc
+                                    ).isoformat(),
+                                }
+                            )
+                            .eq("user_id", auth.user_id)
+                            .execute()
+                        )
+                        logger.info(f"User profile updated for user {auth.user_id}")
+                except Exception as profile_err:
+                    logger.error(f"Failed to update user profile: {profile_err}")
         except Exception as e:
-            # Log error but don't fail the request
-            logger.warning(f"Failed to save analysis to database: {e}")
+            logger.error(f"Failed to save analysis to database: {e}", exc_info=True)
 
         return ChatEndResponse(
             session_id=request.session_id,
@@ -225,6 +267,9 @@ async def get_session_status(
     """
     Get the current status of a chat practice session.
     """
+    if auth:
+        chat_service.validate_session_owner(session_id, auth.user_id)
+
     session = chat_service.get_session(session_id)
     if not session:
         raise HTTPException(status_code=404, detail=f"Session '{session_id}' not found")
@@ -247,6 +292,9 @@ async def get_session_transcript(
     """
     Get the conversation transcript for a session.
     """
+    if auth:
+        chat_service.validate_session_owner(session_id, auth.user_id)
+
     transcript = chat_service.get_session_transcript(session_id)
     if not transcript:
         raise HTTPException(status_code=404, detail=f"Session '{session_id}' not found")
@@ -256,15 +304,29 @@ async def get_session_transcript(
 
 @router.post("/analyze")
 async def analyze_transcript(
-    request: dict, auth: Optional[AuthContext] = Depends(get_current_user)
+    request: dict[str, object], auth: Optional[AuthContext] = Depends(get_current_user)
 ):
     """
     Analyze a conversation transcript and return feedback.
     Used for demo sessions where no server-side session exists.
     """
     try:
-        transcript = request.get("transcript", [])
-        persona_name = request.get("persona_name", "Client")
+        raw_transcript = request.get("transcript", [])
+        raw_persona_name = request.get("persona_name", "Client")
+        persona_name = (
+            raw_persona_name if isinstance(raw_persona_name, str) else "Client"
+        )
+
+        if not isinstance(raw_transcript, list):
+            raise HTTPException(status_code=400, detail="Transcript must be a list")
+
+        transcript: list[dict[str, str]] = []
+        for message in raw_transcript:
+            if isinstance(message, dict):
+                role = message.get("role")
+                content = message.get("content")
+                if isinstance(role, str) and isinstance(content, str):
+                    transcript.append({"role": role, "content": content})
 
         if not transcript:
             raise HTTPException(status_code=400, detail="Transcript is required")

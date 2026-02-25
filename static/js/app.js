@@ -362,49 +362,33 @@ async function renderHome() {
 
     if (!state.user) {
         app.innerHTML = `
-            <div class="hero">
-                <div class="hero-content">
-                    <h1 class="hero-title">Master Motivational Interviewing</h1>
-                    <p class="hero-subtitle">Learn evidence-based communication techniques through interactive dialogue practice with virtual patients.</p>
-                    <div class="hero-buttons">
-                        <a href="#" data-link="/register" class="btn btn-primary btn-lg">Get Started</a>
-                        <a href="#" data-link="/login" class="btn btn-outline btn-lg">Sign In</a>
+            <div class="maps-hero-section">
+                <div class="maps-hero-grid">
+                    <div class="maps-hero-copy">
+                        <h1 class="maps-hero-title">Empowering conversations that transform lives</h1>
+                        <p class="maps-hero-subtitle">Develop effective coaching skills through realistic practice. The MAPS Learning Platform helps you master collaborative, growth-focused guidance to better support colleagues and clients.</p>
+                        <div class="maps-cta">
+                            <a href="#" data-link="/login" class="btn btn-primary btn-lg">Start Training</a>
+                            <a href="#" data-link="/about" class="btn btn-outline btn-lg" style="color: white; border-color: white;">Learn More</a>
+                        </div>
                     </div>
-                </div>
-                <div class="hero-visual">
-                    <div class="conversation-preview">
-                        <div class="message patient-message">
-                            <span class="message-sender">Patient</span>
-                            "I know I should exercise more, but I just don't have the time..."
-                        </div>
-                        <div class="message practitioner-message">
-                            <span class="message-sender">You</span>
-                            "What makes exercise important to you?"
-                        </div>
-                        <div class="message feedback-message correct">
-                            ✓ Good! Open question evokes change talk
+                    
+                    <div class="maps-hero-visual" aria-label="Hero Visual">
+                        <div class="conversation-overlay">
+                            <div class="overlay-label">COACHEE PERSONA</div>
+                            <div class="overlay-quote">"I feel overwhelmed with the new project timeline."</div>
+                            <div class="overlay-label">YOU (COACH)</div>
+                            <div class="overlay-quote">"What support would be most helpful for you right now?"</div>
+                            <div class="tag-badge">✓ Open-ended Question</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="features">
-                <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Interactive Scenarios</h3>
-                    <p>Practice with realistic patient dialogues across different stages of change</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>Instant Feedback</h3>
-                    <p>Learn from detailed feedback on your technique choices</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🏆</div>
-                    <h3>Gamified Learning</h3>
-                    <p>Earn points, level up, and compete on the leaderboard</p>
-                </div>
-            </div>
+            <section class="blue-banner">
+                <h2 class="section-title">Our Commitment</h2>
+                <p>At the Money and Pensions Service, we are committed to giving the right guidance at the right time. This platform allows us to care for our colleagues and the people we serve by honing the skills needed to empower others to find their own solutions.</p>
+            </section>
         `;
     } else {
         showLoading();

@@ -150,6 +150,13 @@ async def submit_choice(
             detail="Module not started"
         )
 
+    # Validate that submitted node matches user's current position
+    if choice_data.node_id != progress.get("current_node_id"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Choice submission does not match your current node. Please refresh and try again.",
+        )
+
     # Find the current node
     dialogue_content = module.get('dialogue_content', {})
     node = find_dialogue_node(dialogue_content, choice_data.node_id)
@@ -184,6 +191,14 @@ async def submit_choice(
     nodes_completed = progress.get('nodes_completed', [])
     is_first_attempt = choice_data.node_id not in nodes_completed
 
+    # Calculate and accumulate points
+    choice_points = ScoringService.calculate_choice_points(
+        is_correct=is_correct,
+        is_first_attempt=is_first_attempt,
+        evoked_change_talk=evoked_ct,
+    )
+    total_points_earned = (progress.get('points_earned', 0) or 0) + choice_points
+
     # Record attempt
     supabase.table('dialogue_attempts').insert({
         'user_id': current_user.user_id,
@@ -196,6 +211,7 @@ async def submit_choice(
         'is_correct_technique': is_correct,
         'feedback_text': selected_choice.get('feedback', ''),
         'evoked_change_talk': evoked_ct,
+        'points_earned': choice_points,
     }).execute()
 
     # Update progress
@@ -212,11 +228,9 @@ async def submit_choice(
         next_node_id == 'end'
     )
 
-    status = progress['status']
     completion_score = progress.get('completion_score', 0)
 
     if is_module_complete:
-        status = 'completed'
         total_nodes = len(dialogue_content.get('nodes', []))
         correct_attempts = len(new_nodes_completed)
         completion_score = ScoringService.calculate_completion_score(
@@ -225,10 +239,15 @@ async def submit_choice(
             correct_choices=correct_attempts
         )
 
+    # P1-10: Fixed double-counting. total_points_earned already includes current
+    # choice points + previous points. Use it directly instead of adding again.
+    points_earned = total_points_earned
+
     # Update progress record
     update_data = {
         'current_node_id': next_node_id if not is_module_complete else choice_data.node_id,
         'nodes_completed': new_nodes_completed,
+        'points_earned': points_earned,
     }
 
     if is_module_complete:
@@ -266,6 +285,7 @@ async def submit_choice(
         is_correct=is_correct,
         feedback_text=selected_choice.get('feedback', ''),
         evoked_change_talk=evoked_ct,
-        next_node_id=next_node_id,
-        is_module_complete=is_module_complete
+        next_node_id=next_node_id if not is_module_complete else None,
+        is_module_complete=is_module_complete,
+        completion_score=completion_score if is_module_complete else None,
     )
