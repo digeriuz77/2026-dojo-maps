@@ -1077,6 +1077,7 @@ function renderDialogueNode(moduleId, nodeData, dialogueContent) {
         });
     }
 
+}
 
 /**
  * Show feedback modal
