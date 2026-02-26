@@ -7,7 +7,6 @@
 const API_BASE = '/api/v1';
 
 // App State
-// App State
 const state = {
     user: null,
     token: localStorage.getItem('access_token'),
@@ -16,12 +15,7 @@ const state = {
     progressId: null,
     showHint: localStorage.getItem('showHint') === 'true'
 };
-    user: null,
-    token: localStorage.getItem('access_token'),
-    currentModule: null,
-    currentNode: null,
-    progressId: null
-};
+
 
 // =====================================================
 // API Helper Functions
