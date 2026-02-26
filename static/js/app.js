@@ -7,7 +7,15 @@
 const API_BASE = '/api/v1';
 
 // App State
+// App State
 const state = {
+    user: null,
+    token: localStorage.getItem('access_token'),
+    currentModule: null,
+    currentNode: null,
+    progressId: null,
+    showHint: localStorage.getItem('showHint') === 'true'
+};
     user: null,
     token: localStorage.getItem('access_token'),
     currentModule: null,
@@ -1021,6 +1029,59 @@ function renderDialogueNode(moduleId, nodeData, dialogueContent) {
     }
 
     app.innerHTML = `
+        <div class="dialogue-page">
+            <div class="dialogue-header">
+                <a href="#" data-link="/modules/${moduleId}" class="back-link">&larr; Exit Module</a>
+                <div class="progress-bar-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${(current_node_number / total_nodes) * 100}%"></div>
+                    </div>
+                    <span class="progress-text">${current_node_number} of ${total_nodes}</span>
+                </div>
+                <button id="hint-toggle" class="hint-toggle-btn ${state.showHint ? 'active' : ''}" title="${state.showHint ? 'Hide techniques' : 'Show techniques as hint'}">
+                    <span class="hint-icon">💡</span>
+                    <span class="hint-text">HINT ${state.showHint ? 'ON' : 'OFF'}</span>
+                </button>
+            </div>
+
+            <div class="dialogue-scene">
+                <div class="patient-avatar">
+                    <div class="avatar-circle">P</div>
+                </div>
+                <div class="patient-message-bubble">
+                    <p class="patient-statement">"${node.patient_statement}"</p>
+                    <span class="context-tag">${node.patient_context}</span>
+                </div>
+            </div>
+
+            <div class="choices-section">
+                <h3 class="choices-title">How would you respond?</h3>
+                <div class="choices-grid">
+                    ${node.practitioner_choices.map((choice, index) => `
+                        <button class="choice-card" data-choice="${index}">
+                            <span class="choice-letter">${String.fromCharCode(65 + index)}</span>
+                            <div class="choice-content">
+                                <p class="choice-text">${choice.text}</p>
+                                ${state.showHint ? `<span class="choice-technique">${choice.technique}</span>` : ''}
+                            </div>
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Add click handler for hint toggle
+    const hintToggle = document.getElementById('hint-toggle');
+    if (hintToggle) {
+        hintToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            state.showHint = !state.showHint;
+            localStorage.setItem('showHint', state.showHint);
+            // Re-render to show/hide technique labels
+            renderDialogueNode(moduleId, nodeData, dialogueContent);
+        });
+    }
         <div class="dialogue-page">
             <div class="dialogue-header">
                 <a href="#" data-link="/modules/${moduleId}" class="back-link">&larr; Exit Module</a>

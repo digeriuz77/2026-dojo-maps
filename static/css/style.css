@@ -2524,3 +2524,141 @@ body.modal-open {
         grid-template-columns: 1fr;
     }
 }
+
+/* HINT Toggle Button */
+.hint-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: auto;
+}
+
+.hint-toggle-btn:hover {
+    background: #e5e7eb;
+    border-color: #9ca3af;
+}
+
+.hint-toggle-btn.active {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    color: #92400e;
+}
+
+.hint-toggle-btn .hint-icon {
+    font-size: 1rem;
+}
+
+.hint-toggle-btn .hint-text {
+    letter-spacing: 0.5px;
+}
+
+/* Dialogue page layout */
+.dialogue-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.dialogue-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.progress-bar-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 150px;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary) 0%, var(--primary-light) 100%);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 0.875rem;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
+/* Choice cards - hide technique by default */
+.choice-technique {
+    display: none;
+}
+
+.choice-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    width: 100%;
+}
+
+.choice-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 137, 123, 0.15);
+}
+
+.choice-card.selected {
+    border-color: var(--primary);
+    background: #f0fdfa;
+}
+
+.choice-card.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.choice-letter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.choice-content {
+    flex: 1;
+}
+
+.choice-text {
+    margin: 0;
+    font-size: 1rem;
+    color: #374151;
+    line-height: 1.5;
+}
