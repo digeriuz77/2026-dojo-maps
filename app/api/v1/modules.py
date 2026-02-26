@@ -49,7 +49,7 @@ async def get_all_user_progress(user_id: str, supabase: Client) -> List[dict]:
 # =====================================================
 
 
-@router.get("", response_model=ModuleListResponse)
+@router.get("/", response_model=ModuleListResponse)
 async def list_modules(
     current_user: AuthContext = Depends(get_current_user),
     supabase: Client = Depends(get_supabase),

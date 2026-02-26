@@ -1,13 +1,21 @@
 """
 API routes for MI Chat Practice sessions.
 Allows users to practice Motivational Interviewing with simulated client personas.
+
+RESTful Patterns:
+    GET    /api/v1/chat-practice/personas/           - List all personas (200 OK)
+    GET    /api/v1/chat-practice/personas/{id}        - Get persona details (200 OK)
+    POST   /api/v1/chat-practice/sessions/            - Start new session (201 Created)
+    POST   /api/v1/chat-practice/sessions/{id}/message - Send message (200 OK)
+    POST   /api/v1/chat-practice/sessions/{id}/end    - End session (200 OK)
 """
 
 import logging
 from datetime import datetime, timezone
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel
 
 from app.core.auth import AuthContext, get_current_user
 from app.core.supabase import get_supabase_admin
@@ -33,41 +41,62 @@ router = APIRouter(prefix="/chat-practice", tags=["Chat Practice"])
 logger = logging.getLogger(__name__)
 
 
-@router.get("/personas", response_model=PersonaListResponse)
-async def list_personas():
+class PersonaDetail(BaseModel):
+    """Detailed persona response model"""
+
+    id: str
+    name: str
+    age: int
+    title: str
+    description: str
+    avatar: str
+    stage_of_change: str
+    initial_mood: str
+
+
+@router.get("/personas/", response_model=PersonaListResponse)
+async def list_personas(
+    stage_of_change: Optional[str] = Query(None, description="Filter by stage of change")
+):
     """
     Get list of available practice personas.
 
     Returns personas that users can practice MI techniques with.
+
+    Query Parameters:
+        stage_of_change: Optional filter by stage of change
+
+    Returns: 200 OK with list of persona summaries
     """
     personas = get_persona_list()
+
+    # Filter by stage of change if provided
+    if stage_of_change:
+        personas = [p for p in personas if p.get('stage_of_change') == stage_of_change]
+
     return PersonaListResponse(personas=[PersonaSummary(**p) for p in personas])
 
 
-@router.get("/personas/{persona_id}")
+@router.get("/personas/{persona_id}", response_model=PersonaDetail)
 async def get_persona_details(persona_id: str):
     """
     Get detailed information about a specific persona.
 
     This provides the persona's background and context for practice.
+
+    Returns: 200 OK with persona details, 404 if not found
     """
     persona = get_persona(persona_id)
     if not persona:
-        raise HTTPException(status_code=404, detail=f"Persona '{persona_id}' not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Persona '{persona_id}' not found"
+        )
 
-    return {
-        "id": persona["id"],
-        "name": persona["name"],
-        "age": persona["age"],
-        "title": persona["title"],
-        "description": persona["description"],
-        "avatar": persona["avatar"],
-        "stage_of_change": persona["stage_of_change"],
-        "initial_mood": persona["initial_mood"],
-    }
+    return PersonaDetail(**persona)
 
 
-@router.post("/start", response_model=ChatStartResponse)
+@router.post("/sessions/", response_model=ChatStartResponse, status_code=status.HTTP_201_CREATED)
 async def start_chat_session(
     request: ChatStartRequest, auth: Optional[AuthContext] = Depends(get_current_user)
 ):
@@ -76,6 +105,8 @@ async def start_chat_session(
 
     The persona will send an opening message to begin the conversation.
     Sessions are limited to 20 turns, after which analysis is provided.
+
+    Returns: 201 Created with session details
     """
     try:
         result = await chat_service.start_session(
@@ -83,23 +114,25 @@ async def start_chat_session(
         )
         return ChatStartResponse(**result)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         logger.error(f"Failed to start chat session: {e}", exc_info=True)
         error_detail = str(e)
         if "OPENAI_API_KEY" in error_detail:
             raise HTTPException(
-                status_code=500,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail="Chat practice feature requires OpenAI API key. Please configure OPENAI_API_KEY environment variable.",
             )
         raise HTTPException(
-            status_code=500, detail=f"Failed to start session: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to start session: {str(e)}"
         )
 
 
-@router.post("/message", response_model=ChatMessageResponse)
+@router.post("/sessions/{session_id}/messages/", response_model=ChatMessageResponse)
 async def send_message(
-    request: ChatMessageRequest, auth: Optional[AuthContext] = Depends(get_current_user)
+    session_id: str,
+    request: ChatMessageRequest,
+    auth: Optional[AuthContext] = Depends(get_current_user)
 ):
     """
     Send a message in an active chat practice session.
@@ -110,24 +143,30 @@ async def send_message(
     - Their personality and stage of change
 
     After 20 turns, the session will automatically end and provide analysis.
+
+    Path Parameters:
+        session_id: The ID of the session to send the message to
+
+    Returns: 200 OK with message response
     """
     try:
         if auth:
-            chat_service.validate_session_owner(request.session_id, auth.user_id)
+            chat_service.validate_session_owner(session_id, auth.user_id)
 
-        result = await chat_service.send_message(request.session_id, request.message)
+        result = await chat_service.send_message(session_id, request.message)
         return ChatMessageResponse(**result)
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
-            status_code=500, detail=f"Failed to process message: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to process message: {str(e)}"
         )
 
 
-@router.post("/end", response_model=ChatEndResponse)
+@router.post("/sessions/{session_id}/end", response_model=ChatEndResponse)
 async def end_chat_session(
-    request: ChatEndRequest, auth: Optional[AuthContext] = Depends(get_current_user)
+    session_id: str,
+    auth: Optional[AuthContext] = Depends(get_current_user)
 ):
     """
     End a chat practice session and get comprehensive analysis.
@@ -138,12 +177,17 @@ async def end_chat_session(
     - Technique identification and counts
     - Strengths and areas for improvement
     - Specific suggestions for future practice
+
+    Path Parameters:
+        session_id: The ID of the session to end
+
+    Returns: 200 OK with session analysis
     """
     try:
         if auth:
-            chat_service.validate_session_owner(request.session_id, auth.user_id)
+            chat_service.validate_session_owner(session_id, auth.user_id)
 
-        session_data = chat_service.end_session(request.session_id)
+        session_data = chat_service.end_session(session_id)
 
         persona = get_persona(session_data["persona_id"])
         persona_name = persona["name"] if persona else "Client"
@@ -197,7 +241,7 @@ async def end_chat_session(
 
         try:
             analysis_id = save_conversation_analysis(
-                session_id=request.session_id,
+                session_id=session_id,
                 analysis=analysis,
                 transcript=transcript,
                 persona_id=session_data.get("persona_id"),
@@ -248,7 +292,7 @@ async def end_chat_session(
             logger.error(f"Failed to save analysis to database: {e}", exc_info=True)
 
         return ChatEndResponse(
-            session_id=request.session_id,
+            session_id=session_id,
             total_turns=session_data["total_turns"],
             analysis=analysis,
             transcript=transcript,

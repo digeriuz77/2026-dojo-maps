@@ -148,7 +148,7 @@ const authAPI = {
  */
 const modulesAPI = {
     async list() {
-        return apiRequest('/modules');
+        return apiRequest('/modules/');
     },
 
     async get(moduleId) {
@@ -199,11 +199,11 @@ const dialogueAPI = {
  */
 const progressAPI = {
     async getStats() {
-        return apiRequest('/progress');
+        return apiRequest('/progress/');
     },
 
     async getAll() {
-        return apiRequest('/progress/modules');
+        return apiRequest('/progress/modules/');
     }
 };
 
@@ -212,7 +212,7 @@ const progressAPI = {
  */
 const leaderboardAPI = {
     async getTop(limit = 50) {
-        return apiRequest(`/leaderboard?limit=${limit}`);
+        return apiRequest(`/leaderboard/?limit=${limit}`);
     },
 
     async getMyRank() {
@@ -225,25 +225,25 @@ const leaderboardAPI = {
  */
 const chatPracticeAPI = {
     async getPersonas() {
-        return apiRequest('/chat-practice/personas');
+        return apiRequest('/chat-practice/personas/');
     },
 
     async startSession(personaId) {
-        return apiRequest('/chat-practice/start', {
+        return apiRequest('/chat-practice/sessions/', {
             method: 'POST',
             body: JSON.stringify({ persona_id: personaId })
         });
     },
 
     async sendMessage(sessionId, message) {
-        return apiRequest('/chat-practice/message', {
+        return apiRequest(`/chat-practice/sessions/${sessionId}/messages/`, {
             method: 'POST',
             body: JSON.stringify({ session_id: sessionId, message: message })
         });
     },
 
     async endSession(sessionId) {
-        return apiRequest('/chat-practice/end', {
+        return apiRequest(`/chat-practice/sessions/${sessionId}/end`, {
             method: 'POST',
             body: JSON.stringify({ session_id: sessionId })
         });
@@ -2313,7 +2313,7 @@ function showFeedbackForm() {
                 user_email: overlay.querySelector('#userEmail').value || null
             };
 
-            const response = await fetch(`${API_BASE}/feedback/submit`, {
+            const response = await fetch(`${API_BASE}/feedback/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
