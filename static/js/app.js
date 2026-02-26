@@ -49,7 +49,10 @@ async function apiRequest(endpoint, options = {}) {
 
     if (!response.ok) {
         const error = await response.json().catch(() => ({ detail: response.statusText }));
-        throw new Error(error.detail || error.message || 'Request failed');
+        const requestError = new Error(error.detail || error.message || 'Request failed');
+        requestError.status = response.status;
+        requestError.endpoint = endpoint;
+        throw requestError;
     }
 
     return response.json();
@@ -204,6 +207,10 @@ const progressAPI = {
 
     async getAll() {
         return apiRequest('/progress/modules/');
+    },
+
+    async getModuleProgress(moduleId) {
+        return apiRequest(`/progress/${moduleId}`);
     }
 };
 
@@ -322,8 +329,19 @@ function showLoading(container = document.getElementById('app')) {
 function showError(message, container = document.getElementById('app')) {
     container.innerHTML = `
         <div class="card">
-            <h2>Error</h2>
+            <h2>Service Error</h2>
             <p>${message}</p>
+            <p style="color: #6b7280; margin-top: 0.5rem;">The route is valid, but the request failed. Please retry.</p>
+            <a href="#" data-link="/" class="btn btn-primary">Go Home</a>
+        </div>
+    `;
+}
+
+function showRouteNotFound(container = document.getElementById('app')) {
+    container.innerHTML = `
+        <div class="card">
+            <h2>Page not found</h2>
+            <p>The requested route does not exist.</p>
             <a href="#" data-link="/" class="btn btn-primary">Go Home</a>
         </div>
     `;
@@ -962,13 +980,26 @@ async function renderDialogue(moduleId) {
     showLoading();
 
     try {
-        // Get module to find start node
+        // Get module for dialogue content
         const module = await modulesAPI.get(moduleId);
         const dialogueContent = module.dialogue_content;
-        const startNodeId = dialogueContent.start_node || 'node_1';
+        let targetNodeId = dialogueContent.start_node || 'node_1';
+
+        // Deterministic resume: prefer backend current_node_id when progress exists
+        try {
+            const progress = await progressAPI.getModuleProgress(moduleId);
+            if (progress?.current_node_id) {
+                targetNodeId = progress.current_node_id;
+            }
+        } catch (progressError) {
+            if (progressError.status !== 404) {
+                throw progressError;
+            }
+            // No progress yet; fallback to module start node
+        }
 
         // Get the dialogue node
-        const nodeData = await dialogueAPI.getNode(moduleId, startNodeId);
+        const nodeData = await dialogueAPI.getNode(moduleId, targetNodeId);
 
         renderDialogueNode(moduleId, nodeData, dialogueContent);
     } catch (error) {
@@ -2390,7 +2421,7 @@ const router = {
                 handler(...paramKeys.map(k => params[k]));
             }
         } else {
-            showError('Page not found');
+            showRouteNotFound();
         }
     },
 

@@ -7,6 +7,7 @@ import logging
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Any, Dict
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -258,8 +259,23 @@ for _spa_route in _SPA_ROUTES:
 
 @app.get("/health")
 async def health_check():
-    """Basic health check for Railway"""
+    """Basic liveness check for process health."""
     return {"status": "healthy"}
+
+
+@app.get("/health/ready")
+async def readiness_health_check():
+    """Readiness check with database connectivity signal."""
+    detailed = await _get_operational_health(detailed=False)
+    supabase_check = detailed.get("checks", {}).get("supabase_connectivity", {"status": "error"})
+    ready = supabase_check.get("status") == "ok"
+
+    return {
+        "status": "ready" if ready else "degraded",
+        "checks": {
+            "supabase_connectivity": supabase_check,
+        },
+    }
 
 
 from fastapi.responses import FileResponse
@@ -273,32 +289,93 @@ async def favicon():
 
 @app.get("/health/detailed")
 async def detailed_health_check():
-    """Detailed health check including Supabase connectivity.
+    """Detailed operational health check.
 
-    SECURITY: Does not expose config details or internal error messages.
+    SECURITY: Does not expose secrets or raw internal exception traces.
     """
-    from app.core.supabase import get_supabase
+    return await _get_operational_health(detailed=True)
 
-    health = {
-        "status": "healthy",
+
+async def _get_operational_health(detailed: bool = False) -> Dict[str, Any]:
+    """Build operational health details for config + schema readiness."""
+    from app.core.supabase import get_supabase, get_supabase_admin
+
+    checks: Dict[str, Any] = {
+        "config": {"status": "ok"},
+        "supabase_connectivity": {"status": "ok"},
+        "schema_contract": {"status": "ok"},
+    }
+
+    status_value = "healthy"
+
+    # Config checks
+    try:
+        missing = []
+        for key in ["SUPABASE_URL", "SUPABASE_KEY", "SUPABASE_SERVICE_ROLE_KEY"]:
+            if not getattr(settings, key, ""):
+                missing.append(key)
+
+        if missing:
+            checks["config"] = {"status": "error", "missing": missing}
+            status_value = "degraded"
+        elif detailed:
+            checks["config"] = {
+                "status": "ok",
+                "supabase_url_configured": bool(getattr(settings, "SUPABASE_URL", "")),
+                "anon_key_configured": bool(getattr(settings, "SUPABASE_KEY", "")),
+                "service_role_configured": bool(getattr(settings, "SUPABASE_SERVICE_ROLE_KEY", "")),
+            }
+    except Exception:
+        checks["config"] = {"status": "error"}
+        status_value = "degraded"
+
+    # Connectivity + contract checks (table/column presence inferred via select)
+    try:
+        anon_client = get_supabase()
+        admin_client = get_supabase_admin()
+
+        anon_client.table("learning_modules").select("id").limit(1).execute()
+        checks["supabase_connectivity"] = {"status": "ok"}
+
+        contract_checks = {
+            "user_profiles": "user_id,modules_completed,last_active_at",
+            "user_progress": "id,user_id,module_id,status,current_node_id,nodes_completed,started_at",
+            "dialogue_attempts": "id,user_id,module_id,progress_id,node_id,choice_id,choice_text,technique,feedback_text",
+        }
+
+        missing_contracts = []
+        for table_name, select_cols in contract_checks.items():
+            try:
+                admin_client.table(table_name).select(select_cols).limit(1).execute()
+            except Exception:
+                missing_contracts.append(table_name)
+
+        if missing_contracts:
+            checks["schema_contract"] = {"status": "error", "missing_or_mismatched": missing_contracts}
+            status_value = "degraded"
+        elif detailed:
+            checks["schema_contract"] = {
+                "status": "ok",
+                "validated_tables": list(contract_checks.keys()),
+            }
+    except Exception:
+        checks["supabase_connectivity"] = {"status": "error"}
+        checks["schema_contract"] = {"status": "unknown"}
+        status_value = "degraded"
+
+    health_payload: Dict[str, Any] = {
+        "status": status_value,
         "app": {
             "name": getattr(settings, "APP_NAME", "MI Learning Platform"),
             "version": getattr(settings, "APP_VERSION", "1.0.0"),
         },
+        "checks": checks,
     }
 
-    try:
-        client = get_supabase()
-        # Try a simple query
-        response = client.table("learning_modules").select("id").limit(1).execute()
-        health["supabase"] = {
-            "status": "connected",
-        }
-    except Exception:
-        health["supabase"] = {"status": "error"}
-        health["status"] = "degraded"
+    if detailed:
+        health_payload["routers_loaded"] = ROUTERS_LOADED
 
-    return health
+    return health_payload
 
 
 async def _periodic_session_cleanup():

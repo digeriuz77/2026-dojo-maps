@@ -24,6 +24,16 @@ class TestAuthAPI:
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {"status": "healthy"}
 
+    def test_health_ready_check(self, client):
+        """Test readiness endpoint returns expected shape."""
+        response = client.get("/health/ready")
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert "status" in data
+        assert data["status"] in ["ready", "degraded"]
+        assert "checks" in data
+        assert "supabase_connectivity" in data["checks"]
+
     @patch('app.api.v1.auth.get_supabase')
     def test_register_success(self, mock_get_supabase, client, mock_supabase_client, sample_user):
         """Test successful user registration"""

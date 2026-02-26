@@ -27,6 +27,33 @@ async def get_user_profile(user_id: str, supabase_admin: Client):
     return None
 
 
+async def ensure_user_profile(current_user: AuthContext, supabase_admin: Client) -> dict:
+    """Ensure a user profile exists, auto-creating a minimal one if missing."""
+    profile = await get_user_profile(current_user.user_id, supabase_admin)
+    if profile:
+        return profile
+
+    try:
+        created = (
+            supabase_admin.table("user_profiles")
+            .insert(
+                {
+                    "user_id": current_user.user_id,
+                    "display_name": current_user.display_name,
+                }
+            )
+            .execute()
+        )
+        if created.data:
+            return created.data[0]
+    except Exception:
+        # Non-fatal: if profile trigger/constraints race, proceed with fallback.
+        pass
+
+    profile = await get_user_profile(current_user.user_id, supabase_admin)
+    return profile or {"modules_completed": 0}
+
+
 # =====================================================
 # Endpoints
 # =====================================================
@@ -43,9 +70,7 @@ async def get_user_stats(
     auth_client = get_authenticated_client(current_user.raw_token)
 
     # Get user profile
-    profile = await get_user_profile(current_user.user_id, supabase_admin)
-    if not profile:
-        profile = {"modules_completed": 0}
+    profile = await ensure_user_profile(current_user, supabase_admin)
 
     # Get all progress
     progress_response = auth_client.table('user_progress') \
@@ -102,9 +127,7 @@ async def get_all_module_progress(
     auth_client = get_authenticated_client(current_user.raw_token)
 
     # Get user profile
-    profile = await get_user_profile(current_user.user_id, supabase_admin)
-    if not profile:
-        profile = {"modules_completed": 0}
+    profile = await ensure_user_profile(current_user, supabase_admin)
 
     # Build query with optional filtering
     query = auth_client.table('user_progress') \
