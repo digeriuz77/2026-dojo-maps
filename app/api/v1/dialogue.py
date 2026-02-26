@@ -271,9 +271,9 @@ async def submit_choice(
     elif choice_points >= 150:
         quality_label = "Good"
     elif choice_points >= 100:
-        quality_label = "Acceptable"
+        quality_label = "Neutral"
     else:
-        quality_label = "Needs Improvement"
+        quality_label = "Poor"
 
     # Record attempt using admin client to bypass RLS
     supabase_admin.table('dialogue_attempts').insert({

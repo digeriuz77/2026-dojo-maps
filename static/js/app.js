@@ -402,14 +402,6 @@ async function renderHome() {
 
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-value">${stats.total_points}</div>
-                        <div class="stat-label">Total Points</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${stats.level}</div>
-                        <div class="stat-label">Level</div>
-                    </div>
-                    <div class="stat-card">
                         <div class="stat-value">${stats.modules_completed}</div>
                         <div class="stat-label">Modules Completed</div>
                     </div>
@@ -825,17 +817,10 @@ async function renderModules() {
                                 <span class="meta-icon">📊</span>
                                 ${module.stage_of_change}
                             </span>
-                            <span class="meta-item">
-                                <span class="meta-icon">⭐</span>
-                                ${module.points} pts
-                            </span>
                         </div>
-                        ${module.user_score !== null ? `
+                        ${module.user_status === 'completed' ? `
                             <div class="module-score">
-                                <div class="score-bar">
-                                    <div class="score-fill" style="width: ${module.user_score}%"></div>
-                                </div>
-                                <span class="score-text">${module.user_score}%</span>
+                                <span class="score-text">Completed</span>
                             </div>
                         ` : ''}
                     </div>
@@ -876,10 +861,6 @@ async function renderModuleDetail(moduleId) {
                         <span class="info-label">Stage of Change</span>
                         <span class="info-value">${module.stage_of_change}</span>
                     </div>
-                    <div class="info-card">
-                        <span class="info-label">Points Available</span>
-                        <span class="info-value">${module.points}</span>
-                    </div>
                 </div>
 
                 <div class="module-description-card">
@@ -893,7 +874,6 @@ async function renderModuleDetail(moduleId) {
                             <span class="badge-icon">✓</span>
                             <div class="badge-content">
                                 <span class="badge-title">Module Completed</span>
-                                <span class="badge-stats">Score: ${module.user_score}% • Points: ${module.user_points_earned}</span>
                             </div>
                         </div>
                         <div class="action-buttons">
@@ -1094,12 +1074,12 @@ function showFeedback(feedback, moduleId, dialogueContent) {
     const overlay = document.createElement('div');
     overlay.className = 'feedback-overlay';
 
-    const qualityLabel = feedback.quality_label || (isCorrect ? 'Acceptable' : 'Needs Improvement');
+    const qualityLabel = feedback.quality_label || (isCorrect ? 'Neutral' : 'Poor');
     const qualityClass = {
         'Excellent': 'quality-excellent',
         'Good': 'quality-good',
-        'Acceptable': 'quality-acceptable',
-        'Needs Improvement': 'quality-poor'
+        'Neutral': 'quality-acceptable',
+        'Poor': 'quality-poor'
     }[qualityLabel] || 'quality-acceptable';
 
     overlay.innerHTML = `
@@ -1126,12 +1106,6 @@ function showFeedback(feedback, moduleId, dialogueContent) {
                 ${isComplete ? `
                     <div class="completion-summary">
                         <h3>🎉 Module Complete!</h3>
-                        <div class="summary-stats">
-                            <div class="summary-stat">
-                                <span class="stat-label">Completion Score</span>
-                                <span class="stat-value">${feedback.completion_score}%</span>
-                            </div>
-                        </div>
                     </div>
                 ` : ''}
             </div>
@@ -1190,14 +1164,6 @@ async function renderProgress() {
             </div>
 
             <div class="stats-grid">
-                <div class="stat-card highlight">
-                    <div class="stat-value">${data.total_points}</div>
-                    <div class="stat-label">Total Points</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value">${data.level}</div>
-                    <div class="stat-label">Current Level</div>
-                </div>
                 <div class="stat-card">
                     <div class="stat-value">${data.modules_completed}</div>
                     <div class="stat-label">Modules Completed</div>
@@ -1222,12 +1188,8 @@ async function renderProgress() {
                                 </div>
                                 <div class="progress-metrics">
                                     <div class="metric">
-                                        <span class="metric-value">${p.completion_score || 0}%</span>
-                                        <span class="metric-label">Score</span>
-                                    </div>
-                                    <div class="metric">
-                                        <span class="metric-value">${p.points_earned}</span>
-                                        <span class="metric-label">Points</span>
+                                        <span class="metric-value">${p.status === 'completed' ? 'Done' : 'In Progress'}</span>
+                                        <span class="metric-label">Status</span>
                                     </div>
                                 </div>
                             </div>

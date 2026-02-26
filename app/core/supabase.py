@@ -149,7 +149,8 @@ class _AuthenticatedTableProxy:
         
         # Add filters
         for f in self._filters:
-            url += f"&{f['column']}={f['value']}"
+            if f["operator"] == "eq":
+                url += f"&{f['column']}=eq.{f['value']}"
         
         with httpx.Client() as client:
             response = client.get(url, headers=self.headers)
@@ -161,8 +162,9 @@ class _AuthenticatedTableProxy:
         import httpx
         url = f"{self.base_url}/rest/v1/{self.table_name}"
         
+        headers = {**self.headers, "Prefer": "return=representation"}
         with httpx.Client() as client:
-            response = client.post(url, json=data, headers=self.headers)
+            response = client.post(url, json=data, headers=headers)
             response.raise_for_status()
             return _SupabaseResult(response.json())
 
@@ -172,11 +174,16 @@ class _AuthenticatedTableProxy:
         url = f"{self.base_url}/rest/v1/{self.table_name}"
         
         # Add filters to URL
+        first = True
         for f in self._filters:
-            url += f"?{f['column']}=eq.{f['value']}"
+            char = '?' if first else '&'
+            if f["operator"] == "eq":
+                url += f"{char}{f['column']}=eq.{f['value']}"
+                first = False
         
+        headers = {**self.headers, "Prefer": "return=representation"}
         with httpx.Client() as client:
-            response = client.patch(url, json=data, headers=self.headers)
+            response = client.patch(url, json=data, headers=headers)
             response.raise_for_status()
             return _SupabaseResult(response.json())
 
@@ -186,11 +193,16 @@ class _AuthenticatedTableProxy:
         url = f"{self.base_url}/rest/v1/{self.table_name}"
         
         # Add filters to URL
+        first = True
         for f in self._filters:
-            url += f"?{f['column']}=eq.{f['value']}"
+            char = '?' if first else '&'
+            if f["operator"] == "eq":
+                url += f"{char}{f['column']}=eq.{f['value']}"
+                first = False
         
+        headers = {**self.headers, "Prefer": "return=representation"}
         with httpx.Client() as client:
-            response = client.delete(url, headers=self.headers)
+            response = client.delete(url, headers=headers)
             response.raise_for_status()
             return _SupabaseResult(response.json() or [])
 
