@@ -262,10 +262,13 @@ async def health_check():
     return {"status": "healthy"}
 
 
-@app.get("/favicon.ico")
+from fastapi.responses import FileResponse
+
+@app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
-    """Return an empty favicon response to avoid 500 errors in logs."""
-    return Response(status_code=204)
+    """Return the MAPS logo as the favicon."""
+    favicon_path = Path(__file__).parent.parent / "static" / "images" / "maps-logo.svg"
+    return FileResponse(favicon_path)
 
 
 @app.get("/health/detailed")

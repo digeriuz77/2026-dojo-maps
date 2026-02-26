@@ -7,6 +7,7 @@
     <title>Admin Dashboard - MI Learning Platform</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/admin.css">
+    <link rel="icon" type="image/svg+xml" href="/static/images/maps-logo.svg">
 </head>
 
 <body>
@@ -209,7 +210,8 @@
                 <div class="users-analytics-section">
                     <h2>User Practice Analytics</h2>
                     <div class="user-controls">
-                        <input type="text" id="analyticsUserSearch" placeholder="Search by email..." class="search-input">
+                        <input type="text" id="analyticsUserSearch" placeholder="Search by email..."
+                            class="search-input">
                         <button onclick="refreshPracticeAnalytics()" class="btn btn-primary">Refresh</button>
                     </div>
                     <div class="table-container">
@@ -235,9 +237,11 @@
                         </table>
                     </div>
                     <div class="pagination">
-                        <button onclick="previousAnalyticsPage()" id="prevAnalyticsPage" class="btn btn-secondary">Previous</button>
+                        <button onclick="previousAnalyticsPage()" id="prevAnalyticsPage"
+                            class="btn btn-secondary">Previous</button>
                         <span id="analyticsPageInfo">Page 1</span>
-                        <button onclick="nextAnalyticsPage()" id="nextAnalyticsPage" class="btn btn-secondary">Next</button>
+                        <button onclick="nextAnalyticsPage()" id="nextAnalyticsPage"
+                            class="btn btn-secondary">Next</button>
                     </div>
                 </div>
             </section>

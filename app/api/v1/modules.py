@@ -189,17 +189,13 @@ async def start_module(
 
     # Create progress record using authenticated INSERT
     try:
-        insert_response = (
-            auth_client.table("user_progress")
-            .insert(
-                {
-                    "user_id": current_user.user_id,
-                    "module_id": module_id,
-                    "status": "in_progress",
-                    "current_node_id": start_node,
-                }
-            )
-            .execute()
+        insert_response = auth_client.table("user_progress").insert(
+            {
+                "user_id": current_user.user_id,
+                "module_id": module_id,
+                "status": "in_progress",
+                "current_node_id": start_node,
+            }
         )
         logger.info(f"[MODULES] Progress created: {insert_response.data}")
     except Exception as e:
