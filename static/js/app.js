@@ -1118,12 +1118,11 @@ function showFeedback(feedback, moduleId, dialogueContent) {
     const overlay = document.createElement('div');
     overlay.className = 'feedback-overlay';
 
-    const qualityLabel = feedback.quality_label || (isCorrect ? 'Neutral' : 'Poor');
+    const qualityLabel = feedback.quality_label || (isCorrect ? 'Good' : 'Ineffective');
     const qualityClass = {
-        'Excellent': 'quality-excellent',
+        'Effective': 'quality-excellent',
         'Good': 'quality-good',
-        'Neutral': 'quality-acceptable',
-        'Poor': 'quality-poor'
+        'Ineffective': 'quality-poor'
     }[qualityLabel] || 'quality-acceptable';
 
     overlay.innerHTML = `

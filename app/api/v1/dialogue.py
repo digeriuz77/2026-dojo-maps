@@ -99,14 +99,51 @@ def is_correct_technique(choice: dict) -> bool:
     technique_lower = technique.lower()
     non_mi_keywords = ['non-mi', 'righting reflex', 'educating', 'lecturing',
                        'defending', 'challenging', 'confrontation']
-    return not any(keyword in technique_lower for keyword in non_mi_keywords)
-    """Determine if a choice uses the correct MI technique"""
-    technique = choice.get('technique', '').lower()
-    # Non-MI techniques
-    non_mi_keywords = ['non-mi', 'righting reflex', 'educating', 'lecturing',
-                       'defending', 'challenging', 'questioning']
-    return not any(keyword in technique for keyword in non_mi_keywords)
 
+
+
+def determines_quality_label(choice: dict) -> str:
+    """Determine quality label for a choice using three-tier system: Effective, Good, Ineffective.
+    
+    Logic (in order of priority):
+    1. Technique annotation: (Effective) → Effective, (Ineffective)/(Non-MI) → Ineffective
+    2. Technique has '+' → Effective (combining techniques)
+    3. next_node_id contains 'poor' → Ineffective
+    4. Feedback contains 'excellent', 'perfect', 'great' → Effective
+    5. Feedback contains 'good' → Good
+    6. Otherwise → Ineffective
+    """
+    technique = choice.get('technique', '')
+    feedback = choice.get('feedback', '').lower()
+    next_node_id = choice.get('next_node_id', '').lower()
+    
+    # Check technique annotation in parentheses
+    annotation_start = technique.rfind('(')
+    annotation_end = technique.rfind(')')
+    if annotation_start != -1 and annotation_end != -1 and annotation_end > annotation_start:
+        annotation = technique[annotation_start + 1:annotation_end].lower().strip()
+        if annotation == 'effective':
+            return 'Effective'
+        if annotation in ['ineffective', 'non-mi', 'non-m i', 'premature']:
+            return 'Ineffective'
+    
+    # Technique has '+' means combining multiple MI techniques (effective)
+    if '+' in technique:
+        return 'Effective'
+    
+    # Check next_node_id for quality hints
+    if 'poor' in next_node_id or 'wrong' in next_node_id:
+        return 'Ineffective'
+    
+    # Check feedback for quality indicators
+    if any(word in feedback for word in ['excellent', 'perfect', 'great job', 'outstanding']):
+        return 'Effective'
+    
+    if 'good' in feedback:
+        return 'Good'
+    
+    # Default to ineffective if none of the above
+    return 'Ineffective'
 
 def evokes_change_talk(node: dict, choice: dict) -> bool:
     """Determine if a choice evokes change talk (simplified heuristic)"""
@@ -309,15 +346,11 @@ async def submit_choice(
     )
     total_points_earned = (progress.get('points_earned', 0) or 0) + choice_points
 
-    # Derive a human-readable quality label from the points earned
-    if choice_points >= 200:
-        quality_label = "Excellent"
-    elif choice_points >= 150:
-        quality_label = "Good"
-    elif choice_points >= 100:
-        quality_label = "Neutral"
-    else:
-        quality_label = "Poor"
+    # Determine quality label using three-tier system
+    quality_label = determines_quality_label(selected_choice)
+    
+    # is_correct based on quality label (Effective/Good = correct, Ineffective = incorrect)
+    is_correct = quality_label != 'Ineffective'
 
     # Record attempt using admin client to bypass RLS.
     # Do not fail the user flow if analytics table/schema is temporarily out of sync.
