@@ -287,7 +287,6 @@ async def submit_choice(
         'is_correct_technique': is_correct,
         'feedback_text': selected_choice.get('feedback', ''),
         'evoked_change_talk': evoked_ct,
-        'points_earned': choice_points,
     }).execute()
 
     # Update progress
@@ -323,7 +322,6 @@ async def submit_choice(
     update_data = {
         'current_node_id': next_node_id if not is_module_complete else choice_data.node_id,
         'nodes_completed': new_nodes_completed,
-        'points_earned': points_earned,
     }
 
     if is_module_complete:
