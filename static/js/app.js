@@ -374,6 +374,7 @@ async function renderHome() {
                     </div>
                     
                     <div class="maps-hero-visual" aria-label="Hero Visual">
+                        <img src="/static/images/MAPSCOACHING.png" alt="MAPS Coaching" class="hero-coaching-image">
                         <div class="conversation-overlay">
                             <div class="overlay-label">COACHEE PERSONA</div>
                             <div class="overlay-quote">"I feel overwhelmed with the new project timeline."</div>

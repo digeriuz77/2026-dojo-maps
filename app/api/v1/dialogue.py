@@ -9,7 +9,7 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from supabase import Client
 from typing import Optional
 
-from app.core.supabase import get_supabase, get_supabase_admin
+from app.core.supabase import get_supabase, get_supabase_admin, get_authenticated_client
 from app.core.auth import get_current_user, AuthContext
 from app.api.v1.modules import get_user_module_progress
 from app.services.scoring_service import ScoringService
@@ -93,11 +93,14 @@ async def get_dialogue_node(
     Returns the patient statement and available practitioner choices.
     If module not started, automatically starts it.
     """
+    # Use authenticated client for user_progress reads so RLS can match current user
+    auth_client = get_authenticated_client(current_user.raw_token)
+
     # Get module
     module = await get_module_by_id(module_id, supabase)
 
     # Check user progress - if not started, auto-start the module
-    progress = await get_user_module_progress(current_user.user_id, module_id, supabase)
+    progress = await get_user_module_progress(current_user.user_id, module_id, auth_client)
     if not progress:
         logger.info(f"[DIALOGUE] Auto-starting module {module_id} for user {current_user.user_id}")
 
@@ -176,9 +179,12 @@ async def submit_choice(
     """
     supabase_admin = get_supabase_admin()
 
+    # Use authenticated client for user_progress reads so RLS can match current user
+    auth_client = get_authenticated_client(current_user.raw_token)
+
     # Get module and progress
     module = await get_module_by_id(choice_data.module_id, supabase)
-    progress = await get_user_module_progress(current_user.user_id, choice_data.module_id, supabase)
+    progress = await get_user_module_progress(current_user.user_id, choice_data.module_id, auth_client)
 
     # Auto-start if not started
     if not progress:
@@ -275,19 +281,23 @@ async def submit_choice(
     else:
         quality_label = "Poor"
 
-    # Record attempt using admin client to bypass RLS
-    supabase_admin.table('dialogue_attempts').insert({
-        'user_id': current_user.user_id,
-        'module_id': choice_data.module_id,
-        'progress_id': progress['id'],
-        'node_id': choice_data.node_id,
-        'choice_id': choice_data.choice_id,
-        'choice_text': choice_data.choice_text,
-        'technique': choice_data.technique,
-        'is_correct_technique': is_correct,
-        'feedback_text': selected_choice.get('feedback', ''),
-        'evoked_change_talk': evoked_ct,
-    }).execute()
+    # Record attempt using admin client to bypass RLS.
+    # Do not fail the user flow if analytics table/schema is temporarily out of sync.
+    try:
+        supabase_admin.table('dialogue_attempts').insert({
+            'user_id': current_user.user_id,
+            'module_id': choice_data.module_id,
+            'progress_id': progress['id'],
+            'node_id': choice_data.node_id,
+            'choice_id': choice_data.choice_id,
+            'choice_text': choice_data.choice_text,
+            'technique': choice_data.technique,
+            'is_correct_technique': is_correct,
+            'feedback_text': selected_choice.get('feedback', ''),
+            'evoked_change_talk': evoked_ct,
+        }).execute()
+    except Exception as e:
+        logger.warning(f"[DIALOGUE] Failed to record dialogue_attempts row (continuing): {e}")
 
     # Update progress
     new_nodes_completed = list(nodes_completed)

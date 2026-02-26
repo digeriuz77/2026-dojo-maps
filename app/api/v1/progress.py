@@ -12,7 +12,7 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from supabase import Client
 from typing import List, Optional
 
-from app.core.supabase import get_supabase, get_supabase_admin
+from app.core.supabase import get_supabase, get_supabase_admin, get_authenticated_client
 from app.core.auth import get_current_user, AuthContext
 from app.models.progress import UserProgress, ProgressListResponse
 
@@ -40,17 +40,15 @@ async def get_user_stats(
     Get user's overall statistics and all module progress.
     """
     supabase_admin = get_supabase_admin()
+    auth_client = get_authenticated_client(current_user.raw_token)
 
     # Get user profile
     profile = await get_user_profile(current_user.user_id, supabase_admin)
     if not profile:
-        raise HTTPException(
-            status_code=404,
-            detail="Profile not found"
-        )
+        profile = {"modules_completed": 0}
 
     # Get all progress
-    progress_response = supabase.table('user_progress') \
+    progress_response = auth_client.table('user_progress') \
         .select('*, learning_modules(id, title, dialogue_content)') \
         .eq('user_id', current_user.user_id) \
         .order('started_at', desc=True) \
@@ -60,22 +58,21 @@ async def get_user_stats(
     for p in progress_response.data:
         # Handle the joined data
         module_data = p.get('learning_modules')
-        if module_data:
-            module_title = module_data.get('title', 'Unknown Module')
-            p.pop('learning_modules', None)
+        module_title = module_data.get('title', 'Unknown Module') if module_data else 'Unknown Module'
+        p.pop('learning_modules', None)
 
-            progress_list.append(UserProgress(
-                id=str(p['id']),
-                module_id=str(p['module_id']),
-                module_title=module_title,
-                status=p.get('status', 'not_started'),
-                completion_score=p.get('completion_score', 0),
-                current_node_id=p.get('current_node_id'),
-                nodes_completed=p.get('nodes_completed', []),
-                techniques_demonstrated=p.get('techniques_demonstrated', {}),
-                started_at=p.get('started_at'),
-                completed_at=p.get('completed_at')
-            ))
+        progress_list.append(UserProgress(
+            id=str(p['id']),
+            module_id=str(p['module_id']),
+            module_title=module_title,
+            status=p.get('status', 'not_started'),
+            completion_score=p.get('completion_score', 0),
+            current_node_id=p.get('current_node_id'),
+            nodes_completed=p.get('nodes_completed', []),
+            techniques_demonstrated=p.get('techniques_demonstrated', {}),
+            started_at=p.get('started_at'),
+            completed_at=p.get('completed_at')
+        ))
 
     return ProgressListResponse(
         modules_completed=profile.get('modules_completed', 0),
@@ -102,17 +99,15 @@ async def get_all_module_progress(
     Returns: 200 OK with list of progress entries
     """
     supabase_admin = get_supabase_admin()
+    auth_client = get_authenticated_client(current_user.raw_token)
 
     # Get user profile
     profile = await get_user_profile(current_user.user_id, supabase_admin)
     if not profile:
-        raise HTTPException(
-            status_code=404,
-            detail="Profile not found"
-        )
+        profile = {"modules_completed": 0}
 
     # Build query with optional filtering
-    query = supabase.table('user_progress') \
+    query = auth_client.table('user_progress') \
         .select('*, learning_modules(id, title, dialogue_content)') \
         .eq('user_id', current_user.user_id)
 
@@ -131,22 +126,21 @@ async def get_all_module_progress(
     for p in paginated_data:
         # Handle the joined data
         module_data = p.get('learning_modules')
-        if module_data:
-            module_title = module_data.get('title', 'Unknown Module')
-            p.pop('learning_modules', None)
+        module_title = module_data.get('title', 'Unknown Module') if module_data else 'Unknown Module'
+        p.pop('learning_modules', None)
 
-            progress_list.append(UserProgress(
-                id=str(p['id']),
-                module_id=str(p['module_id']),
-                module_title=module_title,
-                status=p.get('status', 'not_started'),
-                completion_score=p.get('completion_score', 0),
-                current_node_id=p.get('current_node_id'),
-                nodes_completed=p.get('nodes_completed', []),
-                techniques_demonstrated=p.get('techniques_demonstrated', {}),
-                started_at=p.get('started_at'),
-                completed_at=p.get('completed_at')
-            ))
+        progress_list.append(UserProgress(
+            id=str(p['id']),
+            module_id=str(p['module_id']),
+            module_title=module_title,
+            status=p.get('status', 'not_started'),
+            completion_score=p.get('completion_score', 0),
+            current_node_id=p.get('current_node_id'),
+            nodes_completed=p.get('nodes_completed', []),
+            techniques_demonstrated=p.get('techniques_demonstrated', {}),
+            started_at=p.get('started_at'),
+            completed_at=p.get('completed_at')
+        ))
 
     return ProgressListResponse(
         modules_completed=profile.get('modules_completed', 0),
@@ -163,7 +157,9 @@ async def get_module_progress(
     """
     Get progress for a specific module.
     """
-    response = supabase.table('user_progress') \
+    auth_client = get_authenticated_client(current_user.raw_token)
+
+    response = auth_client.table('user_progress') \
         .select('*, learning_modules(id, title, dialogue_content)') \
         .eq('user_id', current_user.user_id) \
         .eq('module_id', module_id) \
