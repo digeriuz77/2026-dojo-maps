@@ -391,7 +391,8 @@ h6 {
 .conversation-overlay {
     position: absolute;
     right: 0;
-    top: 0;
+    bottom: 0;
+
     width: 320px;
     background: #fff;
     border: 1px solid #e5e7eb;
@@ -2605,9 +2606,15 @@ body.modal-open {
     white-space: nowrap;
 }
 
-/* Choice cards - hide technique by default */
+/* Choice cards - technique label */
 .choice-technique {
-    display: none;
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
 }
 
 .choice-card {
