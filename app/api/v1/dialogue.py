@@ -287,7 +287,6 @@ async def submit_choice(
         'is_correct_technique': is_correct,
         'feedback_text': selected_choice.get('feedback', ''),
         'evoked_change_talk': evoked_ct,
-        'points_earned': choice_points,
     }).execute()
 
     # Update progress
