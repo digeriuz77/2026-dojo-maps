@@ -1094,20 +1094,27 @@ function showFeedback(feedback, moduleId, dialogueContent) {
     const overlay = document.createElement('div');
     overlay.className = 'feedback-overlay';
 
+    const qualityLabel = feedback.quality_label || (isCorrect ? 'Acceptable' : 'Needs Improvement');
+    const qualityClass = {
+        'Excellent': 'quality-excellent',
+        'Good': 'quality-good',
+        'Acceptable': 'quality-acceptable',
+        'Needs Improvement': 'quality-poor'
+    }[qualityLabel] || 'quality-acceptable';
+
     overlay.innerHTML = `
         <div class="feedback-modal ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}">
             <div class="feedback-header">
                 <div class="feedback-icon">${isCorrect ? '✓' : '✗'}</div>
-                <h2 class="feedback-title">${isCorrect ? 'Correct!' : 'Not Quite'}</h2>
+                <h2 class="feedback-title">${isCorrect ? 'Good technique!' : 'Not Quite'}</h2>
             </div>
 
             <div class="feedback-body">
-                <p class="feedback-text">${feedback.feedback_text}</p>
-
-                <div class="points-earned">
-                    <span class="points-value">+${feedback.points_earned}</span>
-                    <span class="points-label">points</span>
+                <div class="quality-badge ${qualityClass}">
+                    <span class="quality-label">${qualityLabel}</span>
                 </div>
+
+                <p class="feedback-text">${feedback.feedback_text}</p>
 
                 ${feedback.evoked_change_talk ? `
                     <div class="change-talk-badge">
@@ -1123,14 +1130,6 @@ function showFeedback(feedback, moduleId, dialogueContent) {
                             <div class="summary-stat">
                                 <span class="stat-label">Completion Score</span>
                                 <span class="stat-value">${feedback.completion_score}%</span>
-                            </div>
-                            <div class="summary-stat">
-                                <span class="stat-label">Total Points</span>
-                                <span class="stat-value">${feedback.total_points}</span>
-                            </div>
-                            <div class="summary-stat">
-                                <span class="stat-label">Level</span>
-                                <span class="stat-value">${feedback.level}</span>
                             </div>
                         </div>
                     </div>
@@ -1270,8 +1269,7 @@ async function renderLeaderboard() {
                             <div class="podium-place place-${index + 1}">
                                 <div class="podium-rank">${index + 1}</div>
                                 <div class="podium-user">${entry.display_name}</div>
-                                <div class="podium-points">${entry.total_points} pts</div>
-                                <div class="podium-level">Level ${entry.level}</div>
+                                <div class="podium-points">${entry.modules_completed} module${entry.modules_completed !== 1 ? 's' : ''}</div>
                             </div>
                         `).join('')}
                     </div>
@@ -1281,8 +1279,7 @@ async function renderLeaderboard() {
                             <div class="leaderboard-item">
                                 <span class="item-rank">${entry.rank}</span>
                                 <span class="item-name">${entry.display_name}</span>
-                                <span class="item-level">Level ${entry.level}</span>
-                                <span class="item-points">${entry.total_points} pts</span>
+                                <span class="item-points">${entry.modules_completed} module${entry.modules_completed !== 1 ? 's' : ''} completed</span>
                             </div>
                         `).join('')}
                     </div>
@@ -1295,7 +1292,7 @@ async function renderLeaderboard() {
                             <span class="rank-number">#${data.current_user.rank}</span>
                             <div class="rank-info">
                                 <span class="rank-name">${data.current_user.display_name}</span>
-                                <span class="rank-stats">Level ${data.current_user.level} • ${data.current_user.total_points} points</span>
+                                <span class="rank-stats">${data.current_user.modules_completed} module${data.current_user.modules_completed !== 1 ? 's' : ''} completed</span>
                             </div>
                         </div>
                     </div>

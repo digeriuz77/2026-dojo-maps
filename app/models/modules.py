@@ -78,6 +78,7 @@ class ChoiceSubmit(BaseModel):
 class ChoiceFeedback(BaseModel):
     """Feedback for a submitted choice"""
     is_correct: bool
+    quality_label: str = ""  # "Excellent", "Good", "Acceptable", "Needs Improvement"
     feedback_text: str
     evoked_change_talk: bool
     next_node_id: Optional[str] = None

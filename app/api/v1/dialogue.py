@@ -265,8 +265,18 @@ async def submit_choice(
     )
     total_points_earned = (progress.get('points_earned', 0) or 0) + choice_points
 
-    # Record attempt
-    supabase.table('dialogue_attempts').insert({
+    # Derive a human-readable quality label from the points earned
+    if choice_points >= 200:
+        quality_label = "Excellent"
+    elif choice_points >= 150:
+        quality_label = "Good"
+    elif choice_points >= 100:
+        quality_label = "Acceptable"
+    else:
+        quality_label = "Needs Improvement"
+
+    # Record attempt using admin client to bypass RLS
+    supabase_admin.table('dialogue_attempts').insert({
         'user_id': current_user.user_id,
         'module_id': choice_data.module_id,
         'progress_id': progress['id'],
@@ -323,7 +333,8 @@ async def submit_choice(
             'completed_at': 'now()'
         })
 
-    supabase.table('user_progress').update(update_data).eq('id', progress['id']).execute()
+    # Use admin client for update to bypass RLS
+    supabase_admin.table('user_progress').update(update_data).eq('id', progress['id']).execute()
 
     # Update user profile
     profile = await get_user_profile(current_user.user_id, supabase_admin)
@@ -339,6 +350,7 @@ async def submit_choice(
 
         return ChoiceFeedback(
             is_correct=is_correct,
+            quality_label=quality_label,
             feedback_text=selected_choice.get('feedback', ''),
             evoked_change_talk=evoked_ct,
             next_node_id=next_node_id if not is_module_complete else None,
@@ -349,6 +361,7 @@ async def submit_choice(
     # Fallback if no profile (shouldn't happen)
     return ChoiceFeedback(
         is_correct=is_correct,
+        quality_label=quality_label,
         feedback_text=selected_choice.get('feedback', ''),
         evoked_change_talk=evoked_ct,
         next_node_id=next_node_id if not is_module_complete else None,

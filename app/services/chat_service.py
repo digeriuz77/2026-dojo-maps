@@ -61,7 +61,7 @@ Motivational Interviewing practice session.
 
 CURRENT STATE:
 - Stage of change: {persona["stage_of_change"]}
-- Initial mood: {persona["initial_mood"]}
+- Initial mood: {persona.get("initial_mood", "guarded but open to talking")}
 - Current turn: {turn_number} of {MAX_TURNS}
 
 AMBIVALENCE (reasons for NOT changing):
