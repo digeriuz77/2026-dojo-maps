@@ -301,8 +301,7 @@ async function renderNav() {
             <a href="#" data-link="/chat-practice">Practice Chat</a>
             <a href="#" data-link="/progress">Progress</a>
             <a href="#" data-link="/leaderboard">Leaderboard</a>
-            <a href="#" data-link="/about">About</a>
-            <span class="user-name">${state.user.display_name || state.user.email}</span>
+                        <span class="user-name">${state.user.display_name || state.user.email}</span>
             <a href="#" data-link="/logout">Logout</a>
         `;
     } else {
@@ -389,7 +388,7 @@ async function renderHome() {
                         <p class="maps-hero-subtitle">Develop effective coaching skills through realistic practice. The MAPS Learning Platform helps you master collaborative, growth-focused guidance to better support colleagues and clients.</p>
                         <div class="maps-cta">
                             <a href="#" data-link="/login" class="btn btn-primary btn-lg">Start Training</a>
-                            <a href="#" data-link="/about" class="btn btn-outline btn-lg" style="color: white; border-color: white;">Learn More</a>
+                            
                         </div>
                     </div>
                     
@@ -2369,7 +2368,7 @@ const router = {
         '/register': renderRegister,
         '/forgot-password': renderForgotPassword,
         '/reset-password': renderResetPassword,
-        '/about': renderAbout,
+        
         '/modules': renderModules,
         '/modules/:id': renderModuleDetail,
         '/modules/:id/dialogue': renderDialogue,

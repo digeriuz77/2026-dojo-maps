@@ -228,7 +228,7 @@ async def reset_password_page(request: Request):
 _SPA_ROUTES = [
     "/login",
     "/register",
-    "/about",
+
     "/modules",
     "/modules/{module_id}",
     "/modules/{module_id}/dialogue",
