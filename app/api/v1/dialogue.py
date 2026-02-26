@@ -62,6 +62,44 @@ def get_node_number(dialogue_content: dict, node_id: str) -> int:
 
 
 def is_correct_technique(choice: dict) -> bool:
+    """Determine if a choice uses the correct MI technique.
+    
+    Parses the technique annotation from the JSON which uses patterns like:
+    - "Simple Reflection (Effective)" - CORRECT technique
+    - "Education/Warning (Non-MI)" - NOT MI-consistent
+    - "Open Question (Premature)" - Questioning before reflection
+    - "Confrontation (Non-MI)" - Not MI-consistent
+    - "Reflection (Recovery)" - Recovering from a mistake (acceptable)
+    """
+    technique = choice.get('technique', '')
+    
+    # Extract the annotation in parentheses at the end
+    # Pattern: "Technique Name (Annotation)"
+    annotation_start = technique.rfind('(')
+    annotation_end = technique.rfind(')')
+    
+    if annotation_start != -1 and annotation_end != -1 and annotation_end > annotation_start:
+        annotation = technique[annotation_start + 1:annotation_end].lower().strip()
+        
+        # Effective techniques return True
+        effective_annotations = ['effective', 'recovery']
+        if annotation in effective_annotations:
+            return True
+        
+        # Non-MI techniques return False
+        non_mi_annotations = ['non-mi', 'non-m i']
+        if annotation in non_mi_annotations:
+            return False
+        
+        # Premature questioning is not ideal but not completely wrong
+        if annotation == 'premature':
+            return False
+    
+    # Fallback: if no clear annotation found, check for old keyword patterns
+    technique_lower = technique.lower()
+    non_mi_keywords = ['non-mi', 'righting reflex', 'educating', 'lecturing',
+                       'defending', 'challenging', 'confrontation']
+    return not any(keyword in technique_lower for keyword in non_mi_keywords)
     """Determine if a choice uses the correct MI technique"""
     technique = choice.get('technique', '').lower()
     # Non-MI techniques
