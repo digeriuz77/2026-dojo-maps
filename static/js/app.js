@@ -1077,6 +1077,38 @@ function renderDialogueNode(moduleId, nodeData, dialogueContent) {
         });
     }
 
+    // Add click handlers for choice cards
+    document.querySelectorAll('.choice-card').forEach((card, index) => {
+        card.addEventListener('click', async () => {
+            // Prevent double-clicks
+            if (card.disabled) return;
+            card.disabled = true;
+            card.classList.add('selected');
+
+            const choice = node.practitioner_choices[index];
+            const choiceId = `choice_${index}`;
+            const choiceText = choice.text;
+            const technique = choice.technique;
+
+            try {
+                showLoading();
+                const feedback = await dialogueAPI.submitChoice(
+                    moduleId,
+                    node.id,
+                    choiceId,
+                    choiceText,
+                    technique
+                );
+                hideLoading();
+                showFeedback(feedback, moduleId, dialogueContent);
+            } catch (error) {
+                showToast(error.message, 'error');
+                // Re-enable choices on error
+                card.disabled = false;
+                card.classList.remove('selected');
+            }
+        });
+    });
 }
 
 /**
