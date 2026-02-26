@@ -9,7 +9,7 @@ from supabase import Client
 from typing import List
 import logging
 
-from app.core.supabase import get_supabase, get_authenticated_client
+from app.core.supabase import get_supabase, get_authenticated_client, get_supabase_admin
 from app.core.auth import get_current_user, AuthContext
 from app.models.modules import ModuleResponse, ModuleListResponse
 
@@ -199,7 +199,7 @@ async def start_module(
                     "current_node_id": start_node,
                 }
             )
-            .insert_execute()
+            .execute()
         )
         logger.info(f"[MODULES] Progress created: {insert_response.data}")
     except Exception as e:
@@ -246,9 +246,11 @@ async def restart_module(
         current_user.user_id, module_id, supabase
     )
 
+    supabase_admin = get_supabase_admin()
+
     if existing_progress:
-        # Reset existing progress
-        supabase.table("user_progress").update(
+        # Reset existing progress using admin client to bypass RLS
+        supabase_admin.table("user_progress").update(
             {
                 "status": "in_progress",
                 "current_node_id": start_node,
@@ -265,9 +267,9 @@ async def restart_module(
             "current_node_id": start_node,
         }
     else:
-        # Create new progress
+        # Create new progress using admin client to bypass RLS
         progress_response = (
-            supabase.table("user_progress")
+            supabase_admin.table("user_progress")
             .insert(
                 {
                     "user_id": current_user.user_id,
