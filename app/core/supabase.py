@@ -28,6 +28,7 @@ def get_supabase() -> Client:
     Get a Supabase client with anon key permissions.
 
     Used for client-side operations like user sign up and sign in.
+    Supports both legacy (JWT-based) and new (sb_publishable_xxx) API keys.
 
     Returns:
         Client: Initialized Supabase client
@@ -51,7 +52,18 @@ def get_supabase() -> Client:
         logger.info("Initializing Supabase client with anon key")
         logger.info(f"Supabase URL: {settings.SUPABASE_URL[:30]}...")
         logger.info(f"Supabase Key present: {bool(settings.SUPABASE_KEY)}")
-        _supabase_client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
+        
+        # Detect key type and configure client accordingly
+        supabase_key = settings.SUPABASE_KEY
+        options = {}
+        
+        # Check if using new key format (sb_publishable_xxx or sb_secret_xxx)
+        if supabase_key.startswith('sb_') and '_' in supabase_key:
+            # New key format - not JWT, use apikey in header
+            options["headers"] = {"apikey": supabase_key}
+            logger.info("Using new API key format (sb_publishable_xxx)")
+        
+        _supabase_client = create_client(settings.SUPABASE_URL, supabase_key, **options)
         logger.info("Supabase client initialized successfully")
     return _supabase_client
 
@@ -61,7 +73,7 @@ def get_supabase_admin() -> Client:
     Get a Supabase client with secret key permissions.
 
     Used for administrative operations that bypass RLS policies.
-    With new key format, this uses sb_secret_xxx for elevated access.
+    Supports both legacy (JWT-based) and new (sb_secret_xxx) API keys.
 
     Returns:
         Client: Initialized Supabase admin client
@@ -82,8 +94,19 @@ def get_supabase_admin() -> Client:
     global _supabase_admin_client
     if _supabase_admin_client is None:
         logger.info("Initializing Supabase admin client with service role key")
+        
+        # Detect key type and configure client accordingly
+        service_key = settings.SUPABASE_SERVICE_ROLE_KEY
+        options = {}
+        
+        # Check if using new key format (sb_publishable_xxx or sb_secret_xxx)
+        if service_key.startswith('sb_') and '_' in service_key:
+            # New key format - not JWT, use apikey in header
+            options["headers"] = {"apikey": service_key}
+            logger.info("Using new API key format (sb_secret_xxx)")
+        
         _supabase_admin_client = create_client(
-            settings.SUPABASE_URL, settings.SUPABASE_SERVICE_ROLE_KEY
+            settings.SUPABASE_URL, service_key, **options
         )
         logger.info("Supabase admin client initialized successfully")
     return _supabase_admin_client
