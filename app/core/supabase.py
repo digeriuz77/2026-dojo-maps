@@ -28,22 +28,15 @@ def get_supabase() -> Client:
     Get a Supabase client with anon key permissions.
 
     Used for client-side operations like user sign up and sign in.
-    Supports both legacy (JWT-based) and new (sb_publishable_xxx) API keys.
+    The supabase Python client v2+ handles both legacy and new API key formats automatically.
 
     Returns:
         Client: Initialized Supabase client
     """
     # Clear proxy environment variables that might conflict with supabase client
-    # This is done here to ensure it happens on each request in case they're set later
     for proxy_var in [
-        "HTTP_PROXY",
-        "HTTPS_PROXY",
-        "http_proxy",
-        "https_proxy",
-        "ALL_PROXY",
-        "all_proxy",
-        "NO_PROXY",
-        "no_proxy",
+        "HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy",
+        "ALL_PROXY", "all_proxy", "NO_PROXY", "no_proxy",
     ]:
         os.environ.pop(proxy_var, None)
 
@@ -52,18 +45,7 @@ def get_supabase() -> Client:
         logger.info("Initializing Supabase client with anon key")
         logger.info(f"Supabase URL: {settings.SUPABASE_URL[:30]}...")
         logger.info(f"Supabase Key present: {bool(settings.SUPABASE_KEY)}")
-        
-        # Detect key type and configure client accordingly
-        supabase_key = settings.SUPABASE_KEY
-        options = {}
-        
-        # Check if using new key format (sb_publishable_xxx or sb_secret_xxx)
-        if supabase_key.startswith('sb_') and '_' in supabase_key:
-            # New key format - not JWT, use apikey in header
-            options["headers"] = {"apikey": supabase_key}
-            logger.info("Using new API key format (sb_publishable_xxx)")
-        
-        _supabase_client = create_client(settings.SUPABASE_URL, supabase_key, **options)
+        _supabase_client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
         logger.info("Supabase client initialized successfully")
     return _supabase_client
 
@@ -73,40 +55,22 @@ def get_supabase_admin() -> Client:
     Get a Supabase client with secret key permissions.
 
     Used for administrative operations that bypass RLS policies.
-    Supports both legacy (JWT-based) and new (sb_secret_xxx) API keys.
 
     Returns:
         Client: Initialized Supabase admin client
     """
     # Clear proxy environment variables that might conflict with supabase client
     for proxy_var in [
-        "HTTP_PROXY",
-        "HTTPS_PROXY",
-        "http_proxy",
-        "https_proxy",
-        "ALL_PROXY",
-        "all_proxy",
-        "NO_PROXY",
-        "no_proxy",
+        "HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy",
+        "ALL_PROXY", "all_proxy", "NO_PROXY", "no_proxy",
     ]:
         os.environ.pop(proxy_var, None)
 
     global _supabase_admin_client
     if _supabase_admin_client is None:
         logger.info("Initializing Supabase admin client with service role key")
-        
-        # Detect key type and configure client accordingly
-        service_key = settings.SUPABASE_SERVICE_ROLE_KEY
-        options = {}
-        
-        # Check if using new key format (sb_publishable_xxx or sb_secret_xxx)
-        if service_key.startswith('sb_') and '_' in service_key:
-            # New key format - not JWT, use apikey in header
-            options["headers"] = {"apikey": service_key}
-            logger.info("Using new API key format (sb_secret_xxx)")
-        
         _supabase_admin_client = create_client(
-            settings.SUPABASE_URL, service_key, **options
+            settings.SUPABASE_URL, settings.SUPABASE_SERVICE_ROLE_KEY
         )
         logger.info("Supabase admin client initialized successfully")
     return _supabase_admin_client
@@ -121,85 +85,29 @@ async def test_connection() -> Dict[str, Any]:
     """
     try:
         client = get_supabase()
-
-        # Test 1: Check if we can query the auth users table (via auth API)
-        logger.info("Testing Supabase connection...")
-
-        # Test 2: Try a simple table query
-        response = client.table("learning_modules").select("count").execute()
-
-        logger.info(f"Connection test successful. Modules count: {response.data}")
-
+        # Simple query to test connection
+        result = client.table("learning_modules").select("id").limit(1).execute()
         return {
-            "status": "success",
-            "message": "Successfully connected to Supabase",
-            "supabase_url": settings.SUPABASE_URL[:30] + "...",
-            "modules_count": len(response.data) if response.data else 0,
-            "config_present": {
-                "supabase_url": bool(settings.SUPABASE_URL),
-                "supabase_key": bool(settings.SUPABASE_KEY),
-                "secret_key": bool(settings.SUPABASE_SERVICE_ROLE_KEY),
-                "jwt_secret": bool(settings.SUPABASE_JWT_SECRET),
-            },
+            "status": "healthy",
+            "service": "supabase",
+            "message": "Connected successfully",
+            "data_count": len(result.data) if result.data else 0
         }
     except Exception as e:
-        logger.error(f"Connection test failed: {e}")
+        logger.error(f"Supabase connection test failed: {e}")
         return {
-            "status": "error",
-            "message": str(e),
-            "supabase_url": settings.SUPABASE_URL[:30] + "..."
-            if settings.SUPABASE_URL
-            else "None",
-            "config_present": {
-                "supabase_url": bool(settings.SUPABASE_URL),
-                "supabase_key": bool(settings.SUPABASE_KEY),
-                "secret_key": bool(settings.SUPABASE_SERVICE_ROLE_KEY),
-                "jwt_secret": bool(settings.SUPABASE_JWT_SECRET),
-            },
+            "status": "unhealthy",
+            "service": "supabase",
+            "error": str(e)
         }
 
 
-def get_authenticated_supabase(jwt_token: str) -> Client:
-    """
-    Get a Supabase client with a specific JWT token for authenticated requests.
-
-    This client will use the provided JWT for RLS policies, allowing operations
-    that require the user's auth context (like inserting user_progress records).
-
-    Args:
-        jwt_token: The JWT token from the authenticated user
-
-    Returns:
-        Client: Initialized Supabase client with the provided JWT
-    """
-    for proxy_var in [
-        "HTTP_PROXY",
-        "HTTPS_PROXY",
-        "http_proxy",
-        "https_proxy",
-        "ALL_PROXY",
-        "all_proxy",
-        "NO_PROXY",
-        "no_proxy",
-    ]:
-        os.environ.pop(proxy_var, None)
-
-    client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
-
-    # Use private method to set headers directly
-    try:
-        headers = {"Authorization": f"Bearer {jwt_token}"}
-        client._headers.update(headers)
-    except AttributeError:
-        pass
-
-    return client
-
-
+# Add httpx client wrapper for authenticated requests
 class AuthenticatedSupabaseClient:
     """
-    A lightweight authenticated Supabase client using httpx directly.
-    Used for operations that require RLS with user authentication.
+    Wrapper around Supabase client that uses JWT token for authentication.
+    This bypasses the Supabase Python client's auth handling and uses httpx
+    directly with the JWT token, which properly passes RLS policies.
     """
 
     def __init__(self, jwt_token: str):
@@ -212,78 +120,91 @@ class AuthenticatedSupabaseClient:
         }
 
     def table(self, table_name: str):
-        """Return a query builder for the specified table."""
-        return AuthenticatedTableQuery(self.base_url, table_name, self.headers)
+        """Return a table reference for querying."""
+        return _AuthenticatedTableProxy(self.base_url, self.headers, table_name)
 
 
-class AuthenticatedTableQuery:
-    """Authenticated table query builder using httpx."""
+class _AuthenticatedTableProxy:
+    """Proxy for table operations using httpx directly."""
 
-    def __init__(self, base_url: str, table_name: str, headers: dict):
+    def __init__(self, base_url: str, headers: Dict[str, str], table_name: str):
         self.base_url = base_url
-        self.table_name = table_name
         self.headers = headers
-        self._select = "*"
+        self.table_name = table_name
+        self._select_columns = "*"
         self._filters = []
-        self._body = None
 
-    def select(self, columns: str):
-        """Set columns to select."""
-        self._select = columns
+    def select(self, columns: str = "*"):
+        self._select_columns = columns
         return self
 
-    def eq(self, column: str, value: str):
-        """Add equality filter."""
-        self._filters.append(f"{column}=eq.{value}")
+    def eq(self, column: str, value: Any):
+        self._filters.append({"column": column, "operator": "eq", "value": value})
         return self
 
     def execute(self):
         """Execute the query."""
         import httpx
-
-        url = f"{self.base_url}/rest/v1/{self.table_name}?select={self._select}"
-        if self._filters:
-            url += "&" + "&".join(self._filters)
-
+        url = f"{self.base_url}/rest/v1/{self.table_name}?select={self._select_columns}"
+        
+        # Add filters
+        for f in self._filters:
+            url += f"&{f['column']}={f['value']}"
+        
         with httpx.Client() as client:
             response = client.get(url, headers=self.headers)
             response.raise_for_status()
-            return type("Response", (), {"data": response.json()})()
+            return _SupabaseResult(response.json())
 
-    def insert(self, data: dict):
-        """Insert data into table."""
-        self._body = data
-        return self
-
-    def insert_execute(self):
-        """Execute the insert."""
+    def insert(self, data: Dict[str, Any]):
+        """Insert a row."""
         import httpx
-
         url = f"{self.base_url}/rest/v1/{self.table_name}"
+        
         with httpx.Client() as client:
-            response = client.post(url, json=self._body, headers=self.headers)
+            response = client.post(url, json=data, headers=self.headers)
             response.raise_for_status()
-            # Handle empty 204 response or return the created record
-            if response.status_code == 204 or not response.text:
-                # Return the inserted data with default values for missing fields
-                return type("Response", (), {"data": [{"id": None, **self._body}]})()
-            try:
-                data = response.json()
-                if isinstance(data, list):
-                    return type("Response", (), {"data": data})()
-                elif isinstance(data, dict):
-                    return type("Response", (), {"data": [data]})()
-                else:
-                    return type(
-                        "Response", (), {"data": [{"id": None, **self._body}]}
-                    )()
-            except Exception:
-                return type("Response", (), {"data": [{"id": None, **self._body}]})()
+            return _SupabaseResult(response.json())
+
+    def update(self, data: Dict[str, Any]):
+        """Update rows."""
+        import httpx
+        url = f"{self.base_url}/rest/v1/{self.table_name}"
+        
+        # Add filters to URL
+        for f in self._filters:
+            url += f"?{f['column']}=eq.{f['value']}"
+        
+        with httpx.Client() as client:
+            response = client.patch(url, json=data, headers=self.headers)
+            response.raise_for_status()
+            return _SupabaseResult(response.json())
+
+    def delete(self):
+        """Delete rows."""
+        import httpx
+        url = f"{self.base_url}/rest/v1/{self.table_name}"
+        
+        # Add filters to URL
+        for f in self._filters:
+            url += f"?{f['column']}=eq.{f['value']}"
+        
+        with httpx.Client() as client:
+            response = client.delete(url, headers=self.headers)
+            response.raise_for_status()
+            return _SupabaseResult(response.json() or [])
+
+
+class _SupabaseResult:
+    """Wrapper for Supabase query results."""
+
+    def __init__(self, data: Any):
+        self.data = data
 
 
 def get_authenticated_client(jwt_token: str) -> AuthenticatedSupabaseClient:
     """
-    Get an authenticated Supabase client using httpx directly.
+    Get a Supabase client with a specific JWT token for authenticated requests.
 
     This bypasses the Supabase Python client's auth handling and uses httpx
     directly with the JWT token, which properly passes RLS policies.
@@ -292,6 +213,6 @@ def get_authenticated_client(jwt_token: str) -> AuthenticatedSupabaseClient:
         jwt_token: The JWT token from the authenticated user
 
     Returns:
-        AuthenticatedSupabaseClient: Client with authenticated REST access
+        AuthenticatedSupabaseClient: Client configured with the JWT token
     """
     return AuthenticatedSupabaseClient(jwt_token)
