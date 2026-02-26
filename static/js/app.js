@@ -507,13 +507,12 @@ function renderEndingNode(moduleId, node, canRetry, progressId) {
             try {
                 const response = await dialogueAPI.restart(moduleId);
                 if (response.current_node_id) {
-                    showLoading();
-                    const nodeData = await dialogueAPI.getNode(moduleId, response.current_node_id);
+                        const nodeData = await dialogueAPI.getNode(moduleId, response.current_node_id);
                     const dialogueContent = await dialogueAPI.getContent(moduleId);
                     renderDialogueNode(moduleId, nodeData, dialogueContent);
                 }
             } catch (error) {
-                showToast(error.message, 'error');
+                alert(error.message);
             }
         });
     }
@@ -567,7 +566,7 @@ function renderLogin() {
             showToast('Welcome back!', 'success');
             router.navigate('/');
         } catch (error) {
-            showToast(error.message, 'error');
+            alert(error.message);
         } finally {
             btn.disabled = false;
             btn.textContent = 'Sign In';
@@ -674,7 +673,7 @@ function renderRegister() {
                 router.navigate('/login');
             }
         } catch (error) {
-            showToast(error.message, 'error');
+            alert(error.message);
         } finally {
             btn.disabled = false;
             btn.textContent = 'Create Account';
@@ -721,7 +720,7 @@ function renderForgotPassword() {
             showToast(result.message || 'Password reset email sent!', 'success');
             setTimeout(() => router.navigate('/login'), 2000);
         } catch (error) {
-            showToast(error.message, 'error');
+            alert(error.message);
         } finally {
             btn.disabled = false;
             btn.textContent = 'Send Reset Link';
@@ -793,7 +792,7 @@ async function renderResetPassword() {
             renderNav();
             setTimeout(() => router.navigate('/login'), 2000);
         } catch (error) {
-            showToast(error.message, 'error');
+            alert(error.message);
         } finally {
             btn.disabled = false;
             btn.textContent = 'Update Password';
@@ -929,7 +928,7 @@ async function renderModuleDetail(moduleId) {
                     state.progressId = result.progress_id;
                     router.navigate(`/modules/${moduleId}/dialogue`);
                 } catch (error) {
-                    showToast(error.message, 'error');
+                    alert(error.message);
                     startBtn.disabled = false;
                     startBtn.textContent = 'Start Module';
                 }
@@ -945,7 +944,7 @@ async function renderModuleDetail(moduleId) {
                     state.progressId = result.progress_id;
                     router.navigate(`/modules/${moduleId}/dialogue`);
                 } catch (error) {
-                    showToast(error.message, 'error');
+                    alert(error.message);
                     continueBtn.disabled = false;
                     continueBtn.textContent = 'Continue Module';
                 }
@@ -962,7 +961,7 @@ async function renderModuleDetail(moduleId) {
                         state.progressId = result.progress_id;
                         router.navigate(`/modules/${moduleId}/dialogue`);
                     } catch (error) {
-                        showToast(error.message, 'error');
+                        alert(error.message);
                         restartBtn.disabled = false;
                         restartBtn.textContent = 'Restart';
                     }
@@ -1091,7 +1090,6 @@ function renderDialogueNode(moduleId, nodeData, dialogueContent) {
             const technique = choice.technique;
 
             try {
-                showLoading();
                 const feedback = await dialogueAPI.submitChoice(
                     moduleId,
                     node.id,
@@ -1099,10 +1097,9 @@ function renderDialogueNode(moduleId, nodeData, dialogueContent) {
                     choiceText,
                     technique
                 );
-                hideLoading();
                 showFeedback(feedback, moduleId, dialogueContent);
             } catch (error) {
-                showToast(error.message, 'error');
+                alert(error.message);
                 // Re-enable choices on error
                 card.disabled = false;
                 card.classList.remove('selected');
@@ -1183,7 +1180,6 @@ function showFeedback(feedback, moduleId, dialogueContent) {
             if (isComplete) {
                 router.navigate('/progress');
             } else if (feedback.next_node_id) {
-                showLoading();
                 dialogueAPI.getNode(moduleId, feedback.next_node_id).then(nodeData => {
                     renderDialogueNode(moduleId, nodeData, dialogueContent);
                 });
@@ -1443,7 +1439,7 @@ async function renderChatPractice() {
 
                     router.navigate('/chat-practice/session');
                 } catch (error) {
-                    showToast(error.message, 'error');
+                    alert(error.message);
                     btn.disabled = false;
                     btn.textContent = 'Start Practice';
                 }
@@ -1591,7 +1587,7 @@ function renderChatSession() {
             const typingIndicator = document.getElementById('typingIndicator');
             if (typingIndicator) typingIndicator.remove();
 
-            showToast(error.message, 'error');
+            alert(error.message);
             chatState.isTyping = false;
             sendBtn.disabled = false;
             chatInput.disabled = false;
@@ -1770,7 +1766,7 @@ function showSessionCompleteModal() {
                     router.navigate('/chat-practice/results');
                 }, 300);
             } catch (error) {
-                showToast(error.message, 'error');
+                alert(error.message);
                 getAnalysisBtn.disabled = false;
                 getAnalysisBtn.textContent = 'Get Analysis';
             }
@@ -2345,7 +2341,7 @@ function showFeedbackForm() {
             }, 300);
 
         } catch (error) {
-            showToast(error.message, 'error');
+            alert(error.message);
             submitBtn.disabled = false;
             submitBtn.textContent = 'Submit Feedback';
         }
