@@ -387,8 +387,6 @@ h1, h2, h3, h4, h5, h6 {
     gap: 3rem;
     align-items: center;
     padding: 4rem 0;
-    position: relative;
-    z-index: 0;
 }
 
 .maps-hero-copy {
@@ -506,36 +504,26 @@ h1, h2, h3, h4, h5, h6 {
     color: rgba(255, 255, 255, 0.95);
     max-width: 720px;
 }
-.blue-banner {
-    padding: 2rem 0;
-    text-align: left;
+/* maps-blue-banner: used in index.html landing page */
+.maps-blue-banner {
     background: linear-gradient(135deg, var(--maps-navy) 0%, var(--maps-blue) 100%);
     color: white;
-    margin: 2rem -1rem -1.5rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    text-align: center;
+    margin: 0 -1rem -1.5rem;
+    padding: 2rem 1rem;
 }
 
-.blue-banner .section-title {
-    display: inline-block;
-    font-size: 1.5rem;
-    font-weight: 800;
-    border-bottom: 4px solid #f472b6;
-    padding-bottom: 6px;
-    margin-bottom: 0.75rem;
-    color: white;
-}
-
-.blue-banner h2 {
+.maps-blue-banner h2 {
     font-size: 1.75rem;
     font-weight: 800;
     margin: 0 0 0.5rem;
     color: white;
 }
 
-.blue-banner p {
+.maps-blue-banner p {
     color: rgba(255, 255, 255, 0.95);
     max-width: 720px;
+    margin: 0 auto;
 }
 
 /* Hero Section (fallback) */
@@ -1368,24 +1356,23 @@ body.modal-open {
     overflow: hidden;
 }
 
-.points-earned {
-    display: flex;
-    align-items: baseline;
+/* Quality badge replacing raw points display */
+.quality-badge {
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    padding: 0.4rem 1.25rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.95rem;
     margin-bottom: 1rem;
+    letter-spacing: 0.02em;
 }
 
-.points-value {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: var(--primary);
-}
-
-.points-label {
-    font-size: 1rem;
-    color: var(--gray);
-}
+.quality-excellent { background: #d1fae5; color: #065f46; }
+.quality-good      { background: #dbeafe; color: #1e40af; }
+.quality-acceptable { background: #fef9c3; color: #854d0e; }
+.quality-poor      { background: #fee2e2; color: #991b1b; }
 
 .change-talk-badge {
     display: flex;
