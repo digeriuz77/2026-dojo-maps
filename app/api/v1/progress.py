@@ -25,9 +25,10 @@ logger = logging.getLogger(__name__)
 
 async def get_user_profile(user_id: str, supabase_admin: Client):
     """Get user profile from user_profiles table"""
+    # Optimized: select only needed columns instead of *
     response = (
         supabase_admin.table("user_profiles")
-        .select("*")
+        .select("user_id, display_name, modules_completed, change_talk_evoked, last_active_at")
         .eq("user_id", user_id)
         .execute()
     )
@@ -88,7 +89,7 @@ async def get_user_stats(
     try:
         progress_response = (
             supabase_admin.table("user_progress")
-            .select("*")
+            .select("id, module_id, status, completion_score, current_node_id, nodes_completed, techniques_demonstrated, started_at, completed_at")
             .eq("user_id", current_user.user_id)
             .order("started_at", desc=True)
             .execute()
@@ -173,7 +174,7 @@ async def get_all_module_progress(
     try:
         query = (
             supabase_admin.table("user_progress")
-            .select("*")
+            .select("id, module_id, status, completion_score, current_node_id, nodes_completed, techniques_demonstrated, started_at, completed_at")
             .eq("user_id", current_user.user_id)
         )
 
@@ -254,7 +255,7 @@ async def get_module_progress(
     try:
         response = (
             supabase_admin.table("user_progress")
-            .select("*")
+            .select("id, module_id, status, completion_score, current_node_id, nodes_completed, techniques_demonstrated, started_at, completed_at")
             .eq("user_id", current_user.user_id)
             .eq("module_id", module_id)
             .execute()

@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import httpx
 
 from app.core.supabase import get_supabase_admin
-from .personas import get_persona
+from .personas import get_persona, DIALECTS
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +43,26 @@ def _get_openai_key() -> str:
     return key
 
 
+def _get_dialect_instructions(persona: Dict[str, Any]) -> str:
+    """Build dialect-specific instructions for the persona."""
+    dialect_key = persona.get("dialect", "RP")
+    dialect_info = DIALECTS.get(dialect_key, DIALECTS.get("RP"))
+
+    if not dialect_info:
+        return ""
+
+    vocab = ", ".join(dialect_info.get("vocabulary", [])[:6])
+    phrases = ", ".join(dialect_info.get("phrases", [])[:3])
+
+    return f"""
+DIALECT: {dialect_info["name"]} ({dialect_info["description"]})
+- Characteristic vocabulary to use occasionally: {vocab}
+- Characteristic phrases: {phrases}
+- Speech pattern: {dialect_info["syntax"]}
+
+IMPORTANT: Use dialect-specific words and phrases naturally and sparingly - not every sentence. The goal is authentic British regional speech, not a caricature."""
+
+
 def _build_system_prompt(
     persona: Dict[str, Any], turn_number: int, conversation_summary: str = ""
 ) -> str:
@@ -54,6 +74,8 @@ CONVERSATION CONTEXT (Summary of earlier conversation):
 {conversation_summary}
 """
 
+    dialect_instructions = _get_dialect_instructions(persona)
+
     return f"""You are roleplaying as {persona["name"]}, a {persona["age"]}-year-old client in a
 Motivational Interviewing practice session.
 
@@ -63,6 +85,7 @@ CURRENT STATE:
 - Stage of change: {persona["stage_of_change"]}
 - Initial mood: {persona.get("initial_mood", "guarded but open to talking")}
 - Current turn: {turn_number} of {MAX_TURNS}
+{dialect_instructions}
 
 AMBIVALENCE (reasons for NOT changing):
 {chr(10).join("- " + point for point in persona["ambivalence_points"])}
@@ -85,6 +108,7 @@ RESPONSE GUIDELINES:
 8. Never break character or mention that this is a practice session
 9. Never explicitly comment on the practitioner's techniques
 10. Show emotion where appropriate - frustration, hope, doubt, fear, determination
+11. Use your dialect naturally - occasional dialect words and phrases, not constantly
 
 Remember: You are {persona["name"]}, not an AI. Respond as they would."""
 

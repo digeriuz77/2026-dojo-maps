@@ -66,23 +66,12 @@ async def get_dashboard_stats(admin: AuthContext = Depends(require_admin)):
         )
         total_modules_completed = completed_resp.count or 0
 
-        # Average progress (simplified)
-        progress_resp = (
-            supabase.table("user_progress").select("nodes_completed").execute()
-        )
+        # Average progress - use optimized RPC function (replaces full table scan)
+        avg_result = supabase.rpc("get_average_progress").execute()
         avg_progress = 0.0
-        if progress_resp.data:
-            completions = []
-            for row in progress_resp.data:
-                nodes = row.get("nodes_completed")
-                if nodes and isinstance(nodes, list):
-                    completions.append(len(nodes))
-                else:
-                    completions.append(0)
-            if completions:
-                avg_progress = (
-                    sum(completions) / len(completions) * 10
-                )  # rough percentage
+        if avg_result.data:
+            avg_progress = round(avg_result.data[0].get("average_progress", 0.0), 1)
+
 
         return {
             "total_users": total_users,
@@ -142,50 +131,28 @@ async def get_users(
 
 @router.get("/modules/stats")
 async def get_module_stats(admin: AuthContext = Depends(require_admin)):
-    """Get module completion statistics."""
+    """Get module completion statistics.
+    
+    Uses optimized RPC function - single query replaces N+1 pattern.
+    """
     try:
         supabase = get_supabase_admin()
 
-        modules_resp = (
-            supabase.table("learning_modules")
-            .select("id, title, display_order")
-            .eq("is_published", True)
-            .order("display_order")
-            .execute()
-        )
+        # Use optimized RPC function (replaces 36+ queries with 1)
+        result = supabase.rpc("get_module_stats").execute()
+
+        if not result.data:
+            return []
 
         stats = []
-        for module in modules_resp.data or []:
-            module_id = module["id"]
-
-            total_resp = (
-                supabase.table("user_progress")
-                .select("id", count="exact")
-                .eq("module_id", module_id)
-                .execute()
-            )
-            completed_resp = (
-                supabase.table("user_progress")
-                .select("id", count="exact")
-                .eq("module_id", module_id)
-                .eq("status", "completed")
-                .execute()
-            )
-            in_progress_resp = (
-                supabase.table("user_progress")
-                .select("id", count="exact")
-                .eq("module_id", module_id)
-                .eq("status", "in_progress")
-                .execute()
-            )
-
+        for row in result.data:
             stats.append(
                 {
-                    "module_id": module_id,
-                    "module_title": module.get("title", "Unknown"),
-                    "total_enrolled": total_resp.count or 0,
-                    "completed_count": completed_resp.count or 0,
-                    "in_progress_count": in_progress_resp.count or 0,
+                    "module_id": row.get("module_id"),
+                    "module_title": row.get("module_title", "Unknown"),
+                    "total_enrolled": row.get("total_enrolled", 0),
+                    "completed_count": row.get("completed_count", 0),
+                    "in_progress_count": row.get("in_progress_count", 0),
                 }
             )
 

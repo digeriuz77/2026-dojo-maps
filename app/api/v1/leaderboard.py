@@ -39,6 +39,7 @@ async def get_leaderboard(
     Get the leaderboard with top users by points.
 
     Includes the current user's rank if not in top list.
+    Uses optimized RPC functions for efficiency.
 
     Query Parameters:
         skip: Number of records to skip for pagination
@@ -48,56 +49,54 @@ async def get_leaderboard(
     """
     supabase_admin = get_supabase_admin()
 
-    # Get total count for pagination
-    count_response = supabase_admin.table('user_profiles').select('id', count='exact').execute()
-    total = count_response.count or 0
-
-    # Get paginated users
-    response = supabase_admin.table('user_profiles') \
-        .select('*') \
-        .order('modules_completed', desc=True) \
-        .order('created_at', desc=False) \
-        .range(skip, skip + limit - 1) \
-        .execute()
+    # Get paginated leaderboard using optimized RPC function
+    # Replaces: select('*') + Python sorting with SQL ROW_NUMBER()
+    response = supabase_admin.rpc("get_leaderboard", {"p_skip": skip, "p_limit": limit}).execute()
 
     entries = []
     current_user_entry = None
 
-    for i, profile in enumerate(response.data, start=skip + 1):
+    for row in response.data or []:
         entry = LeaderboardEntry(
-            rank=i,
-            display_name=profile.get('display_name') or f"User {profile['user_id'][:8]}",
-            modules_completed=profile.get('modules_completed', 0)
+            rank=row.get("rank", 0),
+            display_name=row.get("display_name", f"User {str(row.get('user_id', ''))[:8]}"),
+            modules_completed=row.get("modules_completed", 0)
         )
 
         # Check if this is the current user
-        if profile['user_id'] == current_user.user_id:
+        if str(row.get("user_id")) == str(current_user.user_id):
             current_user_entry = entry
 
         entries.append(entry)
 
-    # If current user not in current page, get their rank
+    # If current user not in current page, get their rank using optimized RPC
     if not current_user_entry:
-        user_profile_response = supabase_admin.table('user_profiles') \
-            .select('*') \
-            .eq('user_id', current_user.user_id) \
-            .execute()
-
-        if user_profile_response.data:
-            # Get user's rank by counting users with more modules completed
-            user_modules = user_profile_response.data[0].get('modules_completed', 0)
-            rank_response = supabase_admin.table('user_profiles') \
-                .select('id') \
-                .gt('modules_completed', user_modules) \
-                .execute()
-
-            user_rank = len(rank_response.data) + 1
-
+        rank_result = supabase_admin.rpc("get_user_rank", {"p_user_id": current_user.user_id}).execute()
+        
+        if rank_result.data:
+            user_rank = rank_result.data[0].get("rank", 0)
+            total = rank_result.data[0].get("total_users", 0)
+            
+            # Get user's display name
+            user_profile = supabase_admin.table("user_profiles").select("display_name, modules_completed").eq("user_id", current_user.user_id).maybe_single().execute()
+            
+            display_name = "You"
+            user_modules = 0
+            if user_profile.data:
+                display_name = user_profile.data.get("display_name") or "You"
+                user_modules = user_profile.data.get("modules_completed", 0)
+            
             current_user_entry = LeaderboardEntry(
                 rank=user_rank,
-                display_name=user_profile_response.data[0].get('display_name') or f"You",
+                display_name=display_name,
                 modules_completed=user_modules
             )
+        else:
+            total = 0
+    else:
+        # Get total count
+        count_response = supabase_admin.table('user_profiles').select('id', count='exact').execute()
+        total = count_response.count or 0
 
     return LeaderboardListResponse(
         entries=entries,
