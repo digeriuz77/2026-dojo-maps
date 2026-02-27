@@ -33,6 +33,10 @@ CONTEXT_WINDOW_MESSAGES = 10
 SUMMARY_SNIPPET_LIMIT = 160
 SUMMARY_MAX_BULLETS = 6
 DEFAULT_INITIAL_MOOD = "guarded but open to talking"
+CHAT_RESPONSE_MAX_TOKENS = 340
+
+SENTENCE_ENDINGS = (".", "!", "?")
+TRAILING_SENTENCE_CLOSERS = "\"'”’)]}"
 
 
 def _get_fireworks_key() -> str:
@@ -72,6 +76,25 @@ def _compact_text(text: str, limit: int = SUMMARY_SNIPPET_LIMIT) -> str:
     if len(normalized) <= limit:
         return normalized
     return normalized[: limit - 1].rstrip() + "…"
+
+
+def _ensure_complete_sentence(text: str) -> str:
+    """Trim a response to a clean sentence boundary when truncation occurs."""
+    cleaned = (text or "").strip()
+    if not cleaned:
+        return ""
+
+    if cleaned.endswith((*SENTENCE_ENDINGS, "…")):
+        return cleaned
+
+    last_sentence_end = max(cleaned.rfind("."), cleaned.rfind("!"), cleaned.rfind("?"))
+    if last_sentence_end != -1:
+        end = last_sentence_end + 1
+        while end < len(cleaned) and cleaned[end] in TRAILING_SENTENCE_CLOSERS:
+            end += 1
+        return cleaned[:end].strip()
+
+    return cleaned.rstrip(" ,;:-—") + "."
 
 
 def _dedupe_keep_recent(items: List[str], max_items: int) -> List[str]:
@@ -418,7 +441,7 @@ async def _call_fireworks(system_prompt: str, messages: List[Dict[str, str]]) ->
         "messages": chat_messages,
         "temperature": 0.7,
         "top_p": 0.9,
-        "max_tokens": 220,
+        "max_tokens": CHAT_RESPONSE_MAX_TOKENS,
     }
 
     async with httpx.AsyncClient(timeout=45.0) as client:
@@ -431,7 +454,13 @@ async def _call_fireworks(system_prompt: str, messages: List[Dict[str, str]]) ->
 
         # Fireworks uses OpenAI-compatible format
         if "choices" in data and len(data["choices"]) > 0:
-            return data["choices"][0].get("message", {}).get("content", "").strip()
+            choice = data["choices"][0]
+            content = choice.get("message", {}).get("content", "").strip()
+            finish_reason = str(choice.get("finish_reason") or "").lower()
+            if finish_reason == "length":
+                logger.info("Chat response hit token limit; trimming to sentence boundary")
+                return _ensure_complete_sentence(content)
+            return content
 
         if "output" in data:
             output = data["output"]
