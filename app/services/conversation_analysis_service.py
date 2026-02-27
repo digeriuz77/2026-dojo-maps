@@ -8,20 +8,20 @@ import httpx
 import json
 from typing import Dict, Any, List, Optional
 
+from app.config import settings
 
-OPENAI_API_URL = "https://api.openai.com/v1/responses"
-
-
-def _get_openai_model() -> str:
-    """Get OpenAI model from environment, defaulting to gpt-4.1-mini."""
-    return os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
+# Fireworks AI API configuration
+FIREWORKS_API_URL = "https://api.fireworks.ai/inference/v1/chat/completions"
 
 
-def _get_openai_key() -> str:
-    """Get OpenAI API key from environment."""
-    key = os.getenv("OPENAI_API_KEY")
+def _get_fireworks_key() -> str:
+    """Get Fireworks API key from environment."""
+    key = os.getenv("FIREWORKS_API_KEY") or settings.FIREWORKS_API_KEY
     if not key:
-        raise ValueError("OPENAI_API_KEY environment variable is not set")
+        raise ValueError(
+            "FIREWORKS_API_KEY environment variable is not set. "
+            "Get your API key from https://fireworks.ai"
+        )
     return key
 
 
@@ -145,7 +145,7 @@ async def analyze_conversation(
     Returns:
         Detailed analysis dictionary
     """
-    api_key = _get_openai_key()
+    api_key = _get_fireworks_key()
 
     # Format the conversation
     formatted_conversation = _format_conversation(transcript, persona_name)
@@ -156,18 +156,32 @@ async def analyze_conversation(
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
 
     payload = {
-        "model": _get_openai_model(),
-        "input": prompt,
+        "model": settings.FIREWORKS_MODEL,
+        "messages": [
+            {"role": "user", "content": prompt}
+        ]
     }
 
+
     async with httpx.AsyncClient(timeout=60.0) as client:
-        response = await client.post(OPENAI_API_URL, headers=headers, json=payload)
+        response = await client.post(FIREWORKS_API_URL, headers=headers, json=payload)
 
         if response.status_code != 200:
             error_detail = response.text
             raise Exception(
-                f"OpenAI API error: {response.status_code} - {error_detail}"
+                f"Fireworks API error: {response.status_code} - {error_detail}"
             )
+
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        response = await client.post(FIREWORKS_API_URL, headers=headers, json=payload)
+
+        if response.status_code != 200:
+            error_detail = response.text
+            raise Exception(
+                f"Fireworks API error: {response.status_code} - {error_detail}"
+            )
+
+        data = response.json()
 
         data = response.json()
 
@@ -181,7 +195,16 @@ async def analyze_conversation(
 
 
 def _extract_response_text(data: Dict[str, Any]) -> str:
-    """Extract text from OpenAI API response."""
+    """Extract text from Fireworks API response."""
+    # Fireworks uses OpenAI-compatible format
+    if "choices" in data and len(data["choices"]) > 0:
+        choice = data["choices"][0]
+        if "message" in choice:
+            return choice["message"].get("content", "").strip()
+        if "text" in choice:
+            return choice["text"].strip()
+
+    # Fallback to other formats
     if "output" in data:
         output = data["output"]
         if isinstance(output, list) and len(output) > 0:
@@ -198,9 +221,6 @@ def _extract_response_text(data: Dict[str, Any]) -> str:
 
     if "text" in data:
         return data["text"].strip()
-
-    if "choices" in data and len(data["choices"]) > 0:
-        return data["choices"][0].get("message", {}).get("content", "").strip()
 
     raise Exception(f"Unexpected API response format: {data}")
 

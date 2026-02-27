@@ -1,5 +1,5 @@
 """
-Chat service for MI practice sessions using OpenAI API.
+Chat service for MI practice sessions using Fireworks AI.
 Handles session management, LLM interaction, conversation history,
 and optional database persistence.
 """
@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import httpx
 
 from app.core.supabase import get_supabase_admin
+from app.config import settings
 from .personas import get_persona, DIALECTS
 
 logger = logging.getLogger(__name__)
@@ -20,8 +21,8 @@ logger = logging.getLogger(__name__)
 # In-memory session storage (fallback when DB unavailable)
 SESSIONS: Dict[str, Dict[str, Any]] = {}
 
-# OpenAI API configuration
-OPENAI_API_URL = "https://api.openai.com/v1/responses"
+# Fireworks AI API configuration
+FIREWORKS_API_URL = "https://api.fireworks.ai/inference/v1/chat/completions"
 
 # Database persistence enabled flag
 DB_PERSISTENCE_ENABLED = True
@@ -30,16 +31,14 @@ DB_PERSISTENCE_ENABLED = True
 MAX_TURNS = 20
 
 
-def _get_openai_model() -> str:
-    """Get OpenAI model from environment, defaulting to gpt-4.1-mini."""
-    return os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
-
-
-def _get_openai_key() -> str:
-    """Get OpenAI API key from environment."""
-    key = os.getenv("OPENAI_API_KEY")
+def _get_fireworks_key() -> str:
+    """Get Fireworks API key from environment."""
+    key = os.getenv("FIREWORKS_API_KEY") or settings.FIREWORKS_API_KEY
     if not key:
-        raise ValueError("OPENAI_API_KEY environment variable is not set")
+        raise ValueError(
+            "FIREWORKS_API_KEY environment variable is not set. "
+            "Get your API key from https://fireworks.ai"
+        )
     return key
 
 
@@ -236,7 +235,12 @@ helpful, express some appreciation. If not, you can express that the conversatio
 quite what you hoped for. Either way, bring the conversation to a natural close."""
 
     try:
-        response_text = await _call_openai(system_prompt, recent_history)
+        response_text = await _call_fireworks(system_prompt, recent_history)
+    except Exception as error:
+        response_text = (
+            "*pauses* I'm sorry, I got a bit distracted. Could you say that again?"
+        )
+        logger.warning(f"Fireworks API error in chat session: {type(error).__name__}")
     except Exception as error:
         response_text = (
             "*pauses* I'm sorry, I got a bit distracted. Could you say that again?"
@@ -259,35 +263,46 @@ quite what you hoped for. Either way, bring the conversation to a natural close.
     }
 
 
-async def _call_openai(system_prompt: str, messages: List[Dict[str, str]]) -> str:
-    """Call OpenAI API using the responses endpoint."""
-    api_key = _get_openai_key()
+async def _call_fireworks(system_prompt: str, messages: List[Dict[str, str]]) -> str:
+    """Call Fireworks AI API using the chat completions endpoint."""
+    api_key = _get_fireworks_key()
 
-    if not api_key or api_key.startswith("sk-your-"):
+    if not api_key or api_key.startswith("fw-"):
         raise ValueError(
-            "OpenAI API key is not configured. Please set OPENAI_API_KEY environment variable. "
-            "Get your API key from https://platform.openai.com/api-keys"
+            "FIREWORKS_API_KEY environment variable is not set. "
+            "Get your API key from https://fireworks.ai"
         )
 
-    conversation_text = f"System: {system_prompt}\n\n"
-    for msg in messages:
-        role = "Practitioner" if msg["role"] == "user" else "Client"
-        conversation_text += f"{role}: {msg['content']}\n\n"
+    # Build messages array for chat completions format
+    chat_messages = [
+        {"role": "system", "content": system_prompt}
+    ]
 
-    conversation_text += "Client:"
+    for msg in messages:
+        role = "user" if msg["role"] == "user" else "assistant"
+        chat_messages.append({"role": role, "content": msg["content"]})
 
     headers = {"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"}
-    payload = {"model": _get_openai_model(), "input": conversation_text}
+
+    payload = {
+        "model": settings.FIREWORKS_MODEL,
+        "messages": chat_messages
+    }
+
 
     async with httpx.AsyncClient(timeout=30.0) as client:
-        response = await client.post(OPENAI_API_URL, headers=headers, json=payload)
+        response = await client.post(FIREWORKS_API_URL, headers=headers, json=payload)
 
         if response.status_code != 200:
             raise Exception(
-                f"OpenAI API error: {response.status_code} - {response.text}"
+                f"Fireworks API error: {response.status_code} - {response.text}"
             )
 
         data = response.json()
+
+        # Fireworks uses OpenAI-compatible format
+        if "choices" in data and len(data["choices"]) > 0:
+            return data["choices"][0].get("message", {}).get("content", "").strip()
 
         if "output" in data:
             output = data["output"]
@@ -303,9 +318,6 @@ async def _call_openai(system_prompt: str, messages: List[Dict[str, str]]) -> st
 
         if "text" in data:
             return data["text"].strip()
-
-        if "choices" in data and len(data["choices"]) > 0:
-            return data["choices"][0].get("message", {}).get("content", "").strip()
 
         raise Exception(f"Unexpected API response format: {data}")
 

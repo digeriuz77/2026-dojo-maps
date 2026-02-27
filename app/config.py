@@ -61,6 +61,10 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4.1-mini"
 
+    # Fireworks AI API (alternative to OpenAI)
+    FIREWORKS_API_KEY: str = ""
+    FIREWORKS_MODEL: str = "accounts/fireworks/models/gpt-oss-120b"
+
     # Scoring Configuration (Optional - have defaults)
     SCORING_EXCELLENT_POINTS: int = 150
     SCORING_GOOD_POINTS: int = 100
