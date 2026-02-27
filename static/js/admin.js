@@ -210,8 +210,6 @@ function setupEventListeners() {
                 loadPersonasForAdmin();
             }
         });
-            document.getElementById(tab.dataset.tab).classList.add('active');
-        });
     });
 
     // Search
@@ -448,19 +446,12 @@ let practiceAnalytics = {
     pageSize: 20
 };
 
+
 // Personas State
 let personas = [];
 let currentPersona = null;
 let currentAmbivalencePoints = [];
 let currentMotivationPoints = [];
-
-// Load practice analytics
-n// Personas State
-let personas = [];
-let currentPersona = null;
-let currentAmbivalencePoints = [];
-let currentMotivationPoints = [];
-
 // Load practice analytics
 async function loadPracticeAnalytics() {
     try {
@@ -633,21 +624,20 @@ async function refreshPracticeAnalytics() {
     await loadPracticeAnalytics();
 }
 
+
 // ========== PERSONA MANAGEMENT ==========
-async function loadPersonasForAdmin() { try { const data = await adminRequest(`${ADMIN_API}/personas`); personas = data || []; renderPersonasList(); } catch (error) { console.error('Error loading personas:', error); showToast('Error loading personas', 'error'); } }
-function renderPersonasList() { const container = document.getElementById('personasList'); if (!personas || personas.length === 0) { container.innerHTML = '<p class="empty">No personas found</p>'; return; } container.innerHTML = personas.map(p => `<div class="persona-item ${currentPersona && currentPersona.id === p.id ? 'active' : ''}" onclick="selectPersona('${p.id}')"><div class="persona-avatar">${p.avatar || '👤'}</div><div class="persona-info"><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml(p.title || '')}</span></div></div>`).join(''); }
-async function selectPersona(personaId) { try { const data = await adminRequest(`${ADMIN_API}/personas/${personaId}`); currentPersona = data; currentAmbivalencePoints = parsePoints(data.ambivalence_points); currentMotivationPoints = parsePoints(data.motivation_points); renderPersonaForm(); renderPersonasList(); } catch (error) { console.error('Error loading persona:', error); showToast('Error loading persona details', 'error'); } }
+async function loadPersonasForAdmin() { try { const data = await adminRequest(ADMIN_API + '/personas'); personas = data || []; renderPersonasList(); } catch (error) { console.error('Error loading personas:', error); showToast('Error loading personas', 'error'); } }
+function renderPersonasList() { const container = document.getElementById('personasList'); if (!personas || personas.length === 0) { container.innerHTML = '<p class="empty">No personas found</p>'; return; } container.innerHTML = personas.map(p => '<div class="persona-item ' + (currentPersona && currentPersona.id === p.id ? 'active' : '') + '" onclick="selectPersona(\"' + p.id + '\")"><div class="persona-avatar">' + (p.avatar || '?') + '</div><div class="persona-info"><strong>' + escapeHtml(p.name) + '</strong><span>' + escapeHtml(p.title || '') + '</span></div></div>').join(''); }
+async function selectPersona(personaId) { try { const data = await adminRequest(ADMIN_API + '/personas/' + personaId); currentPersona = data; currentAmbivalencePoints = parsePoints(data.ambivalence_points); currentMotivationPoints = parsePoints(data.motivation_points); renderPersonaForm(); renderPersonasList(); } catch (error) { console.error('Error loading persona:', error); showToast('Error loading persona details', 'error'); } }
 function parsePoints(points) { if (!points) return []; if (Array.isArray(points)) return points; if (typeof points === 'string') { try { return JSON.parse(points); } catch { return []; } } return []; }
-function renderPersonaForm() { const form = document.getElementById('personaEditForm'); const emptyState = document.getElementById('personaEmptyState'); if (!currentPersona) { form.style.display = 'none'; emptyState.style.display = 'block'; return; } form.style.display = 'block'; emptyState.style.display = 'none'; document.getElementById('personaEditTitle').textContent = `Edit: ${currentPersona.name}`; document.getElementById('personaName').value = currentPersona.name || ''; document.getElementById('personaTitle').value = currentPersona.title || ''; document.getElementById('personaAvatar').value = currentPersona.avatar || ''; document.getElementById('personaStage').value = currentPersona.stage || 'precontemplation'; document.getElementById('personaDialect').value = currentPersona.dialect || 'RP'; document.getElementById('personaDescription').value = currentPersona.description || ''; document.getElementById('personaCoreIdentity').value = currentPersona.core_identity || ''; document.getElementById('personaGuidelines').value = currentPersona.behavior_guidelines || ''; document.getElementById('personaOpening').value = currentPersona.opening_message || ''; renderTagInput('ambivalencePoints', currentAmbivalencePoints, 'ambivalence'); renderTagInput('motivationPoints', currentMotivationPoints, 'motivation'); }
-function renderTagInput(containerId, points, type) { const container = document.getElementById(containerId); container.innerHTML = points.map((point, index) => `<span class="tag">${escapeHtml(point)}<button type="button" class="tag-remove" onclick="remove${type === 'ambivalence' ? 'Ambivalence' : 'Motivation'}Point(${index})">&times;</button></span>`).join(''); }
+function renderPersonaForm() { const form = document.getElementById('personaEditForm'); const emptyState = document.getElementById('personaEmptyState'); if (!currentPersona) { form.style.display = 'none'; emptyState.style.display = 'block'; return; } form.style.display = 'block'; emptyState.style.display = 'none'; document.getElementById('personaEditTitle').textContent = 'Edit: ' + currentPersona.name; document.getElementById('personaName').value = currentPersona.name || ''; document.getElementById('personaTitle').value = currentPersona.title || ''; document.getElementById('personaAvatar').value = currentPersona.avatar || ''; document.getElementById('personaStage').value = currentPersona.stage || 'precontemplation'; document.getElementById('personaDialect').value = currentPersona.dialect || 'RP'; document.getElementById('personaDescription').value = currentPersona.description || ''; document.getElementById('personaCoreIdentity').value = currentPersona.core_identity || ''; document.getElementById('personaGuidelines').value = currentPersona.behavior_guidelines || ''; document.getElementById('personaOpening').value = currentPersona.opening_message || ''; renderTagInput('ambivalencePoints', currentAmbivalencePoints, 'ambivalence'); renderTagInput('motivationPoints', currentMotivationPoints, 'motivation'); }
+function renderTagInput(containerId, points, type) { const container = document.getElementById(containerId); container.innerHTML = points.map((point, index) => '<span class="tag">' + escapeHtml(point) + '<button type="button" class="tag-remove" onclick="remove' + (type === 'ambivalence' ? 'Ambivalence' : 'Motivation') + 'Point(' + index + ')">&times;</button></span>').join(''); }
 function addAmbivalencePoint() { const input = document.getElementById('newAmbivalencePoint'); const value = input.value.trim(); if (value) { currentAmbivalencePoints.push(value); input.value = ''; renderTagInput('ambivalencePoints', currentAmbivalencePoints, 'ambivalence'); } }
 function addMotivationPoint() { const input = document.getElementById('newMotivationPoint'); const value = input.value.trim(); if (value) { currentMotivationPoints.push(value); input.value = ''; renderTagInput('motivationPoints', currentMotivationPoints, 'motivation'); } }
 function removeAmbivalencePoint(index) { currentAmbivalencePoints.splice(index, 1); renderTagInput('ambivalencePoints', currentAmbivalencePoints, 'ambivalence'); }
 function removeMotivationPoint(index) { currentMotivationPoints.splice(index, 1); renderTagInput('motivationPoints', currentMotivationPoints, 'motivation'); }
-async function savePersona() { if (!currentPersona) return; try { const payload = { name: document.getElementById('personaName').value.trim(), title: document.getElementById('personaTitle').value.trim(), avatar: document.getElementById('personaAvatar').value.trim(), stage: document.getElementById('personaStage').value, dialect: document.getElementById('personaDialect').value, description: document.getElementById('personaDescription').value.trim(), core_identity: document.getElementById('personaCoreIdentity').value.trim(), behavior_guidelines: document.getElementById('personaGuidelines').value.trim(), opening_message: document.getElementById('personaOpening').value.trim(), ambivalence_points: JSON.stringify(currentAmbivalencePoints), motivation_points: JSON.stringify(currentMotivationPoints) }; await adminRequest(`${ADMIN_API}/personas/${currentPersona.id}`, { method: 'PUT', body: JSON.stringify(payload) }); showToast('Persona saved successfully', 'success'); await loadPersonasForAdmin(); } catch (error) { console.error('Error saving persona:', error); showToast(error.message || 'Error saving persona', 'error'); } }
-async function refreshPersonasCache() { try { await adminRequest(`${ADMIN_API}/personas/refresh-cache`, { method: 'POST' }); showToast('Personas cache refreshed', 'success'); } catch (error) { console.error('Error refreshing cache:', error); showToast(error.message || 'Error refreshing cache', 'error'); } }
-
-// Make functions globally available
+async function savePersona() { if (!currentPersona) return; try { const payload = { name: document.getElementById('personaName').value.trim(), title: document.getElementById('personaTitle').value.trim(), avatar: document.getElementById('personaAvatar').value.trim(), stage: document.getElementById('personaStage').value, dialect: document.getElementById('personaDialect').value, description: document.getElementById('personaDescription').value.trim(), core_identity: document.getElementById('personaCoreIdentity').value.trim(), behavior_guidelines: document.getElementById('personaGuidelines').value.trim(), opening_message: document.getElementById('personaOpening').value.trim(), ambivalence_points: JSON.stringify(currentAmbivalencePoints), motivation_points: JSON.stringify(currentMotivationPoints) }; await adminRequest(ADMIN_API + '/personas/' + currentPersona.id, { method: 'PUT', body: JSON.stringify(payload) }); showToast('Persona saved successfully', 'success'); await loadPersonasForAdmin(); } catch (error) { console.error('Error saving persona:', error); showToast(error.message || 'Error saving persona', 'error'); } }
+async function refreshPersonasCache() { try { await adminRequest(ADMIN_API + '/personas/refresh-cache', { method: 'POST' }); showToast('Personas cache refreshed', 'success'); } catch (error) { console.error('Error refreshing cache:', error); showToast(error.message || 'Error refreshing cache', 'error'); } }
 
 // Make functions globally available
 window.showUserActions = showUserActions;
@@ -667,6 +657,7 @@ window.logout = logout;
 window.refreshPracticeAnalytics = refreshPracticeAnalytics;
 window.previousAnalyticsPage = previousAnalyticsPage;
 window.nextAnalyticsPage = nextAnalyticsPage;
+
 window.loadPersonasForAdmin = loadPersonasForAdmin;
 window.selectPersona = selectPersona;
 window.addAmbivalencePoint = addAmbivalencePoint;
@@ -675,8 +666,5 @@ window.removeAmbivalencePoint = removeAmbivalencePoint;
 window.removeMotivationPoint = removeMotivationPoint;
 window.savePersona = savePersona;
 window.refreshPersonasCache = refreshPersonasCache;
-
-// Initialize on load
-
 // Initialize on load
 document.addEventListener('DOMContentLoaded', initAdmin);
