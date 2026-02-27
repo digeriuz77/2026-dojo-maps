@@ -6,7 +6,7 @@ All endpoints require admin role authentication.
 """
 
 import logging
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel
@@ -542,4 +542,214 @@ async def get_user_detailed_analytics(
         raise
     except Exception as e:
         logger.error(f"Error loading user analytics: {e}")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error loading user analytics: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ==========================================
+# Persona Management Endpoints
+# ==========================================
+
+
+class PersonaUpdateRequest(BaseModel):
+    """Request model for updating a persona."""
+    name: Optional[str] = None
+    age: Optional[int] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    avatar: Optional[str] = None
+    stage_of_change: Optional[str] = None
+    voice: Optional[str] = None
+    dialect: Optional[str] = None
+    core_identity: Optional[str] = None
+    ambivalence_points: Optional[List[str]] = None
+    motivation_points: Optional[List[str]] = None
+    behavior_guidelines: Optional[str] = None
+    opening_message: Optional[str] = None
+    is_active: Optional[bool] = None
+    display_order: Optional[int] = None
+
+
+class PersonaPointRequest(BaseModel):
+    """Request model for adding a single point."""
+    point: str
+
+
+@router.get("/personas")
+async def list_personas(admin: AuthContext = Depends(require_admin)):
+    """Get all personas for admin management."""
+    try:
+        supabase = get_supabase_admin()
+        response = supabase.table("personas").select("*").order("display_order").execute()
+        return response.data or []
+    except Exception as e:
+        logger.error(f"Error listing personas: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/personas/{persona_id}")
+async def get_persona(persona_id: str, admin: AuthContext = Depends(require_admin)):
+    """Get a single persona by ID or key_name."""
+    try:
+        supabase = get_supabase_admin()
+        response = (
+            supabase.table("personas")
+            .select("*")
+            .or_(f"id.eq.{persona_id},key_name.eq.{persona_id}")
+            .maybe_single()
+            .execute()
+        )
+        if not response.data:
+            raise HTTPException(status_code=404, detail=f"Persona '{persona_id}' not found")
+        return response.data
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting persona: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.put("/personas/{persona_id}")
+async def update_persona(
+    persona_id: str,
+    updates: PersonaUpdateRequest,
+    admin: AuthContext = Depends(require_admin)
+):
+    """Update a persona."""
+    try:
+        supabase = get_supabase_admin()
+        update_data = {k: v for k, v in updates.model_dump().items() if v is not None}
+        
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No fields to update")
+        
+        response = (
+            supabase.table("personas")
+            .update(update_data)
+            .or_(f"id.eq.{persona_id},key_name.eq.{persona_id}")
+            .execute()
+        )
+        
+        if not response.data:
+            raise HTTPException(status_code=404, detail=f"Persona '{persona_id}' not found")
+        
+        from app.services.personas import refresh_personas_cache
+        refresh_personas_cache()
+        
+        return response.data[0]
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error updating persona: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/personas/{persona_id}/ambivalence-points")
+async def add_ambivalence_point(
+    persona_id: str,
+    request: PersonaPointRequest,
+    admin: AuthContext = Depends(require_admin)
+):
+    """Add a single ambivalence point to a persona."""
+    try:
+        import json
+        supabase = get_supabase_admin()
+        
+        current = (
+            supabase.table("personas")
+            .select("ambivalence_points")
+            .or_(f"id.eq.{persona_id},key_name.eq.{persona_id}")
+            .maybe_single()
+            .execute()
+        )
+        
+        if not current.data:
+            raise HTTPException(status_code=404, detail=f"Persona '{persona_id}' not found")
+        
+        points = current.data.get("ambivalence_points", [])
+        if isinstance(points, str):
+            points = json.loads(points)
+        if not points:
+            points = []
+        
+        points.append(request.point)
+        
+        response = (
+            supabase.table("personas")
+            .update({"ambivalence_points": points})
+            .or_(f"id.eq.{persona_id},key_name.eq.{persona_id}")
+            .execute()
+        )
+        
+        from app.services.personas import refresh_personas_cache
+        refresh_personas_cache()
+        
+        return {"ambivalence_points": points}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error adding ambivalence point: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/personas/{persona_id}/motivation-points")
+async def add_motivation_point(
+    persona_id: str,
+    request: PersonaPointRequest,
+    admin: AuthContext = Depends(require_admin)
+):
+    """Add a single motivation point to a persona."""
+    try:
+        import json
+        supabase = get_supabase_admin()
+        
+        current = (
+            supabase.table("personas")
+            .select("motivation_points")
+            .or_(f"id.eq.{persona_id},key_name.eq.{persona_id}")
+            .maybe_single()
+            .execute()
+        )
+        
+        if not current.data:
+            raise HTTPException(status_code=404, detail=f"Persona '{persona_id}' not found")
+        
+        points = current.data.get("motivation_points", [])
+        if isinstance(points, str):
+            points = json.loads(points)
+        if not points:
+            points = []
+        
+        points.append(request.point)
+        
+        response = (
+            supabase.table("personas")
+            .update({"motivation_points": points})
+            .or_(f"id.eq.{persona_id},key_name.eq.{persona_id}")
+            .execute()
+        )
+        
+        from app.services.personas import refresh_personas_cache
+        refresh_personas_cache()
+        
+        return {"motivation_points": points}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error adding motivation point: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/personas/refresh-cache")
+async def refresh_cache(admin: AuthContext = Depends(require_admin)):
+    """Force refresh the personas cache."""
+    try:
+        from app.services.personas import refresh_personas_cache
+        refresh_personas_cache()
+        return {"status": "success", "message": "Personas cache refreshed"}
+    except Exception as e:
+        logger.error(f"Error refreshing cache: {e}")
         raise HTTPException(status_code=500, detail=str(e))
