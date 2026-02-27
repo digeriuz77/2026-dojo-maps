@@ -16,6 +16,8 @@ class PersonaSummary(BaseModel):
     title: str
     description: str
     avatar: str
+    stage_of_change: str
+    dialect: str = "RP"
 
 
 class PersonaListResponse(BaseModel):

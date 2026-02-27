@@ -29,11 +29,15 @@ DB_PERSISTENCE_ENABLED = True
 
 # Maximum turns before session ends
 MAX_TURNS = 20
+CONTEXT_WINDOW_MESSAGES = 10
+SUMMARY_SNIPPET_LIMIT = 160
+SUMMARY_MAX_BULLETS = 6
+DEFAULT_INITIAL_MOOD = "guarded but open to talking"
 
 
 def _get_fireworks_key() -> str:
     """Get Fireworks API key from environment."""
-    key = os.getenv("FIREWORKS_API_KEY") or settings.FIREWORKS_API_KEY
+    key = (os.getenv("FIREWORKS_API_KEY") or settings.FIREWORKS_API_KEY or "").strip()
     if not key:
         raise ValueError(
             "FIREWORKS_API_KEY environment variable is not set. "
@@ -62,10 +66,113 @@ DIALECT: {dialect_info["name"]} ({dialect_info["description"]})
 IMPORTANT: Use dialect-specific words and phrases naturally and sparingly - not every sentence. The goal is authentic British regional speech, not a caricature."""
 
 
+def _compact_text(text: str, limit: int = SUMMARY_SNIPPET_LIMIT) -> str:
+    """Normalize whitespace and trim to a compact snippet."""
+    normalized = " ".join(text.split())
+    if len(normalized) <= limit:
+        return normalized
+    return normalized[: limit - 1].rstrip() + "…"
+
+
+def _dedupe_keep_recent(items: List[str], max_items: int) -> List[str]:
+    """De-duplicate while preserving most recent entries."""
+    seen = set()
+    deduped: List[str] = []
+    for item in reversed(items):
+        key = item.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(item)
+        if len(deduped) >= max_items:
+            break
+    deduped.reverse()
+    return deduped
+
+
+def _append_memory_item(memory_bucket: List[str], text: str, max_items: int = 5) -> None:
+    """Append a compact memory item while preserving recency and uniqueness."""
+    snippet = _compact_text(text, 140)
+    if not snippet:
+        return
+
+    lowered = snippet.lower()
+    if any(existing.lower() == lowered for existing in memory_bucket):
+        return
+
+    memory_bucket.append(snippet)
+    while len(memory_bucket) > max_items:
+        memory_bucket.pop(0)
+
+
+def _build_session_memory(history: List[Dict[str, str]]) -> Dict[str, List[str]]:
+    """Build compact rolling memory from transcript history."""
+    memory: Dict[str, List[str]] = {
+        "practitioner_focus": [],
+        "client_barriers": [],
+        "client_motivation": [],
+    }
+
+    for msg in history:
+        content = msg.get("content", "")
+        role = msg.get("role")
+        lowered = content.lower()
+
+        if role == "user":
+            _append_memory_item(memory["practitioner_focus"], content)
+            continue
+
+        if role != "assistant":
+            continue
+
+        if any(token in lowered for token in ["but", "can't", "cannot", "worried", "not sure", "hard"]):
+            _append_memory_item(memory["client_barriers"], content)
+
+        if any(token in lowered for token in ["i want", "i need", "i can", "i will", "i'm going to", "i should"]):
+            _append_memory_item(memory["client_motivation"], content)
+
+    return memory
+
+
+def _format_session_memory(memory: Dict[str, List[str]]) -> str:
+    """Format rolling memory for system prompt inclusion."""
+    sections: List[str] = []
+
+    focus = memory.get("practitioner_focus") or []
+    barriers = memory.get("client_barriers") or []
+    motivation = memory.get("client_motivation") or []
+
+    if focus:
+        sections.append("Practitioner focus so far:")
+        sections.extend([f"- {item}" for item in focus])
+
+    if barriers:
+        sections.append("Client barriers/tension points:")
+        sections.extend([f"- {item}" for item in barriers])
+
+    if motivation:
+        sections.append("Client motivations/commitments:")
+        sections.extend([f"- {item}" for item in motivation])
+
+    return "\n".join(sections)
+
+
 def _build_system_prompt(
-    persona: Dict[str, Any], turn_number: int, conversation_summary: str = ""
+    persona: Dict[str, Any],
+    turn_number: int,
+    conversation_summary: str = "",
+    rolling_memory: str = "",
 ) -> str:
     """Build the system prompt for the persona."""
+    persona_name = persona.get("name", "Client")
+    persona_age = persona.get("age", "adult")
+    stage_of_change = persona.get("stage_of_change", "contemplation")
+    initial_mood = persona.get("initial_mood") or DEFAULT_INITIAL_MOOD
+    ambivalence_points = persona.get("ambivalence_points") or []
+    motivation_points = persona.get("motivation_points") or []
+    core_identity = persona.get("core_identity", "")
+    behavior_guidelines = persona.get("behavior_guidelines", "")
+
     summary_context = ""
     if conversation_summary:
         summary_context = f"""
@@ -73,47 +180,50 @@ CONVERSATION CONTEXT (Summary of earlier conversation):
 {conversation_summary}
 """
 
+    memory_context = ""
+    if rolling_memory:
+        memory_context = f"""
+ROLLING MEMORY (high-value details to stay consistent):
+{rolling_memory}
+"""
+
     dialect_instructions = _get_dialect_instructions(persona)
 
-    return f"""You are roleplaying as {persona["name"]}, a {persona["age"]}-year-old client in a
+    return f"""You are roleplaying as {persona_name}, a {persona_age}-year-old client in a
 Motivational Interviewing practice session.
 
-{persona["core_identity"]}
+{core_identity}
 
 CURRENT STATE:
-- Stage of change: {persona["stage_of_change"]}
-- Initial mood: {persona.get("initial_mood", "guarded but open to talking")}
+- Stage of change: {stage_of_change}
+- Initial mood: {initial_mood}
 - Current turn: {turn_number} of {MAX_TURNS}
 {dialect_instructions}
 
 AMBIVALENCE (reasons for NOT changing):
-{chr(10).join("- " + point for point in persona["ambivalence_points"])}
+{chr(10).join("- " + point for point in ambivalence_points)}
 
 MOTIVATION (reasons FOR changing):
-{chr(10).join("- " + point for point in persona["motivation_points"])}
+{chr(10).join("- " + point for point in motivation_points)}
 
 {summary_context}
+{memory_context}
 
-{persona["behavior_guidelines"]}
+{behavior_guidelines}
 
 RESPONSE GUIDELINES:
-1. Stay completely in character as {persona["name"]}
-2. Respond naturally, as a real person would in a helping conversation
-3. Keep responses conversational - typically 1-3 sentences, occasionally longer for emotional moments
-4. Show realistic ambivalence - you're not sure about changing yet
-5. React authentically to how the practitioner speaks to you
-6. If asked direct questions, answer them but may show hesitation or redirect
-7. As the conversation progresses and IF the practitioner is supportive, gradually open up more
-8. Never break character or mention that this is a practice session
-9. Never explicitly comment on the practitioner's techniques
-10. Show emotion where appropriate - frustration, hope, doubt, fear, determination
-11. Use your dialect naturally - occasional dialect words and phrases, not constantly
+1. Stay fully in character as {persona_name}; never mention being an AI or simulation.
+2. Keep responses natural and concise (usually 1-3 sentences).
+3. Reflect realistic ambivalence while responding to the practitioner's tone and approach.
+4. If asked to go off-topic, politely redirect to your real dilemma and continue the conversation.
+5. Never provide stage directions, bracketed actions, or analysis of MI techniques.
+6. Use dialect markers sparingly and naturally.
 
-Remember: You are {persona["name"]}, not an AI. Respond as they would."""
+Remember: You are {persona_name}. Respond exactly as this person would."""
 
 
 def _summarize_conversation(
-    history: List[Dict[str, str]], max_messages: int = 6
+    history: List[Dict[str, str]], max_messages: int = CONTEXT_WINDOW_MESSAGES
 ) -> Tuple[List[Dict[str, str]], str]:
     """
     Manage conversation context to reduce token usage.
@@ -127,17 +237,28 @@ def _summarize_conversation(
     older_messages = history[:-max_messages]
     recent_messages = history[-max_messages:]
 
-    summary_parts: List[str] = []
-    for msg in older_messages:
-        role = "Practitioner" if msg["role"] == "user" else "Client"
-        content = (
-            msg["content"][:100] + "..."
-            if len(msg["content"]) > 100
-            else msg["content"]
-        )
-        summary_parts.append(f"{role}: {content}")
+    practitioner_moves = _dedupe_keep_recent(
+        [_compact_text(msg["content"]) for msg in older_messages if msg["role"] == "user"],
+        SUMMARY_MAX_BULLETS,
+    )
+    client_signals = _dedupe_keep_recent(
+        [_compact_text(msg["content"]) for msg in older_messages if msg["role"] == "assistant"],
+        SUMMARY_MAX_BULLETS,
+    )
 
-    summary = "\n".join(summary_parts)
+    summary_lines: List[str] = []
+    if practitioner_moves:
+        summary_lines.append("Practitioner has already explored:")
+        summary_lines.extend([f"- {item}" for item in practitioner_moves])
+
+    if client_signals:
+        summary_lines.append("Client has previously expressed:")
+        summary_lines.extend([f"- {item}" for item in client_signals])
+
+    summary = "\n".join(summary_lines)
+    if len(summary) > 1800:
+        summary = summary[:1797].rstrip() + "..."
+
     return recent_messages, summary
 
 
@@ -156,6 +277,11 @@ async def start_session(
         "persona_id": persona_id,
         "persona": persona,
         "history": [],
+        "memory": {
+            "practitioner_focus": [],
+            "client_barriers": [],
+            "client_motivation": [],
+        },
         "turn": 0,
         "started_at": datetime.now(timezone.utc),
         "is_active": True,
@@ -165,6 +291,7 @@ async def start_session(
     session["history"].append(
         {"role": "assistant", "content": persona["opening_message"]}
     )
+    session["memory"] = _build_session_memory(session["history"])
 
     SESSIONS[session_id] = session
     _save_session_to_db(session)
@@ -218,12 +345,14 @@ async def send_message(session_id: str, user_message: str) -> Dict[str, Any]:
     session["turn"] += 1
     current_turn = session["turn"]
     session["history"].append({"role": "user", "content": user_message})
+    session["memory"] = _build_session_memory(session["history"])
 
     is_final_turn = current_turn >= MAX_TURNS
 
     recent_history, conversation_summary = _summarize_conversation(session["history"])
+    rolling_memory = _format_session_memory(session.get("memory", {}))
     system_prompt = _build_system_prompt(
-        session["persona"], current_turn, conversation_summary
+        session["persona"], current_turn, conversation_summary, rolling_memory
     )
 
     if is_final_turn:
@@ -241,13 +370,9 @@ quite what you hoped for. Either way, bring the conversation to a natural close.
             "*pauses* I'm sorry, I got a bit distracted. Could you say that again?"
         )
         logger.warning(f"Fireworks API error in chat session: {type(error).__name__}")
-    except Exception as error:
-        response_text = (
-            "*pauses* I'm sorry, I got a bit distracted. Could you say that again?"
-        )
-        logger.warning(f"OpenAI API error in chat session: {type(error).__name__}")
 
     session["history"].append({"role": "assistant", "content": response_text})
+    session["memory"] = _build_session_memory(session["history"])
 
     if is_final_turn:
         session["is_active"] = False
@@ -267,7 +392,11 @@ async def _call_fireworks(system_prompt: str, messages: List[Dict[str, str]]) ->
     """Call Fireworks AI API using the chat completions endpoint."""
     api_key = _get_fireworks_key()
 
-    if not api_key or api_key.startswith("fw-"):
+    if not api_key or api_key.strip() in {
+        "",
+        "your_fireworks_api_key_here",
+        "your_fireworks_api_key",
+    }:
         raise ValueError(
             "FIREWORKS_API_KEY environment variable is not set. "
             "Get your API key from https://fireworks.ai"
@@ -286,17 +415,17 @@ async def _call_fireworks(system_prompt: str, messages: List[Dict[str, str]]) ->
 
     payload = {
         "model": settings.FIREWORKS_MODEL,
-        "messages": chat_messages
+        "messages": chat_messages,
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "max_tokens": 220,
     }
 
-
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with httpx.AsyncClient(timeout=45.0) as client:
         response = await client.post(FIREWORKS_API_URL, headers=headers, json=payload)
 
         if response.status_code != 200:
-            raise Exception(
-                f"Fireworks API error: {response.status_code} - {response.text}"
-            )
+            raise Exception(f"Fireworks API error: {response.status_code}")
 
         data = response.json()
 
@@ -445,13 +574,15 @@ def _load_session_from_db(session_id: str) -> Optional[Dict[str, Any]]:
             return None
 
         data = result.data
+        history = data.get("history") or []
         return {
             "id": data["session_id"],
             "session_id": data["session_id"],
             "user_id": data.get("user_id"),
             "persona_id": data["persona_id"],
             "persona": data["persona_data"],
-            "history": data.get("history") or [],
+            "history": history,
+            "memory": _build_session_memory(history),
             "turn": data.get("turn") or 0,
             "is_active": data.get("is_active", False),
             "started_at": data.get("started_at"),

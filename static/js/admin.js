@@ -682,7 +682,7 @@ function renderPersonaForm() {
     document.getElementById('personaName').value = currentPersona.name || ''; 
     document.getElementById('personaTitle').value = currentPersona.title || ''; 
     document.getElementById('personaAvatar').value = currentPersona.avatar || ''; 
-    document.getElementById('personaStage').value = currentPersona.stage || 'precontemplation'; 
+    document.getElementById('personaStage').value = currentPersona.stage_of_change || 'precontemplation'; 
     document.getElementById('personaDialect').value = currentPersona.dialect || 'RP'; 
     document.getElementById('personaDescription').value = currentPersona.description || ''; 
     document.getElementById('personaCoreIdentity').value = currentPersona.core_identity || ''; 
@@ -737,14 +737,14 @@ async function savePersona() {
             name: document.getElementById('personaName').value.trim(), 
             title: document.getElementById('personaTitle').value.trim(), 
             avatar: document.getElementById('personaAvatar').value.trim(), 
-            stage: document.getElementById('personaStage').value, 
+            stage_of_change: document.getElementById('personaStage').value, 
             dialect: document.getElementById('personaDialect').value, 
             description: document.getElementById('personaDescription').value.trim(), 
             core_identity: document.getElementById('personaCoreIdentity').value.trim(), 
             behavior_guidelines: document.getElementById('personaGuidelines').value.trim(), 
             opening_message: document.getElementById('personaOpening').value.trim(), 
-            ambivalence_points: JSON.stringify(currentAmbivalencePoints), 
-            motivation_points: JSON.stringify(currentMotivationPoints) 
+            ambivalence_points: currentAmbivalencePoints, 
+            motivation_points: currentMotivationPoints 
         }; 
         await adminRequest(ADMIN_API + '/personas/' + currentPersona.id, { method: 'PUT', body: JSON.stringify(payload) }); 
         showToast('Persona saved successfully', 'success'); 

@@ -17,10 +17,9 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
 
-from app.core.auth import AuthContext, get_current_user
+from app.core.auth import AuthContext, get_optional_user
 from app.core.supabase import get_supabase_admin
 from app.models.chat import (
-    ChatEndRequest,
     ChatEndResponse,
     ChatMessageRequest,
     ChatMessageResponse,
@@ -51,7 +50,52 @@ class PersonaDetail(BaseModel):
     description: str
     avatar: str
     stage_of_change: str
-    initial_mood: str
+    initial_mood: Optional[str] = "guarded but open to talking"
+
+
+async def _update_user_profile_from_analysis(
+    auth: Optional[AuthContext], analysis: ConversationAnalysis
+) -> None:
+    """Update aggregate profile metrics after a conversation analysis."""
+    if not auth or not auth.user_id:
+        return
+
+    try:
+        supabase_admin = get_supabase_admin()
+        profile_resp = (
+            supabase_admin.table("user_profiles")
+            .select("change_talk_evoked, reflections_offered")
+            .eq("user_id", auth.user_id)
+            .maybe_single()
+            .execute()
+        )
+
+        if not profile_resp or not profile_resp.data:
+            return
+
+        profile = profile_resp.data
+        current_ct = profile.get("change_talk_evoked", 0) or 0
+        current_reflections = profile.get("reflections_offered", 0) or 0
+        technique_mastery = analysis.techniques_count or {}
+
+        (
+            supabase_admin.table("user_profiles")
+            .update(
+                {
+                    "change_talk_evoked": current_ct
+                    + (1 if analysis.change_talk_evoked else 0),
+                    "reflections_offered": current_reflections
+                    + technique_mastery.get("simple_reflection", 0)
+                    + technique_mastery.get("complex_reflection", 0),
+                    "technique_mastery": technique_mastery,
+                    "last_active_at": datetime.now(timezone.utc).isoformat(),
+                }
+            )
+            .eq("user_id", auth.user_id)
+            .execute()
+        )
+    except Exception as profile_err:
+        logger.error(f"Failed to update user profile: {profile_err}")
 
 
 @router.get("/personas/", response_model=PersonaListResponse)
@@ -72,7 +116,12 @@ async def list_personas(
 
     # Filter by stage of change if provided
     if stage_of_change:
-        personas = [p for p in personas if p.get('stage_of_change') == stage_of_change]
+        stage = stage_of_change.strip().lower()
+        personas = [
+            p
+            for p in personas
+            if str(p.get("stage_of_change", "")).strip().lower() == stage
+        ]
 
     return PersonaListResponse(personas=[PersonaSummary(**p) for p in personas])
 
@@ -93,12 +142,18 @@ async def get_persona_details(persona_id: str):
             detail=f"Persona '{persona_id}' not found"
         )
 
+    if not persona.get("initial_mood"):
+        persona = {
+            **persona,
+            "initial_mood": "guarded but open to talking",
+        }
+
     return PersonaDetail(**persona)
 
 
 @router.post("/sessions/", response_model=ChatStartResponse, status_code=status.HTTP_201_CREATED)
 async def start_chat_session(
-    request: ChatStartRequest, auth: Optional[AuthContext] = Depends(get_current_user)
+    request: ChatStartRequest, auth: Optional[AuthContext] = Depends(get_optional_user)
 ):
     """
     Start a new chat practice session with a selected persona.
@@ -118,10 +173,10 @@ async def start_chat_session(
     except Exception as e:
         logger.error(f"Failed to start chat session: {e}", exc_info=True)
         error_detail = str(e)
-        if "OPENAI_API_KEY" in error_detail:
+        if "FIREWORKS_API_KEY" in error_detail or "api key" in error_detail.lower():
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Chat practice feature requires OpenAI API key. Please configure OPENAI_API_KEY environment variable.",
+                detail="Chat practice feature requires Fireworks API key. Please configure FIREWORKS_API_KEY.",
             )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to start session: {str(e)}"
@@ -132,7 +187,7 @@ async def start_chat_session(
 async def send_message(
     session_id: str,
     request: ChatMessageRequest,
-    auth: Optional[AuthContext] = Depends(get_current_user)
+    auth: Optional[AuthContext] = Depends(get_optional_user)
 ):
     """
     Send a message in an active chat practice session.
@@ -166,7 +221,7 @@ async def send_message(
 @router.post("/sessions/{session_id}/end", response_model=ChatEndResponse)
 async def end_chat_session(
     session_id: str,
-    auth: Optional[AuthContext] = Depends(get_current_user)
+    auth: Optional[AuthContext] = Depends(get_optional_user)
 ):
     """
     End a chat practice session and get comprehensive analysis.
@@ -250,44 +305,8 @@ async def end_chat_session(
                 total_turns=session_data["total_turns"],
             )
 
-            if analysis_id and auth and auth.user_id:
-                try:
-                    supabase_admin = get_supabase_admin()
-                    profile_resp = (
-                        supabase_admin.table("user_profiles")
-                        .select("*")
-                        .eq("user_id", auth.user_id)
-                        .maybe_single()
-                        .execute()
-                    )
-
-                    if profile_resp and profile_resp.data:
-                        profile = profile_resp.data
-                        current_ct = profile.get("change_talk_evoked", 0) or 0
-                        current_reflections = profile.get("reflections_offered", 0) or 0
-                        technique_mastery = analysis.techniques_count or {}
-
-                        (
-                            supabase_admin.table("user_profiles")
-                            .update(
-                                {
-                                    "change_talk_evoked": current_ct
-                                    + (1 if analysis.change_talk_evoked else 0),
-                                    "reflections_offered": current_reflections
-                                    + technique_mastery.get("simple_reflection", 0)
-                                    + technique_mastery.get("complex_reflection", 0),
-                                    "technique_mastery": technique_mastery,
-                                    "last_active_at": datetime.now(
-                                        timezone.utc
-                                    ).isoformat(),
-                                }
-                            )
-                            .eq("user_id", auth.user_id)
-                            .execute()
-                        )
-                        logger.info(f"User profile updated for user {auth.user_id}")
-                except Exception as profile_err:
-                    logger.error(f"Failed to update user profile: {profile_err}")
+            if analysis_id:
+                await _update_user_profile_from_analysis(auth, analysis)
         except Exception as e:
             logger.error(f"Failed to save analysis to database: {e}", exc_info=True)
 
@@ -306,7 +325,7 @@ async def end_chat_session(
 
 @router.get("/session/{session_id}", response_model=ChatSessionStatus)
 async def get_session_status(
-    session_id: str, auth: Optional[AuthContext] = Depends(get_current_user)
+    session_id: str, auth: Optional[AuthContext] = Depends(get_optional_user)
 ):
     """
     Get the current status of a chat practice session.
@@ -331,7 +350,7 @@ async def get_session_status(
 
 @router.get("/session/{session_id}/transcript")
 async def get_session_transcript(
-    session_id: str, auth: Optional[AuthContext] = Depends(get_current_user)
+    session_id: str, auth: Optional[AuthContext] = Depends(get_optional_user)
 ):
     """
     Get the conversation transcript for a session.
@@ -348,7 +367,7 @@ async def get_session_transcript(
 
 @router.post("/analyze")
 async def analyze_transcript(
-    request: dict[str, object], auth: Optional[AuthContext] = Depends(get_current_user)
+    request: dict[str, object], auth: Optional[AuthContext] = Depends(get_optional_user)
 ):
     """
     Analyze a conversation transcript and return feedback.
@@ -437,37 +456,7 @@ async def analyze_transcript(
             )
             if analysis_id:
                 logger.info(f"Analysis saved: {analysis_id}")
-
-                # Update user profile if authenticated
-                if auth and auth.user_id:
-                    try:
-                        supabase_admin = get_supabase_admin()
-                        profile_resp = (
-                            supabase_admin.table("user_profiles")
-                            .select("*")
-                            .eq("user_id", auth.user_id)
-                            .maybe_single()
-                            .execute()
-                        )
-
-                        if profile_resp and profile_resp.data:
-                            profile = profile_resp.data
-                            current_ct = profile.get("change_talk_evoked", 0) or 0
-                            current_reflections = profile.get("reflections_offered", 0) or 0
-                            technique_mastery = analysis.techniques_count or {}
-
-                            supabase_admin.table("user_profiles").update(
-                                {
-                                    "change_talk_evoked": current_ct + (1 if analysis.change_talk_evoked else 0),
-                                    "reflections_offered": current_reflections
-                                        + technique_mastery.get("simple_reflection", 0)
-                                        + technique_mastery.get("complex_reflection", 0),
-                                    "technique_mastery": technique_mastery,
-                                    "last_active_at": datetime.now(timezone.utc).isoformat(),
-                                }
-                            ).eq("user_id", auth.user_id).execute()
-                    except Exception as profile_err:
-                        logger.error(f"Failed to update user profile: {profile_err}")
+                await _update_user_profile_from_analysis(auth, analysis)
         except Exception as save_err:
             logger.error(f"Failed to save analysis: {save_err}", exc_info=True)
 

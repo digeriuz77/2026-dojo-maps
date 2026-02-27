@@ -99,6 +99,20 @@ def is_correct_technique(choice: dict) -> bool:
     technique_lower = technique.lower()
     non_mi_keywords = ['non-mi', 'righting reflex', 'educating', 'lecturing',
                        'defending', 'challenging', 'confrontation']
+    if any(keyword in technique_lower for keyword in non_mi_keywords):
+        return False
+
+    mi_keywords = [
+        'open question',
+        'reflection',
+        'affirmation',
+        'summary',
+        'evoking',
+    ]
+    if any(keyword in technique_lower for keyword in mi_keywords):
+        return True
+
+    return False
 
 
 
@@ -330,8 +344,9 @@ async def submit_choice(
             detail="Invalid choice"
         )
 
-    # Determine if correct and if evokes change talk
-    is_correct = is_correct_technique(selected_choice)
+    # Determine quality and correctness
+    quality_label = determines_quality_label(selected_choice)
+    is_correct = quality_label != 'Ineffective'
     evoked_ct = evokes_change_talk(node, selected_choice)
 
     # Determine if first attempt
@@ -345,12 +360,6 @@ async def submit_choice(
         evoked_change_talk=evoked_ct,
     )
     total_points_earned = (progress.get('points_earned', 0) or 0) + choice_points
-
-    # Determine quality label using three-tier system
-    quality_label = determines_quality_label(selected_choice)
-    
-    # is_correct based on quality label (Effective/Good = correct, Ineffective = incorrect)
-    is_correct = quality_label != 'Ineffective'
 
     # Record attempt using admin client to bypass RLS.
     # Do not fail the user flow if analytics table/schema is temporarily out of sync.

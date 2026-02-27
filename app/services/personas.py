@@ -188,6 +188,8 @@ def get_all_personas() -> Dict[str, Dict[str, Any]]:
                 "description": row.get("description", ""),
                 "avatar": row.get("avatar", "👤"),
                 "stage_of_change": row.get("stage_of_change", "contemplation"),
+                "initial_mood": _clean_string(row.get("initial_mood"))
+                or "guarded but open to talking",
                 # Voice and dialect with defaults
                 "voice": row.get("voice", "neutral"),
                 "dialect": row.get("dialect", "RP"),
@@ -216,7 +218,14 @@ def get_all_personas() -> Dict[str, Dict[str, Any]]:
 def get_persona(persona_id: str) -> Optional[Dict[str, Any]]:
     """Get a persona by ID."""
     personas = get_all_personas()
-    return personas.get(persona_id)
+    persona = personas.get(persona_id)
+    if not persona:
+        return None
+
+    if not persona.get("initial_mood"):
+        persona = {**persona, "initial_mood": "guarded but open to talking"}
+
+    return persona
 
 
 def get_persona_list() -> List[Dict[str, Any]]:
@@ -229,6 +238,7 @@ def get_persona_list() -> List[Dict[str, Any]]:
             "title": p["title"],
             "description": p["description"],
             "avatar": p["avatar"],
+            "stage_of_change": p.get("stage_of_change", "contemplation"),
             "dialect": p.get("dialect", "RP"),
         }
         for p in personas.values()
