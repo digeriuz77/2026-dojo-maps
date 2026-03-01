@@ -268,7 +268,9 @@ async def get_dialogue_node(
         )
 
     # Check if this is an ending node and mark module complete if needed
-    if node.get('is_ending') and progress.get('status') != 'completed':
+    # Support both "is_ending" (JSON files) and "is_endpoint" (database seed files)
+    is_ending_node = node.get('is_ending') or node.get('is_endpoint')
+    if is_ending_node and progress.get('status') != 'completed':
         logger.info(f"[DIALOGUE] Module {module_id} ending node reached for user {current_user.user_id}, marking complete")
         supabase_admin = get_supabase_admin()
         
