@@ -24,8 +24,8 @@ class Settings(BaseSettings):
         - SUPABASE_JWT_SECRET: JWT secret (still used by Supabase client for auth operations)
 
     Optional environment variables (Chat Practice):
-        - OPENAI_API_KEY: API key for OpenAI (required for chat practice feature)
-        - OPENAI_MODEL: Model to use (default: gpt-4.1-mini)
+        - FIREWORKS_API_KEY: API key for Fireworks chat/analysis
+        - FIREWORKS_MODEL: Model to use (default: accounts/fireworks/models/gpt-oss-120b)
 
     All other settings have sensible defaults.
     """
@@ -57,22 +57,9 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
-    # SECURITY: OpenAI API key should be accessed through Settings, not os.getenv()
-    OPENAI_API_KEY: str = ""
-    OPENAI_MODEL: str = "gpt-4.1-mini"
-
-    # Fireworks AI API (alternative to OpenAI)
+    # Fireworks AI API
     FIREWORKS_API_KEY: str = ""
     FIREWORKS_MODEL: str = "accounts/fireworks/models/gpt-oss-120b"
-
-    # Scoring Configuration (Optional - have defaults)
-    SCORING_EXCELLENT_POINTS: int = 150
-    SCORING_GOOD_POINTS: int = 100
-    SCORING_ACCEPTABLE_POINTS: int = 50
-    SCORING_POOR_POINTS: int = 0
-    SCORING_FIRST_ATTEMPT_BONUS: int = 50
-    SCORING_CHANGE_TALK_BONUS: int = 50
-    SCORING_COMPLETION_BONUS: int = 200
 
     @field_validator("SUPABASE_URL", mode="before")
     @classmethod

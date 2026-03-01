@@ -4,6 +4,7 @@ Dialogue API endpoints
 Handles dialogue node retrieval and choice submission.
 """
 import logging
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException, Depends, status
 from supabase import Client
@@ -30,6 +31,34 @@ async def get_user_profile(user_id: str, supabase_admin: Client):
     if response.data:
         return response.data[0]
     return None
+
+
+async def ensure_user_profile(current_user: AuthContext, supabase_admin: Client) -> dict:
+    """Ensure user profile exists to keep aggregate metrics in sync."""
+    profile = await get_user_profile(current_user.user_id, supabase_admin)
+    if profile:
+        return profile
+
+    try:
+        created = (
+            supabase_admin.table("user_profiles")
+            .insert(
+                {
+                    "user_id": current_user.user_id,
+                    "display_name": current_user.display_name,
+                    "modules_completed": 0,
+                    "change_talk_evoked": 0,
+                }
+            )
+            .execute()
+        )
+        if created.data:
+            return created.data[0]
+    except Exception as profile_err:
+        logger.warning(f"[DIALOGUE] Failed to auto-create user profile: {profile_err}")
+
+    profile = await get_user_profile(current_user.user_id, supabase_admin)
+    return profile or {"modules_completed": 0, "change_talk_evoked": 0}
 
 
 async def get_module_by_id(module_id: str, supabase: Client) -> dict:
@@ -353,14 +382,6 @@ async def submit_choice(
     nodes_completed = progress.get('nodes_completed', [])
     is_first_attempt = choice_data.node_id not in nodes_completed
 
-    # Calculate and accumulate points
-    choice_points = ScoringService.calculate_choice_points(
-        is_correct=is_correct,
-        is_first_attempt=is_first_attempt,
-        evoked_change_talk=evoked_ct,
-    )
-    total_points_earned = (progress.get('points_earned', 0) or 0) + choice_points
-
     # Record attempt using admin client to bypass RLS.
     # Do not fail the user flow if analytics table/schema is temporarily out of sync.
     try:
@@ -404,12 +425,11 @@ async def submit_choice(
             correct_choices=correct_attempts
         )
 
-    # P1-10: Fixed double-counting. total_points_earned already includes current
-    # choice points + previous points. Use it directly instead of adding again.
-    points_earned = total_points_earned
-
     # Update progress record
+    module_just_completed = is_module_complete and progress.get("status") != "completed"
+
     update_data = {
+        'status': 'in_progress',
         'current_node_id': next_node_id if not is_module_complete else choice_data.node_id,
         'nodes_completed': new_nodes_completed,
     }
@@ -418,22 +438,22 @@ async def submit_choice(
         update_data.update({
             'status': 'completed',
             'completion_score': completion_score,
-            'completed_at': 'now()'
+            'completed_at': datetime.now(timezone.utc).isoformat()
         })
 
     # Use admin client for update to bypass RLS
     supabase_admin.table('user_progress').update(update_data).eq('id', progress['id']).execute()
 
     # Update user profile
-    profile = await get_user_profile(current_user.user_id, supabase_admin)
+    profile = await ensure_user_profile(current_user, supabase_admin)
     if profile:
         modules_completed = profile.get('modules_completed', 0)
         change_talk_evoked = profile.get('change_talk_evoked', 0) + (1 if evoked_ct else 0)
 
         supabase_admin.table('user_profiles').update({
-            'modules_completed': modules_completed + (1 if is_module_complete else 0),
+            'modules_completed': modules_completed + (1 if module_just_completed else 0),
             'change_talk_evoked': change_talk_evoked,
-            'last_active_at': 'now()'
+            'last_active_at': datetime.now(timezone.utc).isoformat()
         }).eq('user_id', current_user.user_id).execute()
 
         return ChoiceFeedback(

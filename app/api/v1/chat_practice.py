@@ -247,9 +247,18 @@ async def end_chat_session(
         persona = get_persona(session_data["persona_id"])
         persona_name = persona["name"] if persona else "Client"
 
-        analysis_result = await conversation_analysis_service.analyze_conversation(
-            transcript=session_data["transcript"], persona_name=persona_name
-        )
+        try:
+            analysis_result = await conversation_analysis_service.analyze_conversation(
+                transcript=session_data["transcript"], persona_name=persona_name
+            )
+        except Exception as analysis_err:
+            logger.error(
+                f"Failed to generate live analysis for session {session_id}: {analysis_err}",
+                exc_info=True,
+            )
+            analysis_result = conversation_analysis_service.get_default_analysis(
+                "Analysis service is temporarily unavailable. A fallback summary was generated."
+            )
 
         techniques_used = [
             MITechniqueUsed(**t) for t in analysis_result.get("techniques_used", [])
@@ -398,9 +407,18 @@ async def analyze_transcript(
             f"[CHAT] Analyzing transcript for {persona_name}, {len(transcript)} messages"
         )
 
-        analysis_result = await conversation_analysis_service.analyze_conversation(
-            transcript=transcript, persona_name=persona_name
-        )
+        try:
+            analysis_result = await conversation_analysis_service.analyze_conversation(
+                transcript=transcript, persona_name=persona_name
+            )
+        except Exception as analysis_err:
+            logger.error(
+                f"[CHAT] Analysis provider call failed: {analysis_err}",
+                exc_info=True,
+            )
+            analysis_result = conversation_analysis_service.get_default_analysis(
+                "Analysis service is temporarily unavailable. A fallback summary was generated."
+            )
 
         logger.info(f"[CHAT] Analysis complete for {persona_name}")
 
@@ -467,6 +485,8 @@ async def analyze_transcript(
             "transcript": transcript,
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to analyze transcript: {str(e)}"

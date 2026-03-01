@@ -44,6 +44,13 @@ async def get_all_user_progress(user_id: str, supabase: Client) -> List[dict]:
     return response.data
 
 
+def _get_progress_client(current_user: AuthContext):
+    """Use user-token scoped client when available, fallback to admin for resilience."""
+    if current_user.raw_token:
+        return get_authenticated_client(current_user.raw_token)
+    return get_supabase_admin()
+
+
 # =====================================================
 # Endpoints
 # =====================================================
@@ -66,17 +73,22 @@ async def list_modules(
         .execute()
     )
 
-    # Get all user progress
-    user_progress = await get_all_user_progress(current_user.user_id, supabase)
-    progress_map = {p["module_id"]: p for p in user_progress}
+    # Get all user progress (use authenticated token context for RLS-consistent reads)
+    progress_client = _get_progress_client(current_user)
+    user_progress = await get_all_user_progress(current_user.user_id, progress_client)
+    progress_map = {
+        str(p.get("module_id")): p
+        for p in user_progress
+        if p and p.get("module_id") is not None
+    }
 
     modules = []
     for module in modules_response.data:
         module_data = {**module, "id": str(module["id"])}
 
         # Add user progress if exists
-        if module["id"] in progress_map:
-            progress = progress_map[module["id"]]
+        if str(module.get("id")) in progress_map:
+            progress = progress_map[str(module.get("id"))]
             module_data["user_status"] = progress["status"]
 
         modules.append(ModuleResponse(**module_data))
@@ -106,7 +118,10 @@ async def get_module(
     module_data = {**module, "id": str(module["id"])}
 
     # Add user progress if exists
-    progress = await get_user_module_progress(current_user.user_id, module_id, supabase)
+    progress_client = _get_progress_client(current_user)
+    progress = await get_user_module_progress(
+        current_user.user_id, module_id, progress_client
+    )
     if progress:
         module_data["user_status"] = progress["status"]
 
@@ -238,8 +253,9 @@ async def restart_module(
     start_node = dialogue_content.get("start_node", "node_1")
 
     # Check for existing progress
+    progress_client = _get_progress_client(current_user)
     existing_progress = await get_user_module_progress(
-        current_user.user_id, module_id, supabase
+        current_user.user_id, module_id, progress_client
     )
 
     supabase_admin = get_supabase_admin()
