@@ -20,7 +20,7 @@ DROP FUNCTION IF EXISTS get_leaderboard(INT, INT);
 -- 1. Get module stats with a single query (replaces N+1 pattern)
 CREATE OR REPLACE FUNCTION get_module_stats()
 RETURNS TABLE (
-    module_id INT,
+    module_id UUID,
     module_title TEXT,
     total_enrolled BIGINT,
     completed_count BIGINT,
@@ -28,7 +28,7 @@ RETURNS TABLE (
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT 
+    SELECT
         m.id as module_id,
         m.title::TEXT as module_title,
         COUNT(p.id)::BIGINT as total_enrolled,
@@ -119,6 +119,61 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- 5. Get recent activity for dashboard chart (last 7 days)
+CREATE OR REPLACE FUNCTION get_recent_activity(p_days INT DEFAULT 7)
+RETURNS TABLE (
+    activity_date DATE,
+    new_users BIGINT,
+    modules_completed BIGINT,
+    practice_sessions BIGINT
+) AS $$
+BEGIN
+    RETURN QUERY
+    WITH date_series AS (
+        SELECT generate_series(
+            CURRENT_DATE - (p_days - 1),
+            CURRENT_DATE,
+            '1 day'::INTERVAL
+        )::DATE AS activity_date
+    ),
+    new_users_daily AS (
+        SELECT
+            DATE(u.created_at) AS activity_date,
+            COUNT(*)::BIGINT AS count
+        FROM users u
+        WHERE u.created_at >= CURRENT_DATE - (p_days - 1)
+        GROUP BY DATE(u.created_at)
+    ),
+    modules_completed_daily AS (
+        SELECT
+            DATE(up.completed_at) AS activity_date,
+            COUNT(*)::BIGINT AS count
+        FROM user_progress up
+        WHERE up.completed_at >= CURRENT_DATE - (p_days - 1)
+          AND up.status = 'completed'
+        GROUP BY DATE(up.completed_at)
+    ),
+    practice_sessions_daily AS (
+        SELECT
+            DATE(ca.created_at) AS activity_date,
+            COUNT(*)::BIGINT AS count
+        FROM conversation_analyses ca
+        WHERE ca.created_at >= CURRENT_DATE - (p_days - 1)
+        GROUP BY DATE(ca.created_at)
+    )
+    SELECT
+        ds.activity_date,
+        COALESCE(nu.count, 0)::BIGINT AS new_users,
+        COALESCE(mc.count, 0)::BIGINT AS modules_completed,
+        COALESCE(ps.count, 0)::BIGINT AS practice_sessions
+    FROM date_series ds
+    LEFT JOIN new_users_daily nu ON ds.activity_date = nu.activity_date
+    LEFT JOIN modules_completed_daily mc ON ds.activity_date = mc.activity_date
+    LEFT JOIN practice_sessions_daily ps ON ds.activity_date = ps.activity_date
+    ORDER BY ds.activity_date;
+END;
+$$ LANGUAGE plpgsql;
+
 -- ============================================
 -- Grant execute permissions to authenticated users
 -- ============================================
@@ -128,6 +183,7 @@ GRANT EXECUTE ON FUNCTION get_module_stats() TO authenticated, anon, service_rol
 GRANT EXECUTE ON FUNCTION get_average_progress() TO authenticated, anon, service_role;
 GRANT EXECUTE ON FUNCTION get_user_rank(UUID) TO authenticated, anon, service_role;
 GRANT EXECUTE ON FUNCTION get_leaderboard(INT, INT) TO authenticated, anon, service_role;
+GRANT EXECUTE ON FUNCTION get_recent_activity(INT) TO authenticated, anon, service_role;
 
 -- Note: These functions should be run via Supabase SQL Editor or as part of deployment
 -- They optimize query patterns to reduce egress and API calls significantly

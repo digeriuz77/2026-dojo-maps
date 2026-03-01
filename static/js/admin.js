@@ -80,6 +80,7 @@ async function initAdmin() {
         await loadUsers();
         await loadModuleStats();
         await loadPracticeAnalytics();
+        await loadRecentActivity();
 
         // 4. Setup event listeners
         setupEventListeners();
@@ -203,7 +204,7 @@ function setupEventListeners() {
 
             tab.classList.add('active');
             document.getElementById(tab.dataset.tab).classList.add('active');
-            
+
             // Load personas when the personas tab is clicked
             if (tab.dataset.tab === 'personas') {
                 loadPersonasForAdmin();
@@ -348,18 +349,66 @@ async function invokeAdminAction(action, targetUserId, newRole = null) {
     }
 }
 
-// Promote to admin from settings
-async function promoteToAdmin() {
-    const userId = document.getElementById('promoteUserId').value.trim();
-    if (!userId) {
-        showToast('Please enter a user ID', 'warning');
+// Load recent activity data
+async function loadRecentActivity() {
+    try {
+        const data = await adminRequest(`${ADMIN_API}/analytics/recent-activity?days=7`);
+        renderActivityChart(data.activity || []);
+    } catch (error) {
+        console.error('Error loading recent activity:', error);
+        document.getElementById('activityChartBars').innerHTML = '<div class="activity-chart-loading">Failed to load activity data</div>';
+    }
+}
+
+// Render activity chart
+function renderActivityChart(activityData) {
+    const container = document.getElementById('activityChartBars');
+
+    if (!activityData || activityData.length === 0) {
+        container.innerHTML = '<div class="activity-chart-loading">No activity data available</div>';
         return;
     }
 
-    const success = await invokeAdminAction('promote_to_admin', userId);
-    if (success) {
-        document.getElementById('promoteUserId').value = '';
-    }
+    // Find max value for scaling
+    let maxValue = 0;
+    activityData.forEach(day => {
+        const dayTotal = (day.new_users || 0) + (day.modules_completed || 0) + (day.practice_sessions || 0);
+        if (dayTotal > maxValue) maxValue = dayTotal;
+    });
+
+    // Ensure maxValue is at least 1 to avoid division by zero
+    maxValue = Math.max(maxValue, 1);
+
+    const html = activityData.map(day => {
+        const date = new Date(day.activity_date);
+        const dayLabel = date.toLocaleDateString('en-US', { weekday: 'short' });
+        const dateLabel = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+        const newUsers = day.new_users || 0;
+        const modulesCompleted = day.modules_completed || 0;
+        const practiceSessions = day.practice_sessions || 0;
+        const total = newUsers + modulesCompleted + practiceSessions;
+
+        // Calculate heights as percentages
+        const newUsersHeight = (newUsers / maxValue) * 100;
+        const modulesHeight = (modulesCompleted / maxValue) * 100;
+        const practiceHeight = (practiceSessions / maxValue) * 100;
+
+        return `
+            <div class="activity-day">
+                <div class="activity-bar-stack" title="New Users: ${newUsers}\nModules Completed: ${modulesCompleted}\nPractice Sessions: ${practiceSessions}">
+                    ${newUsers > 0 ? `<div class="activity-bar-segment new-users" style="height: ${newUsersHeight}%"></div>` : ''}
+                    ${modulesCompleted > 0 ? `<div class="activity-bar-segment modules-completed" style="height: ${modulesHeight}%"></div>` : ''}
+                    ${practiceSessions > 0 ? `<div class="activity-bar-segment practice-sessions" style="height: ${practiceHeight}%"></div>` : ''}
+                    ${total === 0 ? '<div style="flex: 1; display: flex; align-items: center; justify-content: center; color: #ccc; font-size: 0.7rem;">No data</div>' : ''}
+                </div>
+                <div class="activity-day-label">${dayLabel}</div>
+                <div class="activity-day-value">${dateLabel}</div>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = html;
 }
 
 // Pagination
@@ -468,7 +517,7 @@ async function loadComprehensiveAnalytics() {
         // Update stats
         document.getElementById('totalPracticeSessions').textContent = data.total_sessions || 0;
         document.getElementById('activePractitioners').textContent = data.total_users || 0;
-        document.getElementById('avgOverallScore').textContent = 
+        document.getElementById('avgOverallScore').textContent =
             data.avg_overall_score ? data.avg_overall_score.toFixed(1) + '/5' : '-';
 
         // Calculate change talk rate
@@ -619,149 +668,149 @@ async function refreshPracticeAnalytics() {
 
 
 // ========== PERSONA MANAGEMENT ==========
-async function loadPersonasForAdmin() { 
-    try { 
-        const data = await adminRequest(ADMIN_API + '/personas'); 
-        personas = data || []; 
-        renderPersonasList(); 
-    } catch (error) { 
-        console.error('Error loading personas:', error); 
-        showToast('Error loading personas', 'error'); 
-    } 
+async function loadPersonasForAdmin() {
+    try {
+        const data = await adminRequest(ADMIN_API + '/personas');
+        personas = data || [];
+        renderPersonasList();
+    } catch (error) {
+        console.error('Error loading personas:', error);
+        showToast('Error loading personas', 'error');
+    }
 }
 
-function renderPersonasList() { 
-    const container = document.getElementById('personasList'); 
-    if (!personas || personas.length === 0) { 
-        container.innerHTML = '<p class="empty">No personas found</p>'; 
-        return; 
-    } 
-    container.innerHTML = personas.map(p => 
+function renderPersonasList() {
+    const container = document.getElementById('personasList');
+    if (!personas || personas.length === 0) {
+        container.innerHTML = '<p class="empty">No personas found</p>';
+        return;
+    }
+    container.innerHTML = personas.map(p =>
         '<div class="persona-item ' + (currentPersona && currentPersona.id === p.id ? 'active' : '') + '" onclick="selectPersona(\"' + p.id + '\")">' +
         '<div class="persona-avatar">' + (p.avatar || '?') + '</div>' +
         '<div class="persona-info"><strong>' + escapeHtml(p.name) + '</strong><span>' + escapeHtml(p.title || '') + '</span></div>' +
         '</div>'
-    ).join(''); 
+    ).join('');
 }
 
-async function selectPersona(personaId) { 
-    try { 
-        const data = await adminRequest(ADMIN_API + '/personas/' + personaId); 
-        currentPersona = data; 
-        currentAmbivalencePoints = parsePoints(data.ambivalence_points); 
-        currentMotivationPoints = parsePoints(data.motivation_points); 
-        renderPersonaForm(); 
-        renderPersonasList(); 
-    } catch (error) { 
-        console.error('Error loading persona:', error); 
-        showToast('Error loading persona details', 'error'); 
-    } 
+async function selectPersona(personaId) {
+    try {
+        const data = await adminRequest(ADMIN_API + '/personas/' + personaId);
+        currentPersona = data;
+        currentAmbivalencePoints = parsePoints(data.ambivalence_points);
+        currentMotivationPoints = parsePoints(data.motivation_points);
+        renderPersonaForm();
+        renderPersonasList();
+    } catch (error) {
+        console.error('Error loading persona:', error);
+        showToast('Error loading persona details', 'error');
+    }
 }
 
-function parsePoints(points) { 
-    if (!points) return []; 
-    if (Array.isArray(points)) return points; 
-    if (typeof points === 'string') { 
-        try { return JSON.parse(points); } catch { return []; } 
-    } 
-    return []; 
+function parsePoints(points) {
+    if (!points) return [];
+    if (Array.isArray(points)) return points;
+    if (typeof points === 'string') {
+        try { return JSON.parse(points); } catch { return []; }
+    }
+    return [];
 }
 
-function renderPersonaForm() { 
-    const form = document.getElementById('personaEditForm'); 
-    const emptyState = document.getElementById('personaEmptyState'); 
-    if (!currentPersona) { 
-        form.style.display = 'none'; 
-        emptyState.style.display = 'block'; 
-        return; 
-    } 
-    form.style.display = 'block'; 
-    emptyState.style.display = 'none'; 
-    document.getElementById('personaEditTitle').textContent = 'Edit: ' + currentPersona.name; 
-    document.getElementById('personaName').value = currentPersona.name || ''; 
-    document.getElementById('personaTitle').value = currentPersona.title || ''; 
-    document.getElementById('personaAvatar').value = currentPersona.avatar || ''; 
-    document.getElementById('personaStage').value = currentPersona.stage_of_change || 'precontemplation'; 
-    document.getElementById('personaDialect').value = currentPersona.dialect || 'RP'; 
-    document.getElementById('personaDescription').value = currentPersona.description || ''; 
-    document.getElementById('personaCoreIdentity').value = currentPersona.core_identity || ''; 
-    document.getElementById('personaGuidelines').value = currentPersona.behavior_guidelines || ''; 
-    document.getElementById('personaOpening').value = currentPersona.opening_message || ''; 
-    renderTagInput('ambivalencePoints', currentAmbivalencePoints, 'ambivalence'); 
-    renderTagInput('motivationPoints', currentMotivationPoints, 'motivation'); 
+function renderPersonaForm() {
+    const form = document.getElementById('personaEditForm');
+    const emptyState = document.getElementById('personaEmptyState');
+    if (!currentPersona) {
+        form.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+    }
+    form.style.display = 'block';
+    emptyState.style.display = 'none';
+    document.getElementById('personaEditTitle').textContent = 'Edit: ' + currentPersona.name;
+    document.getElementById('personaName').value = currentPersona.name || '';
+    document.getElementById('personaTitle').value = currentPersona.title || '';
+    document.getElementById('personaAvatar').value = currentPersona.avatar || '';
+    document.getElementById('personaStage').value = currentPersona.stage_of_change || 'precontemplation';
+    document.getElementById('personaDialect').value = currentPersona.dialect || 'RP';
+    document.getElementById('personaDescription').value = currentPersona.description || '';
+    document.getElementById('personaCoreIdentity').value = currentPersona.core_identity || '';
+    document.getElementById('personaGuidelines').value = currentPersona.behavior_guidelines || '';
+    document.getElementById('personaOpening').value = currentPersona.opening_message || '';
+    renderTagInput('ambivalencePoints', currentAmbivalencePoints, 'ambivalence');
+    renderTagInput('motivationPoints', currentMotivationPoints, 'motivation');
 }
 
-function renderTagInput(containerId, points, type) { 
-    const container = document.getElementById(containerId); 
-    container.innerHTML = points.map((point, index) => 
-        '<span class="tag">' + escapeHtml(point) + 
+function renderTagInput(containerId, points, type) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = points.map((point, index) =>
+        '<span class="tag">' + escapeHtml(point) +
         '<button type="button" class="tag-remove" onclick="remove' + (type === 'ambivalence' ? 'Ambivalence' : 'Motivation') + 'Point(' + index + ')">&times;</button></span>'
-    ).join(''); 
+    ).join('');
 }
 
-function addAmbivalencePoint() { 
-    const input = document.getElementById('newAmbivalencePoint'); 
-    const value = input.value.trim(); 
-    if (value) { 
-        currentAmbivalencePoints.push(value); 
-        input.value = ''; 
-        renderTagInput('ambivalencePoints', currentAmbivalencePoints, 'ambivalence'); 
-    } 
+function addAmbivalencePoint() {
+    const input = document.getElementById('newAmbivalencePoint');
+    const value = input.value.trim();
+    if (value) {
+        currentAmbivalencePoints.push(value);
+        input.value = '';
+        renderTagInput('ambivalencePoints', currentAmbivalencePoints, 'ambivalence');
+    }
 }
 
 function addMotivationPoint() {
     const input = document.getElementById('newMotivationPoint');
-    const value = input.value.trim(); 
-    if (value) { 
-        currentMotivationPoints.push(value); 
-        input.value = ''; 
-        renderTagInput('motivationPoints', currentMotivationPoints, 'motivation'); 
-    } 
+    const value = input.value.trim();
+    if (value) {
+        currentMotivationPoints.push(value);
+        input.value = '';
+        renderTagInput('motivationPoints', currentMotivationPoints, 'motivation');
+    }
 }
 
-function removeAmbivalencePoint(index) { 
-    currentAmbivalencePoints.splice(index, 1); 
-    renderTagInput('ambivalencePoints', currentAmbivalencePoints, 'ambivalence'); 
+function removeAmbivalencePoint(index) {
+    currentAmbivalencePoints.splice(index, 1);
+    renderTagInput('ambivalencePoints', currentAmbivalencePoints, 'ambivalence');
 }
 
-function removeMotivationPoint(index) { 
-    currentMotivationPoints.splice(index, 1); 
-    renderTagInput('motivationPoints', currentMotivationPoints, 'motivation'); 
+function removeMotivationPoint(index) {
+    currentMotivationPoints.splice(index, 1);
+    renderTagInput('motivationPoints', currentMotivationPoints, 'motivation');
 }
 
-async function savePersona() { 
-    if (!currentPersona) return; 
-    try { 
-        const payload = { 
-            name: document.getElementById('personaName').value.trim(), 
-            title: document.getElementById('personaTitle').value.trim(), 
-            avatar: document.getElementById('personaAvatar').value.trim(), 
-            stage_of_change: document.getElementById('personaStage').value, 
-            dialect: document.getElementById('personaDialect').value, 
-            description: document.getElementById('personaDescription').value.trim(), 
-            core_identity: document.getElementById('personaCoreIdentity').value.trim(), 
-            behavior_guidelines: document.getElementById('personaGuidelines').value.trim(), 
-            opening_message: document.getElementById('personaOpening').value.trim(), 
-            ambivalence_points: currentAmbivalencePoints, 
-            motivation_points: currentMotivationPoints 
-        }; 
-        await adminRequest(ADMIN_API + '/personas/' + currentPersona.id, { method: 'PUT', body: JSON.stringify(payload) }); 
-        showToast('Persona saved successfully', 'success'); 
-        await loadPersonasForAdmin(); 
-    } catch (error) { 
-        console.error('Error saving persona:', error); 
-        showToast(error.message || 'Error saving persona', 'error'); 
-    } 
+async function savePersona() {
+    if (!currentPersona) return;
+    try {
+        const payload = {
+            name: document.getElementById('personaName').value.trim(),
+            title: document.getElementById('personaTitle').value.trim(),
+            avatar: document.getElementById('personaAvatar').value.trim(),
+            stage_of_change: document.getElementById('personaStage').value,
+            dialect: document.getElementById('personaDialect').value,
+            description: document.getElementById('personaDescription').value.trim(),
+            core_identity: document.getElementById('personaCoreIdentity').value.trim(),
+            behavior_guidelines: document.getElementById('personaGuidelines').value.trim(),
+            opening_message: document.getElementById('personaOpening').value.trim(),
+            ambivalence_points: currentAmbivalencePoints,
+            motivation_points: currentMotivationPoints
+        };
+        await adminRequest(ADMIN_API + '/personas/' + currentPersona.id, { method: 'PUT', body: JSON.stringify(payload) });
+        showToast('Persona saved successfully', 'success');
+        await loadPersonasForAdmin();
+    } catch (error) {
+        console.error('Error saving persona:', error);
+        showToast(error.message || 'Error saving persona', 'error');
+    }
 }
 
-async function refreshPersonasCache() { 
-    try { 
-        await adminRequest(ADMIN_API + '/personas/refresh-cache', { method: 'POST' }); 
-        showToast('Personas cache refreshed', 'success'); 
-    } catch (error) { 
-        console.error('Error refreshing cache:', error); 
-        showToast(error.message || 'Error refreshing cache', 'error'); 
-    } 
+async function refreshPersonasCache() {
+    try {
+        await adminRequest(ADMIN_API + '/personas/refresh-cache', { method: 'POST' });
+        showToast('Personas cache refreshed', 'success');
+    } catch (error) {
+        console.error('Error refreshing cache:', error);
+        showToast(error.message || 'Error refreshing cache', 'error');
+    }
 }
 
 // Make functions globally available
@@ -774,7 +823,6 @@ window.setUserRole = setUserRole;
 window.banUser = banUser;
 window.unbanUser = unbanUser;
 window.confirmDeleteUser = confirmDeleteUser;
-window.promoteToAdmin = promoteToAdmin;
 window.previousPage = previousPage;
 window.nextPage = nextPage;
 window.refreshUsers = refreshUsers;

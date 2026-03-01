@@ -484,6 +484,35 @@ async def get_practice_analytics_leaderboard(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/analytics/recent-activity")
+async def get_recent_activity_endpoint(
+    days: int = 7,
+    admin: AuthContext = Depends(require_admin)
+):
+    """
+    Get recent activity data for the dashboard chart.
+
+    Returns daily activity metrics for the specified number of days.
+    """
+    try:
+        supabase = get_supabase_admin()
+
+        # Call the database function for recent activity
+        result = supabase.rpc(
+            "get_recent_activity", {"p_days": days}
+        ).execute()
+
+        if result.data:
+            return {"activity": result.data, "days": days}
+
+        # Return empty data if no results
+        return {"activity": [], "days": days}
+
+    except Exception as e:
+        logger.error(f"Error loading recent activity: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/analytics/user/{user_id}")
 async def get_user_detailed_analytics(
     user_id: str, admin: AuthContext = Depends(require_admin)

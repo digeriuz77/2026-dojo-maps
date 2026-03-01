@@ -30,7 +30,6 @@
                 <li data-tab="practice-analytics">Practice Analytics</li>
                 <li data-tab="modules">Module Analytics</li>
                 <li data-tab="personas">Personas</li>
-                <li data-tab="settings">Settings</li>
             </ul>
         </aside>
 
@@ -72,9 +71,16 @@
                 </div>
 
                 <div class="chart-section">
-                    <h2>Recent Activity</h2>
-                    <div id="activityChart" class="chart-placeholder">
-                        <p>Activity chart will be displayed here</p>
+                    <h2>Recent Activity (Last 7 Days)</h2>
+                    <div id="activityChart" class="activity-chart-container">
+                        <div class="activity-chart-bars" id="activityChartBars"></div>
+                        <div class="activity-chart-legend">
+                            <span class="legend-item"><span class="legend-color new-users"></span> New Users</span>
+                            <span class="legend-item"><span class="legend-color modules-completed"></span> Modules
+                                Completed</span>
+                            <span class="legend-item"><span class="legend-color practice-sessions"></span> Practice
+                                Sessions</span>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -279,59 +285,74 @@
                 </div>
             </section>
 
-            <!-- Settings Tab -->
-            <section id="settings" class="tab-content">
-                <h1>Admin Settings</h1>
-
-                <div class="settings-section">
-                    <h2>User Promotion</h2>
-                    <p>Enter a user ID to promote them to admin:</p>
-                    <div class="form-group">
-                        <input type="text" id="promoteUserId" placeholder="User ID">
-                        <button onclick="promoteToAdmin()" class="btn btn-primary">Promote to Admin</button>
-                    </div>
-                </div>
-
-                <div class="settings-section">
-                    <h2>Database Actions</h2>
-                    <p>Use with caution - these actions are irreversible:</p>
-                    <div class="danger-zone">
-                        <button onclick="showDeleteConfirmation()" class="btn btn-danger">Delete All Inactive
-                            Users</button>
-                    </div>
-                </div>
-            </section>
-
             <!-- Personas Tab -->
             <section id="personas" class="tab-content">
                 <h1>Persona Management</h1>
                 <div class="personas-layout">
                     <div class="personas-list">
                         <h2>Available Personas</h2>
-                        <div id="personasList" class="persona-items"><p class="loading">Loading...</p></div>
-                        <button onclick="loadPersonasForAdmin()" class="btn btn-secondary" style="margin-top:1rem">Refresh</button>
+                        <div id="personasList" class="persona-items">
+                            <p class="loading">Loading...</p>
+                        </div>
+                        <button onclick="loadPersonasForAdmin()" class="btn btn-secondary"
+                            style="margin-top:1rem">Refresh</button>
                     </div>
                     <div class="persona-edit">
                         <div id="personaEditForm" style="display:none">
                             <h2 id="personaEditTitle">Edit Persona</h2>
-                            <div class="form-group"><label>Name</label><input type="text" id="personaName" class="form-control"></div>
+                            <div class="form-group"><label>Name</label><input type="text" id="personaName"
+                                    class="form-control"></div>
                             <div class="form-row">
-                                <div class="form-group"><label>Title</label><input type="text" id="personaTitle" class="form-control"></div>
-                                <div class="form-group"><label>Avatar</label><input type="text" id="personaAvatar" class="form-control" style="width:80px"></div>
+                                <div class="form-group"><label>Title</label><input type="text" id="personaTitle"
+                                        class="form-control"></div>
+                                <div class="form-group"><label>Avatar</label><input type="text" id="personaAvatar"
+                                        class="form-control" style="width:80px"></div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group"><label>Stage</label><select id="personaStage" class="form-control"><option value="precontemplation">Precontemplation</option><option value="contemplation">Contemplation</option><option value="preparation">Preparation</option><option value="action">Action</option><option value="maintenance">Maintenance</option></select></div>
-                                <div class="form-group"><label>Dialect</label><select id="personaDialect" class="form-control"><option value="RP">RP</option><option value="northern">Northern</option><option value="cockney">Cockney</option><option value="scottish">Scottish</option><option value="west_country">West Country</option></select></div>
+                                <div class="form-group"><label>Stage</label><select id="personaStage"
+                                        class="form-control">
+                                        <option value="precontemplation">Precontemplation</option>
+                                        <option value="contemplation">Contemplation</option>
+                                        <option value="preparation">Preparation</option>
+                                        <option value="action">Action</option>
+                                        <option value="maintenance">Maintenance</option>
+                                    </select></div>
+                                <div class="form-group"><label>Dialect</label><select id="personaDialect"
+                                        class="form-control">
+                                        <option value="RP">RP</option>
+                                        <option value="northern">Northern</option>
+                                        <option value="cockney">Cockney</option>
+                                        <option value="scottish">Scottish</option>
+                                        <option value="west_country">West Country</option>
+                                    </select></div>
                             </div>
-                            <div class="form-group"><label>Description</label><textarea id="personaDescription" class="form-control" rows="2"></textarea></div>
-                            <div class="form-group"><label>Core Identity</label><textarea id="personaCoreIdentity" class="form-control" rows="8"></textarea></div>
-                            <div class="form-group"><label>Behavior Guidelines</label><textarea id="personaGuidelines" class="form-control" rows="6"></textarea></div>
-                            <div class="form-group"><label>Opening Message</label><textarea id="personaOpening" class="form-control" rows="4"></textarea></div>
-                            <div class="form-group"><label>Ambivalence Points</label><div id="ambivalencePoints" class="tag-input-container"></div><div class="tag-input-add"><input type="text" id="newAmbivalencePoint" placeholder="Add point..." class="form-control"><button onclick="addAmbivalencePoint()" class="btn btn-secondary">Add</button></div></div>
-                            <div class="form-group"><label>Motivation Points</label><div id="motivationPoints" class="tag-input-container"></div><div class="tag-input-add"><input type="text" id="newMotivationPoint" placeholder="Add point..." class="form-control"><button onclick="addMotivationPoint()" class="btn btn-secondary">Add</button></div></div>
-                            <div class="form-actions"><button onclick="savePersona()" class="btn btn-primary">Save</button><button onclick="refreshPersonasCache()" class="btn btn-secondary">Refresh Cache</button></div>
+                            <div class="form-group"><label>Description</label><textarea id="personaDescription"
+                                    class="form-control" rows="2"></textarea></div>
+                            <div class="form-group"><label>Core Identity</label><textarea id="personaCoreIdentity"
+                                    class="form-control" rows="8"></textarea></div>
+                            <div class="form-group"><label>Behavior Guidelines</label><textarea id="personaGuidelines"
+                                    class="form-control" rows="6"></textarea></div>
+                            <div class="form-group"><label>Opening Message</label><textarea id="personaOpening"
+                                    class="form-control" rows="4"></textarea></div>
+                            <div class="form-group"><label>Ambivalence Points</label>
+                                <div id="ambivalencePoints" class="tag-input-container"></div>
+                                <div class="tag-input-add"><input type="text" id="newAmbivalencePoint"
+                                        placeholder="Add point..." class="form-control"><button
+                                        onclick="addAmbivalencePoint()" class="btn btn-secondary">Add</button></div>
+                            </div>
+                            <div class="form-group"><label>Motivation Points</label>
+                                <div id="motivationPoints" class="tag-input-container"></div>
+                                <div class="tag-input-add"><input type="text" id="newMotivationPoint"
+                                        placeholder="Add point..." class="form-control"><button
+                                        onclick="addMotivationPoint()" class="btn btn-secondary">Add</button></div>
+                            </div>
+                            <div class="form-actions"><button onclick="savePersona()"
+                                    class="btn btn-primary">Save</button><button onclick="refreshPersonasCache()"
+                                    class="btn btn-secondary">Refresh Cache</button></div>
                         </div>
-                        <div id="personaEmptyState" class="empty-state"><p>Select a persona to edit</p></div>
+                        <div id="personaEmptyState" class="empty-state">
+                            <p>Select a persona to edit</p>
+                        </div>
                     </div>
                 </div>
             </section>

@@ -755,3 +755,112 @@ textarea.form-control {
     color: #ecf0f1;
     margin-right: 1rem;
 }
+
+/* Activity Chart Styles */
+.activity-chart-container {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.activity-chart-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    height: 200px;
+    padding: 1rem 0;
+    border-bottom: 2px solid #e9ecef;
+    margin-bottom: 1rem;
+}
+
+.activity-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    max-width: 80px;
+}
+
+.activity-bar-stack {
+    display: flex;
+    flex-direction: column-reverse;
+    width: 40px;
+    height: 160px;
+    background: #f8f9fa;
+    border-radius: 4px 4px 0 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.activity-bar-segment {
+    width: 100%;
+    transition: height 0.3s ease;
+    min-height: 2px;
+}
+
+.activity-bar-segment.new-users {
+    background: #3498db;
+}
+
+.activity-bar-segment.modules-completed {
+    background: #27ae60;
+}
+
+.activity-bar-segment.practice-sessions {
+    background: #9b59b6;
+}
+
+.activity-day-label {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    text-align: center;
+}
+
+.activity-day-value {
+    font-size: 0.7rem;
+    color: #95a5a6;
+    margin-top: 0.25rem;
+}
+
+.activity-chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+}
+
+.legend-color.new-users {
+    background: #3498db;
+}
+
+.legend-color.modules-completed {
+    background: #27ae60;
+}
+
+.legend-color.practice-sessions {
+    background: #9b59b6;
+}
+
+.activity-chart-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: #7f8c8d;
+}
