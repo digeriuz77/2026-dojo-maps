@@ -267,6 +267,40 @@ async def get_dialogue_node(
             detail=f"Node {node_id} not found"
         )
 
+    # Check if this is an ending node and mark module complete if needed
+    if node.get('is_ending') and progress.get('status') != 'completed':
+        logger.info(f"[DIALOGUE] Module {module_id} ending node reached for user {current_user.user_id}, marking complete")
+        supabase_admin = get_supabase_admin()
+        
+        # Calculate completion score
+        nodes_completed = progress.get('nodes_completed', [])
+        total_nodes = len(dialogue_content.get('nodes', []))
+        completion_score = ScoringService.calculate_completion_score(
+            total_nodes=total_nodes,
+            nodes_completed=len(nodes_completed),
+            correct_choices=len(nodes_completed)
+        )
+        
+        # Update progress to completed
+        supabase_admin.table('user_progress').update({
+            'status': 'completed',
+            'completion_score': completion_score,
+            'completed_at': datetime.now(timezone.utc).isoformat()
+        }).eq('id', progress['id']).execute()
+        
+        # Update user profile modules_completed count
+        profile = await get_user_profile(current_user.user_id, supabase_admin)
+        if profile:
+            current_count = profile.get('modules_completed', 0)
+            supabase_admin.table('user_profiles').update({
+                'modules_completed': current_count + 1,
+                'last_active_at': datetime.now(timezone.utc).isoformat()
+            }).eq('user_id', current_user.user_id).execute()
+        
+        # Refresh progress data for response
+        progress['status'] = 'completed'
+        progress['completion_score'] = completion_score
+
     # Check if user can retry this node (has attempted before)
     nodes_completed = progress.get('nodes_completed', [])
     can_retry = node_id in nodes_completed
