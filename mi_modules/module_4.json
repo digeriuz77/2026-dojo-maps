@@ -76,7 +76,7 @@
             "text": "Those approaches did not really work for you.",
             "technique": "Reflection",
             "next_node_id": "exploring_approach",
-            "feedback": "Simple reflection that acknowledges their experience. Does not argue or direct."
+            "feedback": "Good - simple reflection that acknowledges their experience. Does not argue or direct."
           },
           {
             "text": "Maybe you just were not ready to change then.",
@@ -95,7 +95,7 @@
             "text": "So what would be different this time?",
             "technique": "Open question",
             "next_node_id": "curiosity",
-            "feedback": "Invites collaboration but does not address the concern directly. Gentle exploration."
+            "feedback": "Good - invites collaboration; does not address the concern directly. Gentle exploration."
           },
           {
             "text": "I am not here to tell you what to do. I want to understand your situation first.",
@@ -133,7 +133,7 @@
             "text": "So what would be different this time?",
             "technique": "Open question",
             "next_node_id": "curiosity",
-            "feedback": "Invites collaboration but does not address the concern directly."
+            "feedback": "Good - invites collaboration but does not address the concern directly."
           },
           {
             "text": "I am not here to tell you what to do. I want to understand your situation first.",
@@ -165,7 +165,7 @@
             "text": "You are uncertain what could help, and you have been through enough attempts that the uncertainty makes sense.",
             "technique": "Reflection",
             "next_node_id": "engagement",
-            "feedback": "Validates their uncertainty and connects it to their experience. This builds understanding."
+            "feedback": "Good - validates their uncertainty and connects it to their experience. This builds understanding."
           }
         ]
       },
@@ -191,7 +191,7 @@
             "text": "I can commit to that. No judgment, no directions. Just understanding.",
             "technique": "Commitment to boundaries",
             "next_node_id": "engagement",
-            "feedback": "Explicit agreement to their terms. This builds trust and shows respect."
+            "feedback": "Good - explicit agreement to their terms. This builds trust and shows respect."
           }
         ]
       },

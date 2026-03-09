@@ -1117,18 +1117,19 @@ function showFeedback(feedback, moduleId, dialogueContent) {
     const overlay = document.createElement('div');
     overlay.className = 'feedback-overlay';
 
-    const qualityLabel = feedback.quality_label || (isCorrect ? 'Good' : 'Ineffective');
+    const qualityLabel = feedback.quality_label || (isCorrect ? 'Good' : 'Could be stronger');
     const qualityClass = {
         'Effective': 'quality-excellent',
         'Good': 'quality-good',
-        'Ineffective': 'quality-poor'
+        'Ineffective': 'quality-poor',
+        'Could be stronger': 'quality-poor'
     }[qualityLabel] || 'quality-acceptable';
 
     overlay.innerHTML = `
         <div class="feedback-modal ${isCorrect ? 'feedback-correct' : 'feedback-incorrect'}">
             <div class="feedback-header">
                 <div class="feedback-icon">${isCorrect ? '✓' : '✗'}</div>
-                <h2 class="feedback-title">${isCorrect ? 'Good technique!' : 'Not Quite'}</h2>
+                <h2 class="feedback-title">${isCorrect ? 'Good technique!' : 'Something to work on'}</h2>
             </div>
 
             <div class="feedback-body">

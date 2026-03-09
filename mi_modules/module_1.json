@@ -44,7 +44,7 @@
             "text": "Things have changed and you are not sure if you can keep up.",
             "technique": "Reflection",
             "next_node_id": "deeper_explore",
-            "feedback": "Accurate reflection shows you are listening and understand. This builds trust and encourages deeper sharing."
+            "feedback": "Good - accurate reflection shows you are listening and understand. This builds trust and encourages deeper sharing."
           },
           {
             "text": "What specifically has changed with the workload?",
@@ -63,7 +63,7 @@
             "text": "You did not want to come and yet you are here. That takes something.",
             "technique": "Complex reflection + affirmation",
             "next_node_id": "engagement",
-            "feedback": "Notices the contradiction and affirms their effort. This builds alliance and acknowledges their autonomy."
+            "feedback": "Good - notices the contradiction and affirms their effort. This builds alliance and acknowledges their autonomy."
           },
           {
             "text": "I appreciate you taking the time. Maybe we can make this useful for you.",
@@ -82,7 +82,7 @@
             "text": "This is your time. What we talk about stays here.",
             "technique": "Establishing boundaries",
             "next_node_id": "skeptical",
-            "feedback": "Attempts to establish confidentiality but they may not believe yet. You may need to demonstrate trustworthiness through actions."
+            "feedback": "Good attempt to establish confidentiality; they may not believe yet. You may need to demonstrate trustworthiness through actions."
           }
         ]
       },
@@ -121,7 +121,7 @@
             "text": "You want to be respectful of your time while also getting support.",
             "technique": "Complex reflection",
             "next_node_id": "rapport_established",
-            "feedback": "Reflects both their concern and their openness. This validates their dilemma."
+            "feedback": "Good - reflects both their concern and their openness. This validates their dilemma."
           }
         ]
       },
@@ -147,7 +147,7 @@
             "text": "That is a fair concern. What would help you feel more comfortable?",
             "technique": "Reflection + collaborative question",
             "next_node_id": "engagement",
-            "feedback": "Validates their concern and invites them to set the terms. This demonstrates respect."
+            "feedback": "Good - validates their concern and invites them to set the terms. This demonstrates respect."
           },
           {
             "text": "I understand. This is a supportive space, not a reporting one.",

@@ -116,7 +116,7 @@ def is_correct_technique(choice: dict) -> bool:
             return True
         
         # Non-MI techniques return False
-        non_mi_annotations = ['non-mi', 'non-m i']
+        non_mi_annotations = ['non-mi', 'non-m i', 'non-impartial']
         if annotation in non_mi_annotations:
             return False
         
@@ -145,16 +145,20 @@ def is_correct_technique(choice: dict) -> bool:
 
 
 
+# Label for the lowest quality tier (soft language; avoids "unacceptable"/"ineffective")
+QUALITY_NEEDS_IMPROVEMENT = "Could be stronger"
+
+
 def determines_quality_label(choice: dict) -> str:
-    """Determine quality label for a choice using three-tier system: Effective, Good, Ineffective.
+    """Determine quality label for a choice using three-tier system: Effective, Good, Could be stronger.
     
     Logic (in order of priority):
-    1. Technique annotation: (Effective) → Effective, (Ineffective)/(Non-MI) → Ineffective
+    1. Technique annotation: (Effective) → Effective, (Ineffective)/(Non-MI) → Could be stronger
     2. Technique has '+' → Effective (combining techniques)
-    3. next_node_id contains 'poor' → Ineffective
+    3. next_node_id contains 'poor' → Could be stronger
     4. Feedback contains 'excellent', 'perfect', 'great' → Effective
     5. Feedback contains 'good' → Good
-    6. Otherwise → Ineffective
+    6. Otherwise → Could be stronger
     """
     technique = choice.get('technique', '')
     feedback = choice.get('feedback', '').lower()
@@ -167,8 +171,8 @@ def determines_quality_label(choice: dict) -> str:
         annotation = technique[annotation_start + 1:annotation_end].lower().strip()
         if annotation == 'effective':
             return 'Effective'
-        if annotation in ['ineffective', 'non-mi', 'non-m i', 'premature']:
-            return 'Ineffective'
+        if annotation in ['ineffective', 'non-mi', 'non-m i', 'non-impartial', 'premature']:
+            return QUALITY_NEEDS_IMPROVEMENT
     
     # Technique has '+' means combining multiple MI techniques (effective)
     if '+' in technique:
@@ -176,7 +180,7 @@ def determines_quality_label(choice: dict) -> str:
     
     # Check next_node_id for quality hints
     if 'poor' in next_node_id or 'wrong' in next_node_id:
-        return 'Ineffective'
+        return QUALITY_NEEDS_IMPROVEMENT
     
     # Check feedback for quality indicators
     if any(word in feedback for word in ['excellent', 'perfect', 'great job', 'outstanding']):
@@ -185,8 +189,8 @@ def determines_quality_label(choice: dict) -> str:
     if 'good' in feedback:
         return 'Good'
     
-    # Default to ineffective if none of the above
-    return 'Ineffective'
+    # Default when none of the above match
+    return QUALITY_NEEDS_IMPROVEMENT
 
 def evokes_change_talk(node: dict, choice: dict) -> bool:
     """Determine if a choice evokes change talk (simplified heuristic)"""
@@ -411,7 +415,7 @@ async def submit_choice(
 
     # Determine quality and correctness
     quality_label = determines_quality_label(selected_choice)
-    is_correct = quality_label != 'Ineffective'
+    is_correct = quality_label != QUALITY_NEEDS_IMPROVEMENT
     evoked_ct = evokes_change_talk(node, selected_choice)
 
     # Determine if first attempt
