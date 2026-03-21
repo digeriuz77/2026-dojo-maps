@@ -71,6 +71,14 @@ class Settings(BaseSettings):
             raise ValueError("SUPABASE_URL must start with http:// or https://")
         return v.rstrip("/")  # Remove trailing slash
 
+    @field_validator("SITE_URL", mode="before")
+    @classmethod
+    def validate_site_url(cls, v):
+        """Normalize SITE_URL by stripping trailing slash"""
+        if v:
+            return v.rstrip("/")
+        return v
+
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
     def parse_cors_origins(cls, v):

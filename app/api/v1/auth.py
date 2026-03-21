@@ -534,10 +534,10 @@ async def forgot_password(request: PasswordResetRequest):
 
         # Build the redirect URL for password reset
         # Use SITE_URL if set, otherwise construct from request
-        site_url = settings.SITE_URL or ""
+        site_url = (settings.SITE_URL or "").rstrip("/")
         if not site_url:
             # Fallback - this should be configured in production
-            site_url = "https://mi-learning-platform-production.up.railway.app"
+            site_url = "https://maps-coaching.up.railway.app"
         redirect_url = f"{site_url}/reset-password"
 
         logger.info(f"Sending password reset email to {request.email} with redirect URL: {redirect_url}")
