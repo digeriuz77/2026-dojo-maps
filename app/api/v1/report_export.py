@@ -49,7 +49,7 @@ def _generate_html_report(
         "Partnership": analysis.get("partnership_demonstrated", False),
         "Acceptance": analysis.get("acceptance_demonstrated", False),
         "Compassion": analysis.get("compassion_demonstrated", False),
-        "Evocation": analysis.get("evocation_democation_demonstrated", False),
+        "Evocation": analysis.get("evocation_demonstrated", False),
     }
 
     techniques_count = analysis.get("techniques_count", {})

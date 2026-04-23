@@ -303,21 +303,18 @@ async def end_chat_session(
             for msg in session_data["transcript"]
         ]
 
-        try:
-            analysis_id = save_conversation_analysis(
-                session_id=session_id,
-                analysis=analysis,
-                transcript=transcript,
-                persona_id=session_data.get("persona_id"),
-                persona_name=persona_name,
-                user_id=auth.user_id if auth else None,
-                total_turns=session_data["total_turns"],
-            )
+        analysis_id = save_conversation_analysis(
+            session_id=session_id,
+            analysis=analysis,
+            transcript=transcript,
+            persona_id=session_data.get("persona_id"),
+            persona_name=persona_name,
+            user_id=auth.user_id if auth else None,
+            total_turns=session_data["total_turns"],
+        )
 
-            if analysis_id:
-                await _update_user_profile_from_analysis(auth, analysis)
-        except Exception as e:
-            logger.error(f"Failed to save analysis to database: {e}", exc_info=True)
+        if analysis_id:
+            await _update_user_profile_from_analysis(auth, analysis)
 
         return ChatEndResponse(
             session_id=session_id,
@@ -461,22 +458,19 @@ async def analyze_transcript(
         )
 
         # Save analysis to database
-        try:
-            session_id = f"demo_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
-            analysis_id = save_conversation_analysis(
-                session_id=session_id,
-                analysis=analysis,
-                transcript=transcript,
-                persona_id=None,
-                persona_name=persona_name,
-                user_id=auth.user_id if auth else None,
-                total_turns=len([m for m in transcript if m.get("role") == "user"]),
-            )
-            if analysis_id:
-                logger.info(f"Analysis saved: {analysis_id}")
-                await _update_user_profile_from_analysis(auth, analysis)
-        except Exception as save_err:
-            logger.error(f"Failed to save analysis: {save_err}", exc_info=True)
+        demo_session_id = f"demo_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}"
+        analysis_id = save_conversation_analysis(
+            session_id=demo_session_id,
+            analysis=analysis,
+            transcript=transcript,
+            persona_id=None,
+            persona_name=persona_name,
+            user_id=auth.user_id if auth else None,
+            total_turns=len([m for m in transcript if m.get("role") == "user"]),
+        )
+        if analysis_id:
+            logger.info(f"Analysis saved: {analysis_id}")
+            await _update_user_profile_from_analysis(auth, analysis)
 
         return {
             "session_id": "demo",

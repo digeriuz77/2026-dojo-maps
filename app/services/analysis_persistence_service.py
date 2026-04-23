@@ -80,28 +80,9 @@ def save_conversation_analysis(
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
 
-        try:
-            result = (
-                supabase.table("conversation_analyses").insert(analysis_data).execute()
-            )
-        except Exception as database_error:
-            logger.error(
-                f"Database error during analysis insert: {database_error}",
-                exc_info=True,
-            )
-            if "conversation_id" in analysis_data:
-                del analysis_data["conversation_id"]
-                try:
-                    result = (
-                        supabase.table("conversation_analyses")
-                        .insert(analysis_data)
-                        .execute()
-                    )
-                except Exception as retry_error:
-                    logger.error(f"Retry also failed: {retry_error}", exc_info=True)
-                    return None
-            else:
-                return None
+        result = (
+            supabase.table("conversation_analyses").insert(analysis_data).execute()
+        )
 
         if result.data and len(result.data) > 0:
             analysis_id = result.data[0]["id"]
