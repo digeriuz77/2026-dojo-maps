@@ -113,6 +113,7 @@ class ConversationAnalysis(BaseModel):
         Dict[str, Any]
     ]  # [{"turn": 5, "moment": "description", "impact": "positive/negative"}]
     suggestions_for_next_time: List[str]
+    technique_balance: Optional[Dict[str, Any]] = None
 
 
 class ChatEndResponse(BaseModel):

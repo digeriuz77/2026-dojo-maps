@@ -17,7 +17,7 @@ MAX_ANALYSIS_HEAD_MESSAGES = 8
 MAX_ANALYSIS_TAIL_MESSAGES = 24
 MAX_ANALYSIS_CHARS_PER_MESSAGE = 220
 MAX_ANALYSIS_CONVERSATION_CHARS = 6500
-ANALYSIS_RESPONSE_MAX_TOKENS = 1200
+ANALYSIS_RESPONSE_MAX_TOKENS = 2000
 ALLOWED_CLIENT_MOVEMENT = {"toward_change", "stable", "away_from_change"}
 ALLOWED_KEY_MOMENT_IMPACT = {"positive", "negative", "neutral"}
 ALLOWED_TECHNIQUE_EFFECTIVENESS = {
@@ -286,7 +286,9 @@ def _normalize_analysis_payload(value: Any) -> Dict[str, Any]:
 
 def get_default_analysis(error_message: Optional[str] = None) -> Dict[str, Any]:
     """Public fallback analysis payload used when provider calls fail."""
-    return _normalize_analysis_payload(_get_default_analysis(error_message))
+    result = _normalize_analysis_payload(_get_default_analysis(error_message))
+    result["technique_balance"] = calculate_technique_balance(result["techniques_count"])
+    return result
 
 
 def _compact_message_text(text: str, limit: int = MAX_ANALYSIS_CHARS_PER_MESSAGE) -> str:
@@ -399,6 +401,7 @@ async def analyze_conversation(
 
     # Parse JSON from response
     analysis = _normalize_analysis_payload(_parse_analysis_json(response_text))
+    analysis["technique_balance"] = calculate_technique_balance(analysis["techniques_count"])
 
     return analysis
 
