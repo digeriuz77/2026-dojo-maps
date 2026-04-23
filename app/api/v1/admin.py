@@ -571,10 +571,6 @@ async def get_user_detailed_analytics(
         raise
     except Exception as e:
         logger.error(f"Error loading user analytics: {e}")
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error loading user analytics: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

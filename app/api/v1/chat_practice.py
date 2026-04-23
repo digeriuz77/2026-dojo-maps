@@ -296,6 +296,7 @@ async def end_chat_session(
             suggestions_for_next_time=analysis_result.get(
                 "suggestions_for_next_time", []
             ),
+            technique_balance=analysis_result.get("technique_balance"),
         )
 
         transcript = [
@@ -455,6 +456,7 @@ async def analyze_transcript(
             suggestions_for_next_time=analysis_result.get(
                 "suggestions_for_next_time", []
             ),
+            technique_balance=analysis_result.get("technique_balance"),
         )
 
         # Save analysis to database
