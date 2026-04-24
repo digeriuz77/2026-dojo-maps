@@ -17,7 +17,6 @@ MAX_ANALYSIS_HEAD_MESSAGES = 8
 MAX_ANALYSIS_TAIL_MESSAGES = 24
 MAX_ANALYSIS_CHARS_PER_MESSAGE = 220
 MAX_ANALYSIS_CONVERSATION_CHARS = 6500
-ANALYSIS_RESPONSE_MAX_TOKENS = 2000
 ALLOWED_CLIENT_MOVEMENT = {"toward_change", "stable", "away_from_change"}
 ALLOWED_KEY_MOMENT_IMPACT = {"positive", "negative", "neutral"}
 ALLOWED_TECHNIQUE_EFFECTIVENESS = {
@@ -373,7 +372,6 @@ async def analyze_conversation(
         ],
         "temperature": 0.2,
         "top_p": 0.9,
-        "max_tokens": ANALYSIS_RESPONSE_MAX_TOKENS,
         "response_format": {"type": "json_object"},
     }
 
