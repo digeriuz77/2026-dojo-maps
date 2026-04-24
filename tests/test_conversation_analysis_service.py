@@ -130,7 +130,7 @@ async def test_analyze_conversation_uses_capped_output_tokens():
             )
 
     assert result["overall_score"] == 4.0
-    assert captured["payload"]["max_tokens"] == analysis_service.ANALYSIS_RESPONSE_MAX_TOKENS
+    assert "max_tokens" not in captured["payload"]
     assert captured["payload"]["messages"][0]["content"] == analysis_service.ANALYSIS_SYSTEM_PROMPT
     assert "Transcript:" in captured["payload"]["messages"][1]["content"]
 
